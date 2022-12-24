@@ -3,7 +3,7 @@ name = "mji-craftwork"
 version = "0.1.0"
 authors = ["Jim Jiang <jim@lotlab.org>"]
 edition = "2018"
-description = "FinalFantasy XIV island sanction craftwork solver"
+description = "FinalFantasy XIV island sanctuary craftwork solver"
 repository = "https://github.com/Lotlab/ffxiv-mji-craftwork"
 license = "apache2"
 

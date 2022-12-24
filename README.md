@@ -1,4 +1,4 @@
-# FFXIV Island Sanction Craftworks
+# FFXIV Island Sanctuary Craftworks
 
 ## Rust wasm core (mji-craftwork)
 
