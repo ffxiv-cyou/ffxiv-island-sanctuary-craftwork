@@ -1,0 +1,24 @@
+icon.mji {
+    --width: 40px;
+    width: var(--width);
+    height: 40px;
+    display: inline-block;
+    vertical-align: bottom;
+    background-image: url("./mjicraftdemandresearch_hr1.png");
+}
+
+icon.mji-box {
+    background-position: -0px -0px;
+}
+icon.mji-popular-3 {
+    background-position: -40px -0px;
+}
+icon.mji-popular-2 {
+    background-position: -80px -0px;
+}
+icon.mji-popular-1 {
+    background-position: -120px -0px;
+}
+icon.mji-popular-4 {
+    background-position: -160px -0px;
+}
