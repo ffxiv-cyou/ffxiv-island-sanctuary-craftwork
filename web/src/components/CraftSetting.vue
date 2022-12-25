@@ -2,32 +2,31 @@
   <div>
     <form class="pure-form pure-form-stacked pure-g compat-setting">
       <legend>基础设置</legend>
-      <fieldset class="pure-u-1-4">
-        <label for="level">开拓等级</label>
-        <input id="level" type="number" min=1 max=10 placeholder="1-10" v-model="level" />
-      </fieldset>
-      <fieldset class="pure-u-1-4">
-        <label for="craft-level">工坊等级</label>
-        <input id="craft-level" type="number" min=1 max=3 placeholder="1-3" v-model="craft_level" />
-      </fieldset>
-      <fieldset class="pure-u-1-4">
-        <label for="tension">当前干劲</label>
-        <input id="tension" type="number" min=0 max=35 placeholder="" v-model="tension" />
-      </fieldset>
-      <fieldset class="pure-u-1-4">
-        <label for="max-tension">最大干劲</label>
-        <input id="max-tension" type="number" min=0 max=35 placeholder="" v-model="max_tension" />
+      <div class="form-label pure-g">
+        <span class="pure-u-1-4" for="level">开拓等级</span>
+        <span class="pure-u-1-4" for="craft-level">工坊等级</span>
+        <span class="pure-u-1-4" for="tension">当前干劲</span>
+        <span class="pure-u-1-4" for="max-tension">最大干劲</span>
+      </div>
+      <fieldset class="pure-g">
+        <input class="pure-u-1-4" id="level" type="number" min=1 max=10 placeholder="1-10" v-model="level" />
+        <input class="pure-u-1-4" id="craft-level" type="number" min=1 max=3 placeholder="1-3" v-model="craft_level" />
+        <input class="pure-u-1-4" id="tension" type="number" min=0 max=35 placeholder="" v-model="tension" />
+        <input class="pure-u-1-4" id="max-tension" type="number" min=0 max=35 placeholder="" v-model="max_tension" />
       </fieldset>
     </form>
     <form class="pure-form pure-form-stacked pure-g">
       <legend>配方设置</legend>
-      <fieldset class="pure-u-1-4">
-        <label for="pop-pattern">流行模式</label>
-        <input id="pop-pattern" type="number" min=1 max=101 v-model="pop_pattern" />
-      </fieldset>
-      <fieldset class="pure-u-3-4">
-        <label for="data_pack">数据包</label>
-        <input id="data_pack" type="text" min=1 max=10 placeholder="填写抓包得到的数据" v-model="data_pack" />
+      <div class="form-label pure-g">
+        <span class="pure-u-1-4" for="pop-pattern">流行模式</span>
+        <span class="pure-u-1-2" for="data-pack">数据包</span>
+      </div>
+      <fieldset class="pure-g">
+        <input class="pure-u-1-4" id="pop-pattern" type="number" min=1 max=100 v-model="pop_pattern" />
+        <input class="pure-u-1-2" id="data_pack" type="text" min=1 max=10 placeholder="填写抓包得到的数据" v-model="data_pack" />
+        <div class="pure-u-1-4">
+          <button class="pure-button">高级</button>
+        </div>
       </fieldset>
     </form>
     <div class="objects-header pure-g">
@@ -50,21 +49,9 @@
           <option>3</option>
           <option>4</option>
         </select>
-
-        <select class="item-demand pure-u-1-5" id="stacked-state">
-            <option>2F</option>
-            <option>2P</option>
-            <option>3F</option>
-            <option>3P</option>
-            <option>4F</option>
-            <option>4P</option>
-            <option>5F</option>
-            <option>5P</option>
-            <option>6F</option>
-            <option>6P</option>
-            <option>7F</option>
-            <option>7P</option>
-        </select>
+        <span class="item-demand pure-u-1-5">
+          <input type="checkbox" />
+        </span>
       </div>
     </div>
   </div>
@@ -82,6 +69,7 @@ export default class CraftSetting extends Vue {
   craft_level: number = 2;
   tension: number = 0;
   max_tension: number = 30;
+  workers: number = 1;
   pop_pattern: number = 1;
   data_pack: string = "";
   demands: number[] = [];
@@ -137,7 +125,7 @@ export default class CraftSetting extends Vue {
   @Watch("craft_level")
   onPropChange() {
     if (this.solver)
-      this.solver.setInfo(this.tension, this.max_tension, this.craft_level - 1);
+      this.solver.setInfo(this.tension, this.max_tension, this.craft_level - 1, this.workers);
   }
 
   @Watch("level")
@@ -158,7 +146,9 @@ export default class CraftSetting extends Vue {
 input {
   width: 100%;
 }
-
+.form-label {
+  width: 100%;
+}
 .object-item {
   height: 36px;
   line-height: 36px;

@@ -19,17 +19,22 @@ pub struct CraftworkInfo {
     pub max_tension: u8,
     /// 当前工坊等级，取值为0-2
     pub level: u8,
+    /// 每次连击增加的干劲
+    pub tension_add: u8
 }
 
 #[wasm_bindgen]
 impl CraftworkInfo {
     /// 工坊状态
+    /// 
+    /// workers 表示同时运行多少个当前队列，一般为1或3。此参数影响连击干劲增加量
     #[wasm_bindgen(constructor)]
-    pub fn new(tension: u8, max_tension: u8, level: u8) -> Self {
+    pub fn new(tension: u8, max_tension: u8, level: u8, workers: u8) -> Self {
         CraftworkInfo {
             tension,
             max_tension,
             level,
+            tension_add: workers
         }
     }
 }
@@ -43,9 +48,10 @@ impl CraftworkInfo {
     /// 增加一点干劲
     pub fn next(self) -> Self {
         CraftworkInfo {
-            tension: u8::saturating_add(self.tension, 1),
+            tension: u8::saturating_add(self.tension, self.tension_add),
             max_tension: self.max_tension,
             level: self.level,
+            tension_add: self.tension_add
         }
     }
 }

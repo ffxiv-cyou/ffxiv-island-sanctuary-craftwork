@@ -31,7 +31,7 @@ export class SolverProxy {
             }
 
             this.repo = init_repo(recipe, pops, cols);
-            this.info = new CraftworkInfo(0, 30, 2);
+            this.info = new CraftworkInfo(0, 30, 2, 1);
         }).catch((e) => {
             throw e;
         });
@@ -54,8 +54,8 @@ export class SolverProxy {
         set_demands(this.repo, demands);
     }
 
-    setInfo(tension: number, maxTension: number, level: number) {
-        this.info = new CraftworkInfo(tension, maxTension, level);
+    setInfo(tension: number, maxTension: number, level: number, workers: number) {
+        this.info = new CraftworkInfo(tension, maxTension, level, workers);
     }
 
     setPopularityPattern(index: number) {

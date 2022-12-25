@@ -33,7 +33,7 @@ mod tests {
 
     #[test]
     fn test_simulate() {
-        let info = CraftworkInfo::new(10, 10, 2);
+        let info = CraftworkInfo::new(10, 10, 2, 1);
         let recipe = &Recipe{
             id: 1,
             theme1: 0,

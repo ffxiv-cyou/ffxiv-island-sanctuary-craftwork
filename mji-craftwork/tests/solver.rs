@@ -75,13 +75,13 @@ fn init_test() {
     let mut repo = load_data_init();
     load_test_demand(&mut repo);
     
-    solve_singleday(&repo, &CraftworkInfo::new(0, 30, 1), 10, vec![]);
+    solve_singleday(&repo, &CraftworkInfo::new(0, 30, 1, 1), 10, vec![]);
 }
 
 #[test]
 fn predict() {
     let repo = load_data::<51>();
-    let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1));
+    let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
     let empty= vec![];
     let limit = SolveLimit::new(10, &empty);
     let result = solver.solve(&limit);
@@ -96,7 +96,7 @@ fn simulator() {
     let mut repo = load_data_init();
     load_test_demand(&mut repo);
 
-    let state = CraftworkInfo::new(0, 35, 1);
+    let state = CraftworkInfo::new(0, 35, 1, 1);
     let arr = vec![13, 23, 13, 23];
     let result = simulate(&repo, &state, arr);
     println!("{:?}", result);
