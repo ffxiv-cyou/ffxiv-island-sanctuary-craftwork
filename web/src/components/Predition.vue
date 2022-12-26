@@ -1,7 +1,10 @@
 <template>
   <div class="predition">
     <button class="close-btn" @click="close">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
+        <path
+          d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z" />
+      </svg>
     </button>
     <div class="pure-g">
       <div class="pure-form pure-u-1-2">
@@ -52,7 +55,8 @@
           </select>
         </span>
         <span class="recipe-demand pure-u-1-12" v-for="(day) in 7">
-          <icon class="mji mji-box" v-for="() in getDemand(item.Id, day)" />
+          <icon class="mji mji-box" v-for="() in getDemandIcons(item.Id, day)" />
+          <span>({{ getDemand(item.Id, day) }})</span>
         </span>
       </div>
     </div>
@@ -62,7 +66,7 @@
 import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
 import CraftObjects from "@/data/MJICraftworksObject.json";
-import { CraftworkData, CraftworkObject, Utils } from "@/model/data";
+import { CraftworkData, CraftworkObject, DemandUtils, Utils } from "@/model/data";
 import { FromShareCode, ToShareCode, Compress } from "@/model/share";
 
 @Component({
@@ -118,6 +122,9 @@ export default class Predition extends Vue {
 
     return this.cachedDemands[day - 1][id];
   }
+  getDemandIcons(id: number, day: number) {
+    return DemandUtils.GetDemand(this.getDemand(id, day));
+  }
 
   close() {
     this.$emit("close");
@@ -156,30 +163,9 @@ export default class Predition extends Vue {
 
     this.demandPattern = this.solver.predictFromPackets(dataArray);
   }
-
-  benchmark() {
-    let array = new Uint8Array(128);
-    for (let i = 0; i < array.length; i++) {
-      array[i] = Math.floor(Math.random() * 15);
-    }
-    let array2 = new Uint8Array(array.length / 2);
-    for (let i = 0; i < array2.length; i++) {
-      array2[i] = array[i * 2] + (array[i * 2 + 1] << 4);
-    }
-
-    let arr1 = Compress(array);
-    let arr2 = Compress(array2);
-    let raw = ToShareCode(array2);
-
-    console.log(arr1, arr2, raw);
-  }
-
-  mounted() {
-    this.benchmark();
-  }
 }
 </script>
-<style>
+<style scoped>
 .predition {
   display: flex;
   flex-direction: column;
@@ -191,6 +177,7 @@ export default class Predition extends Vue {
   position: absolute;
   right: 10px;
 }
+
 .close-btn {
   width: 24px;
   height: 24px;

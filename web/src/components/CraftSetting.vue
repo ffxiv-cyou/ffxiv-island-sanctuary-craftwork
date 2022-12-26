@@ -27,31 +27,29 @@
       </fieldset>
     </div>
     <div class="objects-header pure-g">
-      <span class="item-name pure-u-2-5">产品名</span>
-      <span class="item-pop pure-u-1-5">欢迎度</span>
-      <span class="item-demand pure-u-1-5">需求</span>
-      <span class="item-demand pure-u-1-5">禁用</span>
+      <span class="item-name pure-u-7-24">产品名</span>
+      <span class="item-pop pure-u-5-24">欢迎度</span>
+      <span class="item-demand pure-u-3-8">需求</span>
+      <span class="item-demand pure-u-1-8">禁用</span>
     </div>
     <div class="objects">
       <div class="object-item pure-form pure-g" v-for="(item, index) in objects">
-        <span class="item-name pure-u-2-5">{{ trimName(item.Name) }}</span>
-        <span class="item-pop pure-u-1-5">
-          <icon class="mji" :class="popularity(item.Id)"/>
+        <span class="item-name pure-u-1-3">{{ trimName(item.Name) }}</span>
+        <span class="item-pop pure-u-3-24">
+          <icon class="mji" :class="popularity(item.Id)" />
         </span>
-        <select class="item-demand pure-u-1-5" id="stacked-state" v-model.number="demands[item.Id]" @change="onDemandChange">
-          <option>0</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-        </select>
-        <span class="item-demand pure-u-1-5">
-          <input type="checkbox" v-model="ban_states[item.Id]"/>
+        <span class="item-demand pure-u-5-24">
+          <icon class="mji mji-box" v-for="() in getDemandBox(demands[item.Id])" />
+        </span>
+        <input class="item-demand pure-u-5-24" type="number" placeholder="需求" v-model.number="demands[item.Id]"
+          @change="onDemandChange" />
+        <span class="pure-u-3-24">
+          <input type="checkbox" v-model="ban_states[item.Id]" />
         </span>
       </div>
     </div>
     <div class="predition_page" v-show="show_pred">
-      <predition :solver="solver" @close="togglePred"/>
+      <predition :solver="solver" @close="togglePred" />
     </div>
   </div>
 </template>
@@ -62,7 +60,7 @@ import CraftObjects from "@/data/MJICraftworksObject.json";
 import Popularity from "@/data/MJICraftworksPopularity.json";
 import type { SolverProxy } from "@/model/solver";
 import Predition from "./Predition.vue";
-import { CraftworkData } from "@/model/data";
+import { CraftworkData, DemandUtils } from "@/model/data";
 
 @Component({
   components: {
@@ -125,12 +123,12 @@ export default class CraftSetting extends Vue {
   }
 
   mounted() {
-    while(this.demands.length < CraftObjects.length)
+    while (this.demands.length < CraftObjects.length)
       this.demands.push(2);
   }
 
   togglePred() {
-    this.show_pred=!this.show_pred;
+    this.show_pred = !this.show_pred;
     return true;
   }
 
@@ -145,17 +143,18 @@ export default class CraftSetting extends Vue {
   @Watch("data_pack")
   onDataPackChange(val: string) {
     if (val.length != 128) return;
-    for (let i = 0; i < val.length; i+=2) {
-      let datum = parseInt(val.substring(i, i+2), 16);
+    for (let i = 0; i < val.length; i += 2) {
+      let datum = parseInt(val.substring(i, i + 2), 16);
       if (i == 0) {
         this.pop_pattern = datum + 1;
       }
       if (i >= 4) {
         let id = (i - 4) / 2;
-        if (this.demands.length <= id){
-          this.demands.push(datum >> 4);
+        let d = DemandUtils.FromDemand(datum >> 4);
+        if (this.demands.length <= id) {
+          this.demands.push(d);
         } else {
-          this.demands[id] = datum >> 4;
+          this.demands[id] = d;
         }
       }
     }
@@ -168,6 +167,10 @@ export default class CraftSetting extends Vue {
     if (this.solver)
       this.solver.updateDemand();
     console.log(this.demands);
+  }
+
+  getDemandBox(val: number) {
+    return DemandUtils.GetDemand(val);
   }
 
   @Watch("pop_pattern")
@@ -195,14 +198,17 @@ export default class CraftSetting extends Vue {
 input {
   width: 100%;
 }
+
 .form-label {
   width: 100%;
 }
+
 .object-item {
   height: 36px;
   line-height: 36px;
   margin-right: 2px;
 }
+
 .objects-header {
   height: 20px;
   line-height: 20px;
@@ -210,9 +216,11 @@ input {
   margin-bottom: 5px;
   margin-right: 10px;
 }
+
 .item-pop,
 .item-demand {
   text-align: center;
+  overflow: hidden;
 }
 
 .objects {
@@ -220,10 +228,16 @@ input {
   max-height: 100%;
   scrollbar-width: thin;
 }
-.object-item icon{
+
+.object-item icon {
   transform: scale(.6);
   margin: -4px 0 0 -8px;
 }
+
+.mji-box+.mji-box {
+  margin-left: -28px !important;
+}
+
 .predition_page {
   position: absolute;
   left: 0;

@@ -50,7 +50,7 @@ export class SolverProxy {
     /**
      * 同时运行的工房数量（1-3）
      */
-    public workers: number = 1;
+    public workers: number = 3;
 
     constructor() {
         init().then(() => {
@@ -86,20 +86,11 @@ export class SolverProxy {
     }
 
     /**
-     * 从网络数据包中获取当前信息
-     * @param data 数据包
-     */
-    setFromPacket(data: Uint8Array) {
-        this.setPopularityPattern(data[0] + 1);
-        set_demands(this.repo, data.slice(2));
-    }
-
-    /**
      * 设置当前的需求
      * @param array 需求表
      */
     setDemand(array: number[]) {
-        let demands = new Uint8Array(array.length);
+        let demands = new Int8Array(array.length);
         for (let i = 0; i < demands.length; i++) {
             demands[i] = array[i];
         }

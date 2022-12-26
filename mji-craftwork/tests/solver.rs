@@ -33,10 +33,7 @@ fn load_data<const T: usize>() -> GameDataRepo {
     repo.set_popular_pattern(current_pop as usize);
     // let next_pop = DEMAND_LIST[1];
 
-    let mut demands : Vec<Demand> = vec![];
-    for i in 0..T {
-        demands.push((DEMAND_LIST[i + 2] >> 4).into());
-    }
+    let demands = vec![9; T];
     repo.set_demands(&demands);
     repo
 }
@@ -63,10 +60,7 @@ fn load_data_init() -> GameDataRepo {
 }
 
 fn load_test_demand(repo: &mut GameDataRepo) {
-    let mut demands : Vec<u8> = vec![];
-    for i in 0..62 {
-        demands.push(DEMAND_LIST[i + 2] >> 4);
-    }
+    let demands = vec![9; 62];
     set_demands(repo, &demands);
 }
 

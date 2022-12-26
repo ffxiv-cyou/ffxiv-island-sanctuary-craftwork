@@ -1,6 +1,9 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 /// 市场需求
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[wasm_bindgen]
 pub enum Demand {
     /// 严重供少于求
     VeryHigh,
@@ -86,7 +89,8 @@ impl From<Demand> for u8 {
 
 /// 需求变化量
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[wasm_bindgen]
 pub enum DemandChange {
     /// 需求大幅降低
     MassiveDecrease,
@@ -98,6 +102,40 @@ pub enum DemandChange {
     Increase,
     /// 需求大幅增加
     MassiveIncrease,
+}
+
+impl DemandChange {
+    /// 真实需求值上限，包括本数
+    pub fn upper_bound(&self) -> i16 {
+        match self {
+            DemandChange::MassiveIncrease => i16::MAX,
+            DemandChange::Increase => 5,
+            DemandChange::Equal => 1,
+            DemandChange::Decerease => -2,
+            DemandChange::MassiveDecrease => -6,
+        }
+    }
+    /// 真实需求值下限，包括本数
+    pub fn lower_bound(&self) -> i16 {
+        match self {
+            DemandChange::MassiveIncrease => 5,
+            DemandChange::Increase => 2,
+            DemandChange::Equal => -1,
+            DemandChange::Decerease => -5,
+            DemandChange::MassiveDecrease => -999,
+        }
+    }
+
+    /// 根据真实需求值映射到区间
+    pub fn from_val(val: i16) -> Self {
+        match val {
+            5..=i16::MAX => Self::MassiveIncrease,
+            2..=4 => Self::Increase,
+            -1..=1 => Self::Equal,
+            -5..=-2 => Self::Decerease,
+            i16::MIN..=-6 => Self::MassiveDecrease
+        }
+    }
 }
 
 impl From<u8> for DemandChange {

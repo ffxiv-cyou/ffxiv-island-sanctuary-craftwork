@@ -2,50 +2,35 @@ use crate::data::{Demand, DemandChange};
 
 use super::DemandPattern;
 
-/// 各种Pattern的需求表
-const DEMAND_TABLE: [[u8; 7]; 12] = [
-    [1, 0, 2, 2, 2, 2, 2],
-    [1, 1, 2, 2, 2, 2, 2],
-    [2, 1, 0, 2, 2, 2, 2],
-    [2, 1, 1, 2, 2, 2, 2],
-    [2, 2, 1, 0, 2, 2, 2],
-    [2, 2, 1, 1, 2, 2, 2],
-    [2, 2, 2, 1, 0, 2, 2],
-    [2, 2, 2, 1, 1, 2, 2],
-    [2, 1, 2, 2, 1, 0, 2],
-    [2, 1, 2, 2, 1, 1, 2],
-    [2, 1, 2, 2, 2, 1, 0],
-    [2, 1, 2, 2, 2, 1, 1],
-];
-/// 各种Pattern的变化表
-const CHANGE_TABLE: [[u8; 7]; 12] = [
-    [2, 4, 0, 2, 2, 2, 2],
-    [2, 3, 0, 2, 2, 2, 2],
-    [2, 4, 4, 0, 2, 2, 2],
-    [2, 3, 3, 0, 2, 2, 2],
-    [2, 2, 4, 4, 0, 2, 2],
-    [2, 2, 3, 3, 0, 2, 2],
-    [2, 2, 2, 4, 4, 0, 2],
-    [2, 2, 2, 3, 3, 0, 2],
-    [2, 2, 0, 4, 4, 4, 0],
-    [2, 2, 1, 3, 3, 3, 0],
-    [2, 2, 0, 2, 4, 4, 4],
-    [2, 2, 0, 3, 3, 3, 3],
+/// 真实需求表
+const REAL_DEMAND_TABLE: [[i8; 7]; 12] = [
+    [17, 25, 9, 9, 9, 9, 9],
+    [13, 17, 9, 9, 9, 9, 9],
+    [9, 17, 25, 9, 9, 9, 9],
+    [9, 13, 17, 9, 9, 9, 9],
+    [9, 9, 17, 25, 9, 9, 9],
+    [9, 9, 13, 17, 9, 9, 9],
+    [9, 9, 9, 17, 25, 9, 9],
+    [9, 9, 9, 13, 17, 9, 9],
+    [9, 10, 2, 9, 17, 25, 9],
+    [9, 10, 5, 9, 13, 17, 9],
+    [9, 10, 2, 2, 9, 17, 25],
+    [9, 10, 2, 5, 9, 13, 17],
 ];
 
 /// 根据指定的pattern获取需求
-pub fn get_demand(pattern: DemandPattern, day: u8, _offset: u8) -> Demand {
+pub fn get_demand(pattern: DemandPattern, day: u8, _offset: u8) -> i8 {
     if day >= 7 || pattern == DemandPattern::Unknown {
-        return Demand::Average;
+        return 9;
     }
 
     let index: u8 = pattern.into();
     let index = (index as usize) - 1;
-    DEMAND_TABLE[index][day as usize].into()
+    REAL_DEMAND_TABLE[index][day as usize].into()
 }
 
 /// 根据变动Pattern获取需求
-pub fn get_demands(pattern: &[DemandPattern], day: u8) -> Vec<Demand> {
+pub fn get_demands(pattern: &[DemandPattern], day: u8) -> Vec<i8> {
     let mut demands = vec![];
     for p in pattern {
         demands.push(get_demand(*p, day, 0));
@@ -84,8 +69,13 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
             if !candidates[j] {
                 continue;
             }
-            if DEMAND_TABLE[j][i] != demand.into() || CHANGE_TABLE[j][i] != change.into() {
+            if Demand::from_val(REAL_DEMAND_TABLE[j][i] as i16) != demand {
                 candidates[j] = false;
+            } else if i > 0 {
+                let delta = REAL_DEMAND_TABLE[j][i] - REAL_DEMAND_TABLE[j][i - 1];
+                if DemandChange::from_val(delta as i16) != change {
+                    candidates[j] = false;
+                }
             }
         }
 

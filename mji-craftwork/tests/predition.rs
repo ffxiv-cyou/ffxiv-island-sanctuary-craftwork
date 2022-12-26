@@ -24,6 +24,6 @@ pub fn demand() {
     ];
     let result = pattern_demand(&vec, 2);
     assert_eq!(result.len(), 2);
-    assert_eq!(result[0], Demand::VeryHigh.into());
-    assert_eq!(result[1], Demand::High.into());
+    assert_eq!(Demand::from_val(result[0] as i16), Demand::VeryHigh.into());
+    assert_eq!(Demand::from_val(result[1] as i16), Demand::High.into());
 }

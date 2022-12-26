@@ -61,14 +61,10 @@ pub fn set_pattern(repo: &mut GameDataRepo, pattern: usize) {
 
 /// 设置需求状况
 ///
-/// 传入一个uint8_t数组，表示各产物的需求状况
+/// 传入一个int8_t数组，表示各产物的需求状况
 #[wasm_bindgen]
-pub fn set_demands(repo: &mut GameDataRepo, data: &[u8]) {
-    let mut array = Vec::<Demand>::new();
-    for &d in data {
-        array.push(d.into())
-    }
-    repo.set_demands(&array)
+pub fn set_demands(repo: &mut GameDataRepo, data: &[i8]) {
+    repo.set_demands(&data)
 }
 
 /// 模拟排班表
@@ -145,7 +141,7 @@ pub fn pattern_predict(array: &[u8], days : usize) -> Vec<u8> {
 /// 
 /// day从0开始
 #[wasm_bindgen]
-pub fn pattern_demand(array: &[u8], day: u8) -> Vec<u8> {
+pub fn pattern_demand(array: &[u8], day: u8) -> Vec<i8> {
     let mut pats = vec![];
     for &i in array {
         pats.push(i.into());

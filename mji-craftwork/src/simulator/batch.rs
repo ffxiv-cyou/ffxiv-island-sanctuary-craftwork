@@ -56,6 +56,20 @@ impl Batch {
         ret
     }
 
+    /// 获取指定物品的产量
+    pub fn get_produce(&self, id: u16) -> u8 {
+        let mut count = 0;
+        for i in 0..self.seq {
+            if self.steps[i] == id {
+                count += match i {
+                    0 => 1,
+                    _ => 2,
+                }
+            }
+        }
+        return count
+    }
+
     pub fn get_time(&self) -> u16 {
         self.time
     }

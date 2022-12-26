@@ -59,7 +59,8 @@ impl<'a, T> BFSolver<'a, T> where T: IDataRepo {
             last.id != r.id
             },
             |r, s| {
-                let val = simulate(&info, &s);
+                let demand_sub = current.get_produce(s.id()) * info.workers;
+                let val = simulate(&info, &s, demand_sub);
                 let current = current.push(r.id, val, r.craft_time as u16);
 
                 if current.get_time() > 20 {

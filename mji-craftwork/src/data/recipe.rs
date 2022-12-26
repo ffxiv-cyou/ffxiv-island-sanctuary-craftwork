@@ -36,12 +36,12 @@ pub struct RecipeState {
     id: u16,
     value: u16,
     time: u8,
-    demand: Demand,
+    demand: i8,
     popularity: Popularity,
 }
 
 impl RecipeState {
-    pub fn new(recipe: &Recipe, demand: Demand, popularity: Popularity) -> Self {
+    pub fn new(recipe: &Recipe, demand: i8, popularity: Popularity) -> Self {
         Self {
             id: recipe.id,
             value: recipe.value,
@@ -50,8 +50,8 @@ impl RecipeState {
             popularity,
         }
     }
-    pub fn factor(&self) -> f32 {
-        (self.demand.factor() as u16 * self.popularity.factor() as u16) as f32 / 10000f32
+    pub fn factor(&self, demand_sub: i16) -> f32 {
+        (Demand::from_val(self.demand as i16 - demand_sub).factor() as u16 * self.popularity.factor() as u16) as f32 / 10000f32
     }
     pub fn value(&self) -> u16 {
         self.value
