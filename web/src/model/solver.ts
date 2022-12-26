@@ -75,6 +75,7 @@ export class SolverProxy {
             }
 
             this.repo = init_repo(recipe, pops, cols);
+            this.setPopularityPattern(1);
         }).catch((e) => {
             throw e;
         });
@@ -89,7 +90,7 @@ export class SolverProxy {
      * @param data 数据包
      */
     setFromPacket(data: Uint8Array) {
-        this.setPopularityPattern(data[0]);
+        this.setPopularityPattern(data[0] + 1);
         set_demands(this.repo, data.slice(2));
     }
 

@@ -96,10 +96,10 @@ export default class CraftSetting extends Vue {
   }
 
   get craft_level() {
-    return this.solver.craftLevel;
+    return this.solver.craftLevel + 1;
   }
   set craft_level(val: number) {
-    this.solver.craftLevel = val;
+    this.solver.craftLevel = val - 1;
   }
 
   get tension() {
@@ -148,7 +148,7 @@ export default class CraftSetting extends Vue {
     for (let i = 0; i < val.length; i+=2) {
       let datum = parseInt(val.substring(i, i+2), 16);
       if (i == 0) {
-        this.pop_pattern = datum;
+        this.pop_pattern = datum + 1;
       }
       if (i >= 4) {
         let id = (i - 4) / 2;
