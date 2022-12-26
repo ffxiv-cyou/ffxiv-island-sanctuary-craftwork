@@ -1,7 +1,7 @@
 <template>
   <div>
     <form class="pure-form pure-form-stacked pure-g compat-setting">
-      <legend>基础设置</legend>
+      <legend>设置</legend>
       <div class="form-label pure-g">
         <span class="pure-u-1-4" for="level">开拓等级</span>
         <span class="pure-u-1-4" for="craft-level">工坊等级</span>
@@ -15,34 +15,30 @@
         <input class="pure-u-1-4" id="max-tension" type="number" min=0 max=35 placeholder="" v-model="max_tension" />
       </fieldset>
     </form>
-    <form class="pure-form pure-form-stacked pure-g">
-      <legend>配方设置</legend>
+    <div class="pure-form pure-form-stacked pure-g">
       <div class="form-label pure-g">
         <span class="pure-u-1-4" for="pop-pattern">流行模式</span>
-        <span class="pure-u-1-2" for="data-pack">数据包</span>
+        <span class="pure-u-3-4" for="data-pack" title="从数据包解析当前需求和欢迎度">自动解析</span>
       </div>
       <fieldset class="pure-g">
         <input class="pure-u-1-4" id="pop-pattern" type="number" min=1 max=100 v-model="pop_pattern" />
-        <input class="pure-u-1-2" id="data_pack" type="text" min=1 max=10 placeholder="填写抓包得到的数据" v-model="data_pack" />
-        <div class="pure-u-1-4">
-          <button class="pure-button">高级</button>
-        </div>
+        <input class="pure-u-5-12" id="data_pack" type="text" placeholder="抓包数据" v-model="data_pack" />
+        <button class="pure-u-1-3 pure-button" style="margin: 0.25em 0;" @click="togglePred">需求趋势</button>
       </fieldset>
-    </form>
+    </div>
     <div class="objects-header pure-g">
       <span class="item-name pure-u-2-5">产品名</span>
       <span class="item-pop pure-u-1-5">欢迎度</span>
       <span class="item-demand pure-u-1-5">需求</span>
-      <span class="item-demand pure-u-1-5">模式</span>
+      <span class="item-demand pure-u-1-5">禁用</span>
     </div>
     <div class="objects">
       <div class="object-item pure-form pure-g" v-for="(item, index) in objects">
-        <!-- <span class="item-id">{{ item.Id }}</span> -->
         <span class="item-name pure-u-2-5">{{ trimName(item.Name) }}</span>
         <span class="item-pop pure-u-1-5">
           <icon class="mji" :class="popularity(item.Id)"/>
         </span>
-        <select class="item-demand pure-u-1-5" id="stacked-state" v-model.number="demands[item.Id]">
+        <select class="item-demand pure-u-1-5" id="stacked-state" v-model.number="demands[item.Id]" @change="onDemandChange">
           <option>0</option>
           <option>1</option>
           <option>2</option>
@@ -50,9 +46,12 @@
           <option>4</option>
         </select>
         <span class="item-demand pure-u-1-5">
-          <input type="checkbox" />
+          <input type="checkbox" v-model="ban_states[item.Id]"/>
         </span>
       </div>
+    </div>
+    <div class="predition_page" v-show="show_pred">
+      <predition :solver="solver" @close="togglePred"/>
     </div>
   </div>
 </template>
@@ -62,29 +61,81 @@ import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
 import CraftObjects from "@/data/MJICraftworksObject.json";
 import Popularity from "@/data/MJICraftworksPopularity.json";
 import type { SolverProxy } from "@/model/solver";
+import Predition from "./Predition.vue";
+import { CraftworkData } from "@/model/data";
 
-@Component({})
+@Component({
+  components: {
+    Predition: Predition
+  }
+})
 export default class CraftSetting extends Vue {
-  level: number = 6;
-  craft_level: number = 2;
-  tension: number = 0;
-  max_tension: number = 30;
+  show_pred = false;
+
   workers: number = 1;
   pop_pattern: number = 1;
   data_pack: string = "";
-  demands: number[] = [];
+
+  ban_states: boolean[] = [];
+
+  constructor() {
+    super();
+    for (let i = 0; i < CraftObjects.length; i++) {
+      this.ban_states.push(false);
+    }
+  }
 
   @Prop()
   solver!: SolverProxy;
+
+  get level() {
+    return this.solver.level;
+  }
+  set level(val: number) {
+    this.solver.level = val;
+  }
+
+  get craft_level() {
+    return this.solver.craftLevel;
+  }
+  set craft_level(val: number) {
+    this.solver.craftLevel = val;
+  }
+
+  get tension() {
+    return this.solver.tension;
+  }
+  set tension(val: number) {
+    this.solver.tension = val;
+  }
+
+  get max_tension() {
+    return this.solver.maxTension;
+  }
+  set max_tension(val: number) {
+    this.solver.maxTension = val;
+  }
 
   get objects() {
     return CraftObjects.filter((v) => v.Name);
   }
 
+  get demands() {
+    return this.solver.demands;
+  }
+
+  mounted() {
+    while(this.demands.length < CraftObjects.length)
+      this.demands.push(2);
+  }
+
+  togglePred() {
+    this.show_pred=!this.show_pred;
+    return true;
+  }
+
   trimName(name: string) {
-    if (name.startsWith("海岛")) return name.slice(2);
-    if (name.startsWith("开拓工房")) return name.slice(4);
-    return name;
+    return CraftworkData.TrimName(name);
   }
 
   popularity(id: number): string {
@@ -113,32 +164,30 @@ export default class CraftSetting extends Vue {
     this.onPopPatChange();
   }
 
-  @Watch("demands")
   onDemandChange() {
     if (this.solver)
-      this.solver.setDemand(this.demands);
+      this.solver.updateDemand();
     console.log(this.demands);
-  }
-
-  @Watch("tension")
-  @Watch("max_tension")
-  @Watch("craft_level")
-  onPropChange() {
-    if (this.solver)
-      this.solver.setInfo(this.tension, this.max_tension, this.craft_level - 1, this.workers);
-  }
-
-  @Watch("level")
-  onLevelChange() {
-    if (this.level)
-      this.solver.setLevel(this.level);
   }
 
   @Watch("pop_pattern")
   onPopPatChange() {
     if (this.solver)
       this.solver.setPopularityPattern(this.pop_pattern);
-    console.log(this.pop_pattern);
+  }
+
+  @Watch("ban_states", { deep: true })
+  updateBanState() {
+    let arr = [];
+    for (let i = 0; i < this.ban_states.length; i++) {
+      if (this.ban_states[i]) {
+        arr.push(i);
+      }
+    }
+    if (this.solver) {
+      this.solver.banList = arr;
+    }
+    console.log(this.solver.banList);
   }
 }
 </script>
@@ -159,7 +208,7 @@ input {
   line-height: 20px;
   border-bottom: 1px solid #999;
   margin-bottom: 5px;
-  margin-right: 19px;
+  margin-right: 10px;
 }
 .item-pop,
 .item-demand {
@@ -169,9 +218,24 @@ input {
 .objects {
   overflow-y: scroll;
   max-height: 100%;
+  scrollbar-width: thin;
 }
 .object-item icon{
   transform: scale(.6);
   margin: -4px 0 0 -8px;
+}
+.predition_page {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  max-width: 900px;
+  max-height: calc(100vh - 30px);
+  background: white;
+  border: #999 solid 1px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 5px #999;
 }
 </style>

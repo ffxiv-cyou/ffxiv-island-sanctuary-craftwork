@@ -28,9 +28,10 @@ export default class App extends Vue {}
 <style scoped>
 .main {
   margin: auto;
-  height: calc(100vh - 50px);
+  height: calc(100vh);
 }
 header {
-  height: 50px;
+  height: 20px;
+  display: none;
 }
 </style>

@@ -1,6 +1,6 @@
 /// 市场需求
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Demand {
     /// 严重供少于求
     VeryHigh,

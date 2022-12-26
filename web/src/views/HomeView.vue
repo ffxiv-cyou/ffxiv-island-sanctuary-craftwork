@@ -4,8 +4,8 @@
     <div class="body">
       <h1>工坊求解模拟器</h1>
       <button @click="load" class="pure-button">解最优</button>
-      <batch-view :batch="value" />
-      <hr/>
+      <!-- <batch-view :batch="value" />
+      <hr/> -->
       <div>
         <batch-view v-for="(val, key) in batches" :batch="val" />
       </div>

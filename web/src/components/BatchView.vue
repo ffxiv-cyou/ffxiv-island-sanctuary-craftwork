@@ -16,7 +16,7 @@
 <script lang="ts">
 import type { Batch, BatchValues } from "@/model/solver";
 import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
-import { CraftworkData, type CraftworkObject } from "@/model/data";
+import { CraftworkData } from "@/model/data";
 
 @Component({})
 export default class BatchView extends Vue {
@@ -32,7 +32,7 @@ export default class BatchView extends Vue {
         return "pure-u-" + CraftworkData.GetRecipe(id).Time + "-24";
     }
     getRecipeName(id: number) {
-        return CraftworkData.GetRecipe(id).Name;
+        return CraftworkData.TrimName(CraftworkData.GetRecipe(id).Name);
     }
     getRecipeTime(id: number) {
         return CraftworkData.GetRecipe(id).Time;
@@ -50,8 +50,7 @@ export default class BatchView extends Vue {
 <style>
 .batch {
     display: flex;
-    height: 30px;
-    line-height: 30px;
+    margin: 4px
 }
 .batch-value {
     width: 50px;
@@ -61,11 +60,14 @@ export default class BatchView extends Vue {
     flex: 1;
 }
 .step-item {
-    background: #CCC;
+    background: #ddd;
     border-radius: 5px;
     border: 1px solid rgba(131, 85, 0, 0.5);
     padding: 0 5px;
     box-sizing: border-box;
+    margin: 0 2px;
+    height: 30px;
+    line-height: 30px;
 }
 .step-time {
     float: right;

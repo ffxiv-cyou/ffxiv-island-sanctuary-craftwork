@@ -1,13 +1,57 @@
 import PopularSheet from "../data/MJICraftworksPopularity.json";
 import Recipes from "../data/MJICraftworksObject.json";
 
-import init, { init_repo, set_demands, set_pattern, solve_singleday, GameDataRepo, CraftworkInfo, simulate } from "mji-craftwork";
+import init, {
+    init_repo,
+    set_demands,
+    set_pattern,
+    solve_singleday,
+    GameDataRepo,
+    CraftworkInfo,
+    simulate,
+    pattern_predict,
+    pattern_demand,
+    DemandPattern,
+} from "mji-craftwork";
 
 export class SolverProxy {
     repo!: GameDataRepo;
-    info!: CraftworkInfo;
-    level: number = 10;
-    banList: number[] = [];
+
+    /**
+     * 开拓等级，用于过滤配方，1-10
+     */
+    public level: number = 10;
+
+    /**
+     * 配方禁用列表
+     */
+    public banList: number[] = [];
+
+    /**
+     * 缓存的需求列表
+     */
+    public demands: number[] = [];
+
+    /**
+     * 当前干劲
+     */
+    public tension: number = 0;
+
+    /**
+     * 最大干劲
+     */
+    public maxTension: number = 35;
+
+    /**
+     * 工坊等级，0-2
+     */
+    public craftLevel: number = 2;
+
+    /**
+     * 同时运行的工房数量（1-3）
+     */
+    public workers: number = 1;
+
     constructor() {
         init().then(() => {
             let recipe = new Uint16Array(6 * Recipes.length);
@@ -31,7 +75,6 @@ export class SolverProxy {
             }
 
             this.repo = init_repo(recipe, pops, cols);
-            this.info = new CraftworkInfo(0, 30, 2, 1);
         }).catch((e) => {
             throw e;
         });
@@ -41,11 +84,19 @@ export class SolverProxy {
         await init();
     }
 
+    /**
+     * 从网络数据包中获取当前信息
+     * @param data 数据包
+     */
     setFromPacket(data: Uint8Array) {
         this.setPopularityPattern(data[0]);
         set_demands(this.repo, data.slice(2));
     }
 
+    /**
+     * 设置当前的需求
+     * @param array 需求表
+     */
     setDemand(array: number[]) {
         let demands = new Uint8Array(array.length);
         for (let i = 0; i < demands.length; i++) {
@@ -54,14 +105,30 @@ export class SolverProxy {
         set_demands(this.repo, demands);
     }
 
-    setInfo(tension: number, maxTension: number, level: number, workers: number) {
-        this.info = new CraftworkInfo(tension, maxTension, level, workers);
+    /**
+     * 更新需求
+     */
+    updateDemand() {
+        this.setDemand(this.demands);
     }
 
+    get info() {
+        return new CraftworkInfo(this.tension, this.maxTension, this.craftLevel, this.workers);
+    }
+
+    /**
+     * 设置当前的人气状态
+     * @param index 人气模式
+     */
     setPopularityPattern(index: number) {
         set_pattern(this.repo, index);
     }
 
+    /**
+     * 模拟求解。注意只考虑连击
+     * @param array 配方
+     * @returns 配方收益
+     */
     simulate(array: number[]): BatchValues {
         let steps = new Uint8Array(array.length);
         for (let i = 0; i < steps.length; i++) {
@@ -71,6 +138,10 @@ export class SolverProxy {
         return new BatchValues(array, arr);
     }
 
+    /**
+     * 根据当前人气和供给求解当天的最优值
+     * @returns 
+     */
     solveDay(): Batch[] {
         let banList = new Uint16Array(this.banList.length);
         for (let i = 0; i < banList.length; i++) {
@@ -80,18 +151,62 @@ export class SolverProxy {
         return Batch.fromSimulateArray(arr);
     }
 
-    setLevel(level: number) {
-        this.level = level;
+    /**
+     * 从已有的历史数据包推测变化模式
+     * @param packets 数据包
+     * @returns 变化模式
+     */
+    predictFromPackets(packets: Uint8Array[]): DemandPattern[] {
+        const days = packets.length;
+        const objs = packets[0].length - 2;
+        const array = new Uint8Array(days * objs);
+        for (let i = 0; i < packets.length; i++) {
+            const np = packets[i].slice(2);
+            for (let j = 0; j < objs; j++) {
+                array[j * days + i] = np[j];
+            }
+        }
+
+        const result = pattern_predict(array, packets.length);
+        let arr = [];
+        for (let i = 0; i < result.length; i++) {
+            arr.push(result[i] as DemandPattern);
+        }
+        return arr;
     }
 
-    setBanList(list: number[]) {
-        this.banList = list;
+    /**
+     * 根据变化模式推测指定日期的需求
+     * @param pattern 变化模式
+     * @param day 日期
+     * @returns 需求
+     */
+    demandsFromPredict(pattern: DemandPattern[], day: number): number[] {
+        const array = new Uint8Array(pattern.length);
+        for (let i = 0; i < pattern.length; i++) {
+            array[i] = pattern[i];
+        }
+        const result = pattern_demand(array, day);
+        let arr = [];
+        for (let i = 0; i < result.length; i++) {
+            arr.push(result[i]);
+        }
+        return arr;
     }
 }
 
 export class Batch {
+    /**
+     * 当前批次运行完毕后的预计收益
+     */
     public value: number;
+    /**
+     * 当前批次的步骤数量
+     */
     public count: number;
+    /**
+     * 当前批次的步骤
+     */
     public steps: number[];
 
     constructor(value: number, count: number, steps: number[]) {
@@ -121,6 +236,9 @@ export class Batch {
 }
 
 export class BatchValues extends Batch {
+    /**
+     * 每一步骤的收益。注意连击后收益会自动乘2
+     */
     public stepValues: number[];
 
     constructor(steps: number[], values: Uint16Array) {

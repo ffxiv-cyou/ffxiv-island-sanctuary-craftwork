@@ -7,7 +7,13 @@ import wasmPack from 'vite-plugin-wasm-pack';
 export default defineConfig({
   plugins: [
     wasmPack('../mji-craftwork'),
-    vue()
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: tag => tag === "icon",
+        }
+      }
+    })
   ],
   resolve: {
     alias: {

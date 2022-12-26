@@ -2,9 +2,11 @@ pub mod data;
 pub mod simulator;
 pub mod solver;
 pub mod utils;
+pub mod predition;
 
-use data::{Demand, GameDataRepo, IDataRepo, Recipe, RecipeState};
+use data::{Demand, GameDataRepo, IDataRepo, Recipe, RecipeState, DemandChange};
 use solver::{BFSolver, Solver, SolveLimit};
+use predition::{get_demands, predict_all};
 use wasm_bindgen::prelude::*;
 
 use crate::data::CraftworkInfo;
@@ -86,7 +88,7 @@ pub fn simulate(repo: &GameDataRepo, state: &CraftworkInfo, seq: Vec<u8>) -> Vec
     ret
 }
 
-/// 搜索最优解
+/// 搜索单日的最优解
 ///
 /// 返回所有可能的解的数组，数组结构如下
 /// value step_count steps[6]
@@ -103,4 +105,51 @@ pub fn solve_singleday(repo: &GameDataRepo, state: &CraftworkInfo, level: u8, ba
         ret.extend_from_slice(b.get_steps());
     }
     ret
+}
+
+/// 预测需求曲线
+/// 
+/// 传入的 array 为需求变动的二维数组转一维表示，单个物品多日的变动优先。
+/// 高4位为需求，低4位为需求变动（与数据包格式保持一致）。
+/// 
+/// 返回曲线的模式，其中：
+/// - 0: 未知
+/// - 1: 2强
+/// - 2: 2弱
+/// - 3: 3强
+/// - 以此类推
+#[wasm_bindgen]
+pub fn pattern_predict(array: &[u8], days : usize) -> Vec<u8> {
+    let mut seqs = vec![];
+    for i in 0..array.len() {
+        let byte = array[i];
+        let demand: Demand = (byte >> 4).into();
+        let change: DemandChange = (byte & 0x0F).into();
+        seqs.push((demand, change))
+    }
+
+    let pat = predict_all(&seqs, days);
+    let mut result = vec![];
+    for i in pat {
+        result.push(i.into());
+    }
+
+    result
+}
+
+/// 根据需求曲线预测指定日期的需求
+/// 
+/// day从0开始
+#[wasm_bindgen]
+pub fn pattern_demand(array: &[u8], day: u8) -> Vec<u8> {
+    let mut pats = vec![];
+    for &i in array {
+        pats.push(i.into());
+    }
+    let demands = get_demands(&pats, day);
+    let mut result = vec![];
+    for i in demands {
+        result.push(i.into());
+    }
+    result
 }
