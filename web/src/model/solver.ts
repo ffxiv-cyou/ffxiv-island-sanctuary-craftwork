@@ -143,13 +143,13 @@ export class SolverProxy {
      * 根据当前人气和供给求解当天的最优值
      * @returns 
      */
-    solveDay(): Batch[] {
+    solveDay(): BatchValues[] {
         let banList = new Uint16Array(this.banList.length);
         for (let i = 0; i < banList.length; i++) {
             banList[i] = this.banList[i];
         }
         let arr = solve_singleday(this.repo, this.info, this.level, banList);
-        return Batch.fromSimulateArray(arr);
+        return BatchValues.fromSimulateArray(arr);
     }
 
     /**
@@ -254,5 +254,24 @@ export class BatchValues extends Batch {
         for (let i = 0; i < steps.length; i++) {
             this.stepValues.push(values[i]);
         }
+    }
+
+    static fromArray(array: Uint16Array): BatchValues {
+        let value = array[0];
+        let count = array[1];
+        let steps = [];
+        for (let i = 2; i < 8; i++) {
+            if (array[i] != 0)
+                steps.push(array[i]);
+        }
+        return new BatchValues(steps, array.slice(8));
+    }
+
+    static fromSimulateArray(array: Uint16Array): BatchValues[] {
+        let result = [];
+        for (let i = 0; i < array.length; i += 14) {
+            result.push(BatchValues.fromArray(array.slice(i, i + 14)));
+        }
+        return result;
     }
 }

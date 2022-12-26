@@ -91,7 +91,10 @@ pub fn simulate(repo: &GameDataRepo, state: &CraftworkInfo, seq: Vec<u8>) -> Vec
 /// 搜索单日的最优解
 ///
 /// 返回所有可能的解的数组，数组结构如下
-/// value step_count steps[6]
+/// - value 总价
+/// - step_count 步骤数目
+/// - steps[6] 每一步的物品ID
+/// - values[6] 每一步的价格
 #[wasm_bindgen]
 pub fn solve_singleday(repo: &GameDataRepo, state: &CraftworkInfo, level: u8, ban_list: Vec<u16>) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
@@ -103,6 +106,7 @@ pub fn solve_singleday(repo: &GameDataRepo, state: &CraftworkInfo, level: u8, ba
         ret.push(b.get_val());
         ret.push(b.seq as u16);
         ret.extend_from_slice(b.get_steps());
+        ret.extend_from_slice(b.get_values());
     }
     ret
 }
