@@ -1,0 +1,30 @@
+name: Build and GH-Page Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: wasm-pack
+          targets: wasm32-unknown-unknown
+      - name: Build
+        run: |
+          cd web
+          npm ci
+          npm run build
+      - name: Deploy to GH Page
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: gh-pages
+          folder: web/dist
