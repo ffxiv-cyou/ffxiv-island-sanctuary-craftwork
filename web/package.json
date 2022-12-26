@@ -14,7 +14,6 @@
   "dependencies": {
     "fflate": "^0.7.4",
     "js-base64": "^3.7.3",
-    "mji-craftwork": "file:../mji-craftwork/pkg",
     "purecss": "^3.0.0",
     "vue": "^3.2.45",
     "vue-facing-decorator": "^2.1.12",
