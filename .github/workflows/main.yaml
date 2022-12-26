@@ -22,7 +22,8 @@ jobs:
       - name: Build
         run: |
           cd web
-          npm install
+          npm run wasm
+          npm ci
           npm run build
       - name: Deploy to GH Page
         uses: JamesIves/github-pages-deploy-action@4.1.1
