@@ -178,6 +178,7 @@ export default class CraftSetting extends Vue {
     let current = DemandUtils.GetDemand(this.demands[id]);
     let next = (current + 1) % 5;
     this.demands[id] = DemandUtils.FromDemand(next);
+    this.onDemandChange();
   }
 
   @Watch("pop_pattern")
