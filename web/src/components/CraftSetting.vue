@@ -27,21 +27,21 @@
       </fieldset>
     </div>
     <div class="objects-header pure-g">
-      <span class="item-name pure-u-7-24">产品名</span>
-      <span class="item-pop pure-u-5-24">欢迎度</span>
-      <span class="item-demand pure-u-3-8">需求</span>
-      <span class="item-demand pure-u-1-8">禁用</span>
+      <span class="item-name pure-u-8-24">产品名</span>
+      <span class="item-pop pure-u-4-24">欢迎度</span>
+      <span class="item-demand pure-u-9-24">需求</span>
+      <span class="item-demand pure-u-3-24">禁用</span>
     </div>
     <div class="objects">
       <div class="object-item pure-form pure-g" v-for="(item, index) in objects">
-        <span class="item-name pure-u-1-3">{{ trimName(item.Name) }}</span>
-        <span class="item-pop pure-u-3-24">
+        <span class="item-name pure-u-9-24">{{ trimName(item.Name) }}</span>
+        <span class="item-pop pure-u-2-24">
           <icon class="mji" :class="popularity(item.Id)" />
         </span>
-        <span class="item-demand pure-u-5-24">
+        <span class="item-demand-box pure-u-6-24" @click="changeDemandBox(item.Id)">
           <icon class="mji mji-box" v-for="() in getDemandBox(demands[item.Id])" />
         </span>
-        <input class="item-demand pure-u-5-24" type="number" placeholder="需求" v-model.number="demands[item.Id]"
+        <input class="item-demand pure-u-4-24" type="number" placeholder="需求" v-model.number="demands[item.Id]"
           @change="onDemandChange" />
         <span class="pure-u-3-24">
           <input type="checkbox" v-model="ban_states[item.Id]" />
@@ -172,6 +172,11 @@ export default class CraftSetting extends Vue {
   getDemandBox(val: number) {
     return DemandUtils.GetDemand(val);
   }
+  changeDemandBox(id: number) {
+    let current = DemandUtils.GetDemand(this.demands[id]);
+    let next = (current + 1) % 5;
+    this.demands[id] = DemandUtils.FromDemand(next);
+  }
 
   @Watch("pop_pattern")
   onPopPatChange() {
@@ -219,8 +224,14 @@ input {
 
 .item-pop,
 .item-demand {
-  text-align: center;
   overflow: hidden;
+  text-align: center;
+}
+.item-demand-box {
+  text-align: right;
+}
+input.item-demand {
+  padding: 0.2em 0.1em !important;
 }
 
 .objects {
@@ -231,11 +242,11 @@ input {
 
 .object-item icon {
   transform: scale(.6);
-  margin: -4px 0 0 -8px;
+  margin: -2px -8px 0 -8px;
 }
 
 .mji-box+.mji-box {
-  margin-left: -28px !important;
+  margin-left: -20px !important;
 }
 
 .predition_page {

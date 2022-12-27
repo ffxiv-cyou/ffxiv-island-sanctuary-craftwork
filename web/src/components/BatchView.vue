@@ -1,83 +1,56 @@
 <template>
-    <div class="batch" v-if="batch">
-        <div class="batch-value">
-            {{ batch.value }}
-        </div>
-        <div class="steps pure-g">
-            <div v-for="(val, index) in batch.steps" class="step-item" :class="getClassName(val)">
-                <span>{{ getRecipeName(val) }}</span>
-                <span class="step-time">{{ getRecipeTime(val) }}h</span>
-                <span class="step-value" v-if="getValue(index)">{{ getValue(index) }}币</span>
-            </div>
-        </div>
+  <div class="batch" v-if="batch">
+    <div class="batch-value">
+      {{ batch.value }}
     </div>
+    <div class="steps pure-g">
+      <step v-for="(val, index) in batch.steps" 
+      :class="getClassName(val)" 
+      :step="val"
+      :value="batch.stepValues[index]"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import type { Batch, BatchValues } from "@/model/solver";
 import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
 import { CraftworkData } from "@/model/data";
+import Step from "./Step.vue";
 
-@Component({})
+@Component({
+  components: {
+    Step: Step
+  }
+})
 export default class BatchView extends Vue {
-    @Prop()
-    batch!: Batch;
+  @Prop()
+  batch!: BatchValues;
 
-    @Watch("batch")
-    onBatchChange() {
+  @Watch("batch")
+  onBatchChange() {
 
-    }
+  }
 
-    getClassName(id: number) {
-        return "pure-u-" + CraftworkData.GetRecipe(id).Time + "-24";
-    }
-    getRecipeName(id: number) {
-        return CraftworkData.TrimName(CraftworkData.GetRecipe(id).Name);
-    }
-    getRecipeTime(id: number) {
-        return CraftworkData.GetRecipe(id).Time;
-    }
-    getValue(index: number) {
-        let b = this.batch as BatchValues;
-        if (b.stepValues) {
-            return b.stepValues[index];
-        }
-        return undefined;
-    }
+  getClassName(id: number) {
+    return "pure-u-" + CraftworkData.GetRecipe(id).Time + "-24";
+  }
 }
 </script>
 
-<style>
+<style lang="scss">
 .batch {
-    display: flex;
-    margin: 4px
+  display: flex;
+  margin: 4px
 }
+
 .batch-value {
-    width: 50px;
+  width: 50px;
 }
+
 .steps {
-    flex-flow: nowrap !important;
-    flex: 1;
-}
-.step-item {
-    background: #ddd;
-    border-radius: 5px;
-    border: 1px solid rgba(131, 85, 0, 0.5);
-    padding: 0 5px;
-    box-sizing: border-box;
-    margin: 0 2px;
-    height: 30px;
-    line-height: 30px;
-}
-.step-time {
-    float: right;
-}
-.step-value {
-    float: right;
-}
-.step-time + .step-value {
-    padding-right: 2px;
-    margin-right: 2px;
-    border-right: 1px solid #999;
+  flex-flow: nowrap !important;
+  flex: 1;
 }
 </style>

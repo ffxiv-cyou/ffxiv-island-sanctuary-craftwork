@@ -32,10 +32,10 @@ export default class Home extends Vue {
   solver: SolverProxy = new SolverProxy();
 
   value?: BatchValues;
-  batches: Batch[] = [];
+  batches: BatchValues[] = [];
 
   async load() {
-    this.value = this.solver.simulate([13, 23, 13, 23]);
+    this.value = this.solver.simulate([10, 14, 10, 14, 10, 14]);
     let batches = this.solver.solveDay();
     this.batches = batches.slice(0, 100);
   }

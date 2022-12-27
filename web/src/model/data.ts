@@ -5,6 +5,8 @@ export class CraftworkObject {
     Id!: number;
     // 产物名称
     Name!: string;
+    // 图标
+    Icon!: number;
     // 基础价格
     Price!: number;
     // 等级
@@ -29,6 +31,8 @@ export class CraftworkIngredient {
 export class ItemName {
     Id!: number;
     Name!: string;
+    // 图标
+    Icon!: number;
 }
 
 export class CraftworkData {

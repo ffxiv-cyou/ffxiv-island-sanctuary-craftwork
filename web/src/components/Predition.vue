@@ -117,7 +117,7 @@ export default class Predition extends Vue {
   }
   getDemand(id: number, day: number) {
     if (this.cachedDemands.length < day) {
-      return 2;
+      return 9;
     }
 
     return this.cachedDemands[day - 1][id];
