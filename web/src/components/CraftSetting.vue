@@ -21,7 +21,7 @@
         <span class="pure-u-3-4" for="data-pack" title="从数据包解析当前需求和欢迎度">自动解析</span>
       </div>
       <fieldset class="pure-g">
-        <input class="pure-u-1-4" id="pop-pattern" type="number" min=1 max=100 v-model="pop_pattern" />
+        <input class="pure-u-1-4" id="pop-pattern" type="number" min=1 max=100 v-model.number="pop_pattern" />
         <input class="pure-u-5-12" id="data_pack" type="text" placeholder="抓包数据" v-model="data_pack" />
         <button class="pure-u-1-3 pure-button" style="margin: 0.25em 0;" @click="togglePred">需求趋势</button>
       </fieldset>
@@ -124,7 +124,7 @@ export default class CraftSetting extends Vue {
 
   mounted() {
     while (this.demands.length < CraftObjects.length)
-      this.demands.push(2);
+      this.demands.push(9);
   }
 
   togglePred() {
@@ -137,6 +137,8 @@ export default class CraftSetting extends Vue {
   }
 
   popularity(id: number): string {
+    if (this.pop_pattern >= Popularity.length)
+      return "mji-popular-3";
     return "mji-popular-" + Popularity[this.pop_pattern][id].toString()
   }
 
