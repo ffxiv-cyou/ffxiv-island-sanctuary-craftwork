@@ -7,13 +7,15 @@ use mji_craftwork::{
 #[test]
 pub fn pattern() {
     let vec = vec![
-        0x22, 0x14, 0x04, // 3F
-        0x22, 0x13, 0x13, // 3P
+        0x10, 0x00, 0x24, // 2F
+        0x22, 0x10, 0x00, // 3F
+        0x22, 0x11, 0x11, // 3P
     ];
     let result = pattern_predict(&vec, 3);
-    assert_eq!(result.len(), 2);
-    assert_eq!(result[0], DemandPattern::Day3Strong.into());
-    assert_eq!(result[1], DemandPattern::Day3Weak.into());
+    assert_eq!(result.len(), 3);
+    assert_eq!(result[0], DemandPattern::Day2Strong.into());
+    assert_eq!(result[1], DemandPattern::Day3Strong.into());
+    assert_eq!(result[2], DemandPattern::Day3Weak.into());
 }
 
 #[test]

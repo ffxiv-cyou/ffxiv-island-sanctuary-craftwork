@@ -92,16 +92,16 @@ impl From<Demand> for u8 {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[wasm_bindgen]
 pub enum DemandChange {
-    /// 需求大幅降低
-    MassiveDecrease,
-    /// 需求降低
-    Decerease,
-    /// 无变化
-    Equal,
-    /// 需求增加
-    Increase,
     /// 需求大幅增加
     MassiveIncrease,
+    /// 需求增加
+    Increase,
+    /// 无变化
+    Equal,
+    /// 需求降低
+    Decerease,
+    /// 需求大幅降低
+    MassiveDecrease,
 }
 
 impl DemandChange {
@@ -141,11 +141,11 @@ impl DemandChange {
 impl From<u8> for DemandChange {
     fn from(val: u8) -> Self {
         match val {
-            0 => Self::MassiveDecrease,
-            1 => Self::Decerease,
+            4 => Self::MassiveDecrease,
+            3 => Self::Decerease,
             2 => Self::Equal,
-            3 => Self::Increase,
-            4 => Self::MassiveIncrease,
+            1 => Self::Increase,
+            0 => Self::MassiveIncrease,
             _ => panic!()
         }
     }
@@ -154,11 +154,11 @@ impl From<u8> for DemandChange {
 impl From<DemandChange> for u8 {
     fn from(val: DemandChange) -> Self {
         match val {
-            DemandChange::MassiveDecrease => 0,
-            DemandChange::Decerease => 1,
+            DemandChange::MassiveDecrease => 4,
+            DemandChange::Decerease => 3,
             DemandChange::Equal => 2,
-            DemandChange::Increase => 3,
-            DemandChange::MassiveIncrease => 4,
+            DemandChange::Increase => 1,
+            DemandChange::MassiveIncrease => 0,
         }
     }
 }
