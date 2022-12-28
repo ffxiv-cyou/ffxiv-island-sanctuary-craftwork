@@ -12,6 +12,10 @@
           color: white;
           text-shadow: 1px 1px 2px black;
       }
+      a {
+        text-decoration: none;
+        color: white;
+      }
       .title {
         user-select: none;
       }
@@ -23,7 +27,8 @@
   </head>
   <body>
     <div class="app">
-      <p id="token">请点击调查需求</p>
+      <span><a href="#" id="close">&times;</a></span>
+      <span id="token">请点击调查需求</span>
     </div>
     <script type="module" src="/src/ngld.ts"></script>
   </body>

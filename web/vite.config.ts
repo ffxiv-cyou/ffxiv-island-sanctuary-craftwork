@@ -6,7 +6,13 @@ import wasmPack from 'vite-plugin-wasm-pack';
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    minify: true
+    minify: true,
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        ngld: 'ngld.html',
+      },
+    },
   },
   plugins: [
     wasmPack('../mji-craftwork'),
