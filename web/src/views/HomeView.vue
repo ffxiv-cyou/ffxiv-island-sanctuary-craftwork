@@ -1,7 +1,7 @@
 <template>
-  <div class="main">
-    <craft-setting class="setting" :solver="solver"/>
-    <div class="body">
+  <div class="container">
+    <craft-setting class="container-left setting" :solver="solver"/>
+    <div class="container-right solve">
       <h1>工坊求解模拟器</h1>
       <button @click="load" class="pure-button">解最优</button>
       <!-- <batch-view :batch="value" />
@@ -13,8 +13,8 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Ref, Vue } from "vue-facing-decorator";
-import { SolverProxy, Batch, BatchValues } from "@/model/solver"
+import { Component, Prop, Ref, Vue } from "vue-facing-decorator";
+import type {  SolverProxy, Batch, BatchValues } from "@/model/solver"
 import CraftSetting from "@/components/CraftSetting.vue";
 import BatchView from "@/components/BatchView.vue";
 
@@ -25,11 +25,8 @@ import BatchView from "@/components/BatchView.vue";
   }
 })
 export default class Home extends Vue {
-
-  mounted() {
-
-  }
-  solver: SolverProxy = new SolverProxy();
+  @Prop()
+  solver!: SolverProxy;
 
   value?: BatchValues;
   batches: BatchValues[] = [];
@@ -47,14 +44,8 @@ export default class Home extends Vue {
   display: inline-flex;
   flex-direction: column;
   background: #bfb8a6;
-  padding: 10px;
 }
-.body {
-  flex: 1;
-  padding: 10px;
+.solve {
   overflow-y: scroll;
-}
-.main {
-  display: flex;
 }
 </style>

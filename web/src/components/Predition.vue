@@ -9,10 +9,15 @@
     <div class="pure-g">
       <div class="pure-form pure-u-1-2">
         <legend>需求趋势预测（填写抓包数据）</legend>
+        <label for="predict-known">
+          <input id="predict-known" type="checkbox" />
+          仅预测未知的趋势
+        </label> 
         <fieldset class="pure-g">
-          <input class="pure-u-1-6" type="text" onclick="this.select();" v-for="(i) in 5" :placeholder="'Day' + i"
+          <input class="pure-u-1-5" type="text" onclick="this.select();" v-for="(i) in 4" :placeholder="'Day' + i"
             v-model="datapacks[i - 1]" />
-          <div class="pure-u-1-6">
+
+          <div class="pure-u-1-5">
             <button class="pure-button" @click="predict">预测</button>
           </div>
         </fieldset>
@@ -82,7 +87,7 @@ export default class Predition extends Vue {
 
   cachedDemands: number[][] = [];
 
-  datapacks: string[] = ["", "", "", "", ""];
+  datapacks: string[] = ["", "", "", ""];
 
   constructor() {
     super();

@@ -14,12 +14,22 @@ startOverlayEvents();
 let clostBtn = document.getElementById('close');
 if (clostBtn != null) {
   clostBtn.onclick = () => {
-    setContent("");
+    if (element != null) {
+      element.innerText = "";
+    }
   };
 }
 
+let basePath = document.location.protocol + "//" + document.location.host;
+
 function setContent(content: string) {
   if (element != null) {
-    element.innerText = content;
+    element.setAttribute('href', basePath + "/#/pred/" + content)
+    element.innerText = "解析";
   }
+}
+
+let link = document.getElementById('link');
+if (link != null) {
+  link.setAttribute('href', basePath);
 }

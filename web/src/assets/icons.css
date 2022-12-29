@@ -22,3 +22,26 @@ icon.mji-popular-1 {
 icon.mji-popular-4 {
     background-position: -160px -0px;
 }
+
+button.sched {
+    background: transparent;
+    background-image: url("./mjicraftschedule_hr1.png");
+    border: none;
+    color: white;
+
+    --scale: 1;
+
+    width: calc(var(--scale) * 64px);
+    height: calc(var(--scale) * 64px);
+    background-size: calc(var(--scale) * 384px) calc(var(--scale) * 232px);
+    cursor: pointer;
+}
+button.sched-red {
+    background-position: calc(var(--scale) * -132px) calc(var(--scale) * -96px);
+}
+button.sched-green {
+    background-position: calc(var(--scale) * -196px) calc(var(--scale) * -96px);
+}
+button.sched-yellow {
+    background-position: calc(var(--scale) * -260px) calc(var(--scale) * -96px);
+}

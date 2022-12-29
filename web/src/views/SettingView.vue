@@ -1,0 +1,77 @@
+<template>
+  <div class="setting-page">
+    <h1>设置</h1>
+    <div class="pure-form pure-form-aligned">
+      <legend>工坊基础设置</legend>
+      <fieldset>
+        <div class="pure-control-group">
+          <label for="level">开拓等级</label>
+          <input id="level" type="number" min=1 max=10 placeholder="1-10" v-model="level" />
+          <span class="pure-form-message-inline">当前开拓等级，大于此等级的配方不会被求解</span>
+        </div>
+        <div class="pure-control-group">
+          <label for="craft-level">工坊等级</label>
+          <input id="craft-level" type="number" min=1 max=3 placeholder="1-3" v-model="craft_level" />
+          <span class="pure-form-message-inline">当前工坊等级，影响产品价格</span>
+        </div>
+        <div class="pure-control-group">
+          <label for="max-tension">干劲上限</label>
+          <input id="max-tension" type="number" min=0 max=35 placeholder="0-35" v-model="max_tension" />
+          <span class="pure-form-message-inline">工坊的干劲上限，影响产品价格</span>
+        </div>
+        <div class="pure-control-group">
+          <label for="workers">工坊数量</label>
+          <input id="workers" type="number" min=1 max=3 placeholder="1-3" v-model="workers"/>
+          <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算</span>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</template>
+<script lang="ts">
+import type { SolverProxy } from "@/model/solver";
+import { Component, Prop, Ref, Vue } from "vue-facing-decorator";
+@Component({})
+export default class SettingView extends Vue {
+  @Prop()
+  solver!: SolverProxy;
+
+  get config() {
+    return this.solver.config;
+  }
+
+  get level() {
+    return this.config.level;
+  }
+  set level(val: number) {
+    this.config.level = val;
+  }
+
+  get craft_level() {
+    return this.config.craftLevel + 1;
+  }
+  set craft_level(val: number) {
+    this.config.craftLevel = val - 1;
+  }
+
+  get max_tension() {
+    return this.config.maxTension;
+  }
+  set max_tension(val: number) {
+    this.config.maxTension = val;
+  }
+
+  get workers() {
+    return this.config.workers;
+  }
+  set workers(val: number) {
+    this.config.workers = val;
+  }
+
+}
+</script>
+<style>
+.setting-page {
+  max-width: 1000px;
+}
+</style>

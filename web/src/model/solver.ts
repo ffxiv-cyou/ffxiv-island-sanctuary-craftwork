@@ -13,24 +13,20 @@ import init, {
     pattern_demand,
     DemandPattern,
 } from "mji-craftwork";
+import { Config } from "./config";
 
 export class SolverProxy {
     repo!: GameDataRepo;
 
     /**
-     * 开拓等级，用于过滤配方，1-10
+     * 配置
      */
-    public level: number = 10;
+    public config!: Config;
 
     /**
      * 配方禁用列表
      */
-    public banList: number[] = [];
-
-    /**
-     * 缓存的需求列表
-     */
-    public demands: number[] = [];
+    public banList: boolean[] = [];
 
     /**
      * 当前干劲
@@ -38,20 +34,9 @@ export class SolverProxy {
     public tension: number = 0;
 
     /**
-     * 最大干劲
+     * 需求列表
      */
-    public maxTension: number = 35;
-
-    /**
-     * 工坊等级，0-2
-     */
-    public craftLevel: number = 2;
-
-    /**
-     * 同时运行的工房数量（1-3）
-     */
-    public workers: number = 3;
-
+    public demands: number[] = [];
     constructor() {
         init().then(() => {
             let recipe = new Uint16Array(6 * Recipes.length);
@@ -75,10 +60,13 @@ export class SolverProxy {
             }
 
             this.repo = init_repo(recipe, pops, cols);
-            this.setPopularityPattern(1);
         }).catch((e) => {
             throw e;
         });
+        this.config = Config.load();
+        for (let i = 0; i < Recipes.length; i++) {
+            this.banList.push(false);
+        }
     }
 
     async init() {
@@ -105,7 +93,7 @@ export class SolverProxy {
     }
 
     get info() {
-        return new CraftworkInfo(this.tension, this.maxTension, this.craftLevel, this.workers);
+        return new CraftworkInfo(this.tension, this.config.maxTension, this.config.craftLevel, this.config.workers);
     }
 
     /**
@@ -122,6 +110,8 @@ export class SolverProxy {
      * @returns 配方收益
      */
     simulate(array: number[]): BatchValues {
+        set_pattern(this.repo, this.config.popPattern);
+
         let steps = new Uint8Array(array.length);
         for (let i = 0; i < steps.length; i++) {
             steps[i] = array[i];
@@ -135,11 +125,17 @@ export class SolverProxy {
      * @returns 
      */
     solveDay(): BatchValues[] {
-        let banList = new Uint16Array(this.banList.length);
-        for (let i = 0; i < banList.length; i++) {
-            banList[i] = this.banList[i];
+        set_pattern(this.repo, this.config.popPattern);
+
+        let banArr = [];
+        for (let i = 0; i < this.banList.length; i++) {
+            if (this.banList[i]) {
+                banArr.push(i);
+            }
         }
-        let arr = solve_singleday(this.repo, this.info, this.level, banList);
+
+        let banList = new Uint16Array(banArr);
+        let arr = solve_singleday(this.repo, this.info, this.config.level, banList);
         return BatchValues.fromSimulateArray(arr);
     }
 
