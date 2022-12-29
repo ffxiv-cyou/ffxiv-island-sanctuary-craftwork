@@ -112,6 +112,15 @@ export default class DemandPattern extends Vue {
     return document.location.protocol + "//" + document.location.host + "/#/pat/" + ToShareCode(binary);
   }
 
+  set shareLink(val: string) {
+    let pat = /#\/pat\/(.+)/;
+    let result = pat.exec(val);
+    console.log(result);
+    if (result && result.length > 0) {
+      this.$router.push("/pat/" + result[1])
+    }
+  }
+
   get shareMode() {
     return this.inputShareCode !== undefined;
   }
