@@ -11,27 +11,33 @@
           font-size: 14px;
           color: white;
           text-shadow: 1px 1px 2px black;
+          user-select: none;
+      }
+      span + span {
+        margin-left: 5px;
       }
       a {
         text-decoration: none;
         color: white;
       }
-      .title {
-        user-select: none;
+      #all {
+        display: inline-block;
       }
-      #token {
-        user-select: all;
-        line-break: anywhere;
+      .hide {
+        display: none !important;
       }
     </style>
-    <script type="module" crossorigin src="/assets/ngld-79808e15.js"></script>
+    <script type="module" crossorigin src="/assets/ngld-19704dc4.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-ec808ebb.js">
   </head>
   <body>
     <div class="app">
       <span><a href="#" id="close">&times;</a></span>
-      <span><a id="token" href="#" target="_blank"></a></span>
-      <span><a id="link" href="http://island.ffxiv.cyou" target="_blank">求解器</a></span>
+      <span id="not-inited">悬浮窗未连接</span>
+      <div id="all" class="hide">
+        <span><a id="link" href="http://island.ffxiv.cyou" target="_blank">求解器</a></span>
+        <span><a id="token" href="#" target="_blank"></a></span>
+      </div>
     </div>
     
   </body>
