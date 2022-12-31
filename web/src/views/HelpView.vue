@@ -133,7 +133,7 @@ export default class TemplateView extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .about {
   display: flex;
   flex-direction: column;
