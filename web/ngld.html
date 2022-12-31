@@ -11,25 +11,31 @@
           font-size: 14px;
           color: white;
           text-shadow: 1px 1px 2px black;
+          user-select: none;
+      }
+      span + span {
+        margin-left: 5px;
       }
       a {
         text-decoration: none;
         color: white;
       }
-      .title {
-        user-select: none;
+      #all {
+        display: inline-block;
       }
-      #token {
-        user-select: all;
-        line-break: anywhere;
+      .hide {
+        display: none !important;
       }
     </style>
   </head>
   <body>
     <div class="app">
       <span><a href="#" id="close">&times;</a></span>
-      <span><a id="token" href="#" target="_blank"></a></span>
-      <span><a id="link" href="http://island.ffxiv.cyou" target="_blank">求解器</a></span>
+      <span id="not-inited">悬浮窗未连接</span>
+      <div id="all" class="hide">
+        <span><a id="link" href="http://island.ffxiv.cyou" target="_blank">求解器</a></span>
+        <span><a id="token" href="#" target="_blank"></a></span>
+      </div>
     </div>
     <script type="module" src="/src/ngld.ts"></script>
   </body>
