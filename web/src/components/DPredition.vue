@@ -7,11 +7,17 @@
           <label for="aligned-name">第{{ i }}天</label>
           <input type="text" id="aligned-name" onclick="this.select();" placeholder="抓包数据" v-model="datapacks[i - 1]"  />
         </div>
+        <p v-if="inputDate >= 4">
+          今天是第{{ inputDate + 1 }}天，解析需要前4天的数据。
+        </p>
+        <p v-if="!validate">
+          您需要按顺序填入前4天的数据
+        </p>
         <div class="pure-controls">
           <label for="aligned-cb" class="pure-checkbox">
             <input type="checkbox" id="aligned-cb" v-model="updateUnknownOnly"/> 仅预测未知的趋势
           </label>
-          <button @click="predict" class="pure-button pure-button-primary">预测趋势</button>
+          <button @click="predict" class="pure-button pure-button-primary" :disabled="!validate">预测趋势</button>
           <button @click="clear" class="pure-button pure-button-warning">重置趋势</button>
         </div>
         <div v-if="nextPattern">
@@ -40,11 +46,27 @@ export default class PreditionComponent extends Vue {
   updateUnknownOnly: boolean = false;
 
   datapacks: string[] = ["", "", "", ""];
+
+  inputDate = -1;
+
+  get validate() {
+    let filled = false;
+    for (let i = this.datapacks.length - 1; i >= 0 ; i--) {
+      if (this.datapacks[i].length == 0) {
+        if (filled) return false;
+      } else {
+        filled = true;
+      }
+    }
+    return true;
+  }
   
   @Watch("inputData")
   fromInputData() {
-    if (!this.inputData)
+    if (!this.inputData) {
+      this.inputDate = -1;
       return;
+    }
     let date = new Date();
     let day = date.getUTCDay();
     let hour = date.getUTCHours();
@@ -53,6 +75,9 @@ export default class PreditionComponent extends Vue {
       day--;
     }
     day %= 7;
+    this.inputDate = day;
+    if (day >= 4) 
+      return;
 
     this.datapacks[day] = this.inputData;
     for (let i = day + 1; i < this.datapacks.length; i++) {
