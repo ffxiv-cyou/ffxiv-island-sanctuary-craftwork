@@ -1,9 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue';
 import HelpView from '../views/HelpView.vue';
-import TView from '../views/Template.vue';
 import PredView from '../views/DemandPredition.vue';
 import Setting from '../views/SettingView.vue';
+import PlanView from '../views/PlanView.vue';
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -36,7 +36,12 @@ const router = createRouter({
     {
       path: '/plan',
       name: 'plan',
-      component: TView
+      component: PlanView
+    },
+    {
+      path: '/plan/:share',
+      name: 'plan_share',
+      component: PlanView
     },
     {
       path: '/setting',

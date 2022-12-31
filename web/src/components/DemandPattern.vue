@@ -163,7 +163,7 @@ export default class DemandPattern extends Vue {
     return "mji-popular-" + Popularity[this.popPattern][id].toString()
   }
 
-  @Watch("solver.demandPatterns", { deep: true })
+  @Watch("config.demandPatterns", { deep: true })
   reloadDemand() {
     for (let i = 0; i < 7; i++) {
       let result = this.solver.demandsFromPredict(this.demandPattern, i);
@@ -189,13 +189,16 @@ export default class DemandPattern extends Vue {
     }
     this.config.popPattern = this.inputPopPattern;
     this.config.save();
+    this.solver.updatePredictDemands();
     this.$router.push('/pred');
   }
 
   mounted() {
     this.parseShareCode();
     try {
-      this.reloadDemand();
+      this.solver.init().then(() => {
+        this.reloadDemand();
+      });
     }
     catch{}
   }

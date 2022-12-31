@@ -1,26 +1,28 @@
 icon.mji {
-    --width: 40px;
-    width: var(--width);
-    height: 40px;
+    --scale: 1;
+
+    width: calc(var(--scale) * 40px);
+    height: calc(var(--scale) * 40px);
+    background-size: calc(var(--scale) * 200px) calc(var(--scale) * 240px);
     display: inline-block;
     vertical-align: bottom;
     background-image: url("./mjicraftdemandresearch_hr1.png");
 }
 
 icon.mji-box {
-    background-position: -0px -0px;
+    background-position: calc(var(--scale) * -0px) calc(var(--scale) * -0px);
 }
 icon.mji-popular-3 {
-    background-position: -40px -0px;
+    background-position: calc(var(--scale) * -40px) calc(var(--scale) * -0px);
 }
 icon.mji-popular-2 {
-    background-position: -80px -0px;
+    background-position: calc(var(--scale) * -80px) calc(var(--scale) * -0px);
 }
 icon.mji-popular-1 {
-    background-position: -120px -0px;
+    background-position: calc(var(--scale) * -120px) calc(var(--scale) * -0px);
 }
 icon.mji-popular-4 {
-    background-position: -160px -0px;
+    background-position: calc(var(--scale) * -160px) calc(var(--scale) * -0px);
 }
 
 button.sched {

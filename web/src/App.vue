@@ -2,7 +2,7 @@
   <header>
     <div class="wrapper">
       <nav>
-        <RouterLink to="/">模拟器</RouterLink>
+        <RouterLink to="/">求解器</RouterLink>
         <RouterLink to="/plan">排班表</RouterLink>
         <RouterLink to="/pred">需求与趋势</RouterLink>
         <RouterLink to="/setting">设置</RouterLink>
@@ -11,7 +11,7 @@
     </div>
   </header>
 
-  <RouterView :solver="solver" class="body"/>
+  <RouterView :solver="solver" v-if="inited" class="body"/>
 </template>
 
 <script lang="ts">
@@ -28,6 +28,12 @@ import "@/assets/icons.css";
 })
 export default class App extends Vue {
   solver: SolverProxy = new SolverProxy();
+
+  inited = false;
+  async mounted() {
+    await this.solver.init();
+    this.inited = true;
+  }
 }
 </script>
 

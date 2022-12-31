@@ -1,15 +1,16 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <h1>帮助</h1>
+    <p>暂时不知道写啥</p>
+    <p>
+      ALL FINAL FANTASY XIV CONTENT IS PROPERTY OF SQUARE ENIX CO., LTD 
+    </p>
   </div>
 </template>
 
 <style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
+.about {
+  display: flex;
+  flex-direction: column;
 }
 </style>

@@ -11,7 +11,11 @@
           <label for="aligned-cb" class="pure-checkbox">
             <input type="checkbox" id="aligned-cb" v-model="updateUnknownOnly"/> 仅预测未知的趋势
           </label>
-          <button @click="predict" class="pure-button pure-button-primary">预测</button>
+          <button @click="predict" class="pure-button pure-button-primary">预测趋势</button>
+          <button @click="clear" class="pure-button pure-button-warning">重置趋势</button>
+        </div>
+        <div v-if="nextPattern">
+          下周欢迎度模式：{{ nextPattern }}
         </div>
       </fieldset>
     </div>
@@ -56,6 +60,8 @@ export default class PreditionComponent extends Vue {
     }
   }
 
+  nextPattern: number = 0;
+
   predict() {
     this.saveData();
 
@@ -77,6 +83,16 @@ export default class PreditionComponent extends Vue {
     }
 
     this.config.popPattern = dataArray[0][0] + 1;
+    this.nextPattern = dataArray[0][1] + 1;
+    this.solver.updatePredictDemands();
+    this.config.save();
+  }
+
+  clear() {
+    for (let i = 0; i < this.config.demandPatterns.length; i++) {
+      this.config.demandPatterns[i] = 0;
+    }
+    this.solver.updatePredictDemands();
     this.config.save();
   }
 

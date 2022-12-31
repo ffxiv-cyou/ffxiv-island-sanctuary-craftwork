@@ -91,9 +91,9 @@ export default class CraftSetting extends Vue {
 
   @Watch("date")
   updateDemands() {
-    if (this.date === 0) return;
-    this.solver.demands = this.solver.demandsFromPredict(this.solver.config.demandPatterns, this.date - 1);
-    this.solver.updateDemand();
+    if (this.date > 0) {
+      this.solver.setPredictDemands(this.date - 1);
+    }
   }
 
   mounted() {
@@ -135,7 +135,7 @@ export default class CraftSetting extends Vue {
   }
 }
 </script>
-<style>
+<style scoped>
 
 .object-item {
   height: 36px;

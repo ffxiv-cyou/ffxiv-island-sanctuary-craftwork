@@ -3,9 +3,10 @@
     <craft-setting class="container-left setting" :solver="solver"/>
     <div class="container-right solve">
       <h1>工坊求解模拟器</h1>
+      <p v-if="batches.length == 0">
+        首次使用？请先查看帮助页面了解详细使用说明。
+      </p>
       <button @click="load" class="pure-button">解最优</button>
-      <!-- <batch-view :batch="value" />
-      <hr/> -->
       <div>
         <batch-view v-for="(val, key) in batches" :batch="val" />
       </div>
@@ -28,11 +29,9 @@ export default class Home extends Vue {
   @Prop()
   solver!: SolverProxy;
 
-  value?: BatchValues;
   batches: BatchValues[] = [];
 
   async load() {
-    this.value = this.solver.simulate([10, 14, 10, 14, 10, 14]);
     let batches = this.solver.solveDay();
     this.batches = batches.slice(0, 100);
   }

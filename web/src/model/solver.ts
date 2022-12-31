@@ -33,44 +33,58 @@ export class SolverProxy {
      */
     public tension: number = 0;
 
+    inited = false;
+
     /**
      * 需求列表
      */
     public demands: number[] = [];
+
+    /**
+     * 缓存的预测需求列表
+     */
+    public predictDemands: number[][] = [];
+
     constructor() {
-        init().then(() => {
-            let recipe = new Uint16Array(6 * Recipes.length);
-            let cols = PopularSheet[0].length;
-            let pops = new Uint8Array(PopularSheet.length * cols);
-
-            for (let i = 0; i < Recipes.length; i++) {
-                const r = Recipes[i];
-                recipe[i * 6 + 0] = r.Id;
-                recipe[i * 6 + 1] = r.Theme0;
-                recipe[i * 6 + 2] = r.Theme1;
-                recipe[i * 6 + 3] = r.Level;
-                recipe[i * 6 + 4] = r.Time;
-                recipe[i * 6 + 5] = r.Price;
-            }
-            for (let i = 0; i < PopularSheet.length; i++) {
-                const r = PopularSheet[i];
-                for (let j = 0; j < r.length; j++) {
-                    pops[i * cols + j] = r[j];
-                }
-            }
-
-            this.repo = init_repo(recipe, pops, cols);
-        }).catch((e) => {
-            throw e;
-        });
         this.config = Config.load();
         for (let i = 0; i < Recipes.length; i++) {
             this.banList.push(false);
         }
+        init().catch((e) => {
+            throw e;
+        });
     }
 
     async init() {
+        if (this.inited)
+            return;
+
         await init();
+
+        let recipe = new Uint16Array(6 * Recipes.length);
+        let cols = PopularSheet[0].length;
+        let pops = new Uint8Array(PopularSheet.length * cols);
+
+        for (let i = 0; i < Recipes.length; i++) {
+            const r = Recipes[i];
+            recipe[i * 6 + 0] = r.Id;
+            recipe[i * 6 + 1] = r.Theme0;
+            recipe[i * 6 + 2] = r.Theme1;
+            recipe[i * 6 + 3] = r.Level;
+            recipe[i * 6 + 4] = r.Time;
+            recipe[i * 6 + 5] = r.Price;
+        }
+        for (let i = 0; i < PopularSheet.length; i++) {
+            const r = PopularSheet[i];
+            for (let j = 0; j < r.length; j++) {
+                pops[i * cols + j] = r[j];
+            }
+        }
+
+        this.repo = init_repo(recipe, pops, cols);
+        this.inited = true;
+
+        this.updatePredictDemands();
     }
 
     /**
@@ -92,8 +106,37 @@ export class SolverProxy {
         this.setDemand(this.demands);
     }
 
+    /**
+     * 从配置中的demandPatterns更新缓存的需求
+     */
+    updatePredictDemands() {
+        for (let i = 0; i < 7; i++) {
+            let result = this.demandsFromPredict(this.config.demandPatterns, i);
+            if (this.predictDemands.length <= i) {
+                this.predictDemands.push(result);
+            } else {
+                this.predictDemands[i] = result;
+            }
+        }
+    }
+
+    /**
+     * 根据配置的需求变化表设置指定日期的需求
+     * @param day 
+     */
+    setPredictDemands(day: number) {
+        for (let j = 0; j < this.predictDemands[day].length; j++) {
+            this.demands[j] = this.predictDemands[day][j];
+        }
+        this.setDemand(this.predictDemands[day]);
+    }
+
     get info() {
-        return new CraftworkInfo(this.tension, this.config.maxTension, this.config.craftLevel, this.config.workers);
+        return this.infoWithTension(this.tension);
+    }
+
+    infoWithTension(tension: number): CraftworkInfo {
+        return new CraftworkInfo(tension, this.config.maxTension, this.config.craftLevel, this.config.workers);
     }
 
     /**
@@ -120,6 +163,48 @@ export class SolverProxy {
         return new BatchValues(array, arr);
     }
 
+    simulateWeek(weekSteps: number[][]): BatchValues[] {
+        let batchValues = [];
+        set_pattern(this.repo, this.config.popPattern);
+
+        let demandChanges = [];
+        for (let i = 0; i < Recipes.length; i++) {
+            demandChanges.push(0);
+        }
+        let tensionAdd = 0;
+
+        for (let i = 0; i < weekSteps.length; i++) {
+            const daySteps = weekSteps[i];
+            let demands = this.predictDemands[i];
+            for (let j = 0; j < demandChanges.length; j++) {
+                this.demands[j] = demands[j] - demandChanges[j];
+            }
+            this.updateDemand();
+
+            let stepArray = new Uint8Array(daySteps.length);
+            for (let i = 0; i < daySteps.length; i++) {
+                stepArray[i] = daySteps[i];
+            }
+            let arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray);
+            let values = new BatchValues(daySteps, arr);
+            batchValues.push(values);
+
+            for (let j = 0; j < values.steps.length; j++) {
+                let step = values.steps[j];
+                if (j == 0) {
+                    demandChanges[step] += (1 * this.config.workers);
+                } else {
+                    demandChanges[step] += (2 * this.config.workers);
+                    tensionAdd += this.config.workers;
+                }
+            }
+            if (tensionAdd >= this.config.maxTension)
+                tensionAdd = this.config.maxTension;
+        }
+
+        return batchValues;
+    }
+
     /**
      * 根据当前人气和供给求解当天的最优值
      * @returns 
@@ -136,6 +221,20 @@ export class SolverProxy {
 
         let banList = new Uint16Array(banArr);
         let arr = solve_singleday(this.repo, this.info, this.config.level, banList);
+        return BatchValues.fromSimulateArray(arr);
+    }
+
+    solveDayDetail(demands: number[], banList: number[], tension: number) {
+        set_pattern(this.repo, this.config.popPattern);
+        let banArr = new Uint16Array(banList);
+        let demandArr = new Int8Array(demands);
+        set_demands(this.repo, demandArr);
+
+        let info = this.infoWithTension(tension);
+        let arr = solve_singleday(this.repo, info, this.config.level, banArr);
+
+        this.updateDemand(); // 还原demand 的修改
+
         return BatchValues.fromSimulateArray(arr);
     }
 
