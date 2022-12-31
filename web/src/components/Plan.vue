@@ -1,7 +1,7 @@
 <template>
   <div class="plan">
     <div class="plan-info info-box">
-      <span class="total-value">总收益: {{ sumVal }}</span>
+      <span class="total-value">总收益: {{ sumVal }} &times; {{ workers }} = {{ sumVal * workers }}</span>
       <span class="share-link">分享链接: <a :href="shareLink" target="_blank">{{ shareLink }}</a></span>
     </div>
     <div class="plan-batch info-box" v-for="(val, index) in batchValues">
@@ -32,6 +32,10 @@ export default class PlanView extends Vue {
 
   @Prop()
   steps!: number[][];
+
+  get workers() {
+    return this.solver.config.workers;
+  }
 
   batchValues: BatchValues[] = [];
 
