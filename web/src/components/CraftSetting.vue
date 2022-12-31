@@ -147,8 +147,7 @@ export default class CraftSetting extends Vue {
   height: 20px;
   line-height: 20px;
   border-bottom: 1px solid #e5e5e5;
-  margin-bottom: 5px;
-  margin-right: 10px;
+  margin: 5px 10px 5px 0;
   padding-bottom: 5px;
 }
 
@@ -184,5 +183,7 @@ input#tension {
 .mji-box+.mji-box {
   margin-left: -20px !important;
 }
-
+label + input {
+  margin-left: 0.5em;
+}
 </style>

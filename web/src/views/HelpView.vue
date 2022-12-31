@@ -12,5 +12,6 @@
 .about {
   display: flex;
   flex-direction: column;
+  max-width: 1000px;
 }
 </style>

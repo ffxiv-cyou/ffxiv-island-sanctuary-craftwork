@@ -270,4 +270,7 @@ input + label {
 #pop-pattern {
   width: 5em;
 }
+#share-link {
+  flex: 1;
+}
 </style>
