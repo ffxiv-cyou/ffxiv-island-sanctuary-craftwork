@@ -16,12 +16,14 @@ pub struct SolveLimit<'a> {
     /// 配方最高等级
     level: u8,
     /// 禁用配方
-    ban_list: &'a [u16]
+    ban_list: &'a [u16],
+    /// 结果数量
+    pub max_result: usize
 }
 
 impl<'a> SolveLimit<'a> {
     pub fn new(level: u8, ban_list: &'a [u16]) -> SolveLimit {
-        Self { level, ban_list }
+        Self { level, ban_list, max_result: 100 }
     }
 
     pub fn check(&self, recipe: &Recipe) -> bool {

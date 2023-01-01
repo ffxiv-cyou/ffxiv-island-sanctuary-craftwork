@@ -1,3 +1,5 @@
+use std::collections::BinaryHeap;
+
 use crate::{
     data::{CraftworkInfo, IDataRepo},
     simulator::simulate,
@@ -18,9 +20,14 @@ impl<'a, T> Solver for BFSolver<'a, T> where T: IDataRepo {
         let mut ret: Vec<Batch> = vec![];
         self.solve_sub(limit, &mut ret, Batch::new(), self.info.clone());
         // 结果排序
-        ret.sort();
-        ret.reverse();
-        ret
+        let mut heap = BinaryHeap::new();
+        for item in ret {
+            if heap.len() >= limit.max_result {
+                heap.pop();
+            }
+            heap.push(item)
+        }
+        heap.into_sorted_vec()
     }
 
     fn update_info(&mut self, info: CraftworkInfo) {

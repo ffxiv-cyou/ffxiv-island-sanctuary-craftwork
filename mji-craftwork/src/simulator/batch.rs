@@ -86,10 +86,9 @@ impl Batch {
 
 impl PartialOrd for Batch {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match self.value == other.value {
-            true => self.seq.partial_cmp(&other.seq),
-            false => self.value.partial_cmp(&other.value),
-        }
+        let a = self.value as usize * 10 + self.seq ;
+        let b = other.value as usize * 10 + other.seq;
+        b.partial_cmp(&a)
     }
 }
 
@@ -101,10 +100,9 @@ impl PartialEq for Batch {
 
 impl Ord for Batch {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match self.value == other.value {
-            true => self.seq.cmp(&other.seq),
-            false => self.value.cmp(&other.value),
-        }
+        let a = self.value as usize * 10 + self.seq ;
+        let b = other.value as usize * 10 + other.seq;
+        b.cmp(&a)
     }
 }
 impl Eq for Batch {}
