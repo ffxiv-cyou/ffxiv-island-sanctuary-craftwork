@@ -1,18 +1,13 @@
-# FFXIV Island Sanctuary Craftworks
+# FFXIV 无人岛工坊求解器
 
-## Rust wasm core (mji-craftwork)
+## 介绍
 
-```Bash
-wasm-pack build # Build
-wasm-pack test --headless --firefox # Test in Headless Browser
-wasm-pack publish # Publish to NPM
-```
+请访问 [https://island.ffxiv.cyou](https://island.ffxiv.cyou) 使用。
 
-## Web frontend
+## 编译方法
 
 ```Bash
+cd web
 npm install
-npm run dev
-npm run build
-npm run lint
+npm run build-only
 ```
