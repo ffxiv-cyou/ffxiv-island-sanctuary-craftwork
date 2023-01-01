@@ -8,8 +8,11 @@
           <input type="text" id="aligned-name" onclick="this.select();" placeholder="抓包数据" v-model="datapacks[i - 1]"  />
         </div>
         <p v-if="inputDate >= 4">
-          今天是第{{ inputDate + 1 }}天，解析需要前4天的数据。
+          今天是第{{ inputDate + 1 }}天，但趋势预测需要前4天的数据。抓包结果如下：
         </p>
+        <code v-if="inputDate >= 4">
+          {{ inputData }}
+        </code>
         <p v-if="!validate">
           您需要按顺序填入前4天的数据
         </p>
@@ -148,5 +151,8 @@ export default class PreditionComponent extends Vue {
   input[type="text"] {
     width: 100%;
   }
+}
+code {
+  line-break: anywhere;
 }
 </style>
