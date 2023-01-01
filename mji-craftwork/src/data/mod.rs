@@ -6,7 +6,7 @@ mod repo;
 pub use demand::{Demand, DemandChange};
 pub use popularity::Popularity;
 pub use recipe::{Recipe, RecipeState};
-pub use repo::{DataRepo, GameDataRepo, IDataRepo};
+pub use repo::{GameDataRepo, IDataRepo};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// 工坊当前状态

@@ -1,12 +1,6 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use super::{Demand, Popularity, Recipe, RecipeState};
-
-pub struct DataRepo<const T: usize> {
-    recipes: [Recipe; T],
-    demand: [i8; T],
-    popularity: [Popularity; T],
-}
+use super::{Popularity, Recipe, RecipeState};
 
 pub trait IDataRepo {
     fn recipe(&self, id: usize) -> &Recipe;
@@ -30,31 +24,6 @@ pub trait IDataRepo {
                 callback(recipe, self.state(i))
             }
         }
-    }
-}
-
-impl<const T: usize> DataRepo<T> {
-    pub fn new(recipes: [Recipe; T], demand: [i8; T], popularity: [Popularity; T]) -> Self {
-        Self {
-            recipes,
-            demand,
-            popularity,
-        }
-    }
-}
-
-impl<const T: usize> IDataRepo for DataRepo<T> {
-    fn recipe_len(&self) -> usize {
-        T
-    }
-    fn recipe(&self, id: usize) -> &Recipe {
-        &self.recipes[id]
-    }
-    fn popular(&self, id: usize) -> Popularity {
-        self.popularity[id]
-    }
-    fn demand(&self, id: usize) -> i8 {
-        self.demand[id]
     }
 }
 

@@ -1,4 +1,4 @@
-use mji_craftwork::{data::{GameDataRepo, Demand, Popularity, Recipe, CraftworkInfo}, solver::{BFSolver, Solver, SolveLimit}, init_repo, set_demands, solve_singleday, simulate, };
+use mji_craftwork::{data::{GameDataRepo, Popularity, Recipe, CraftworkInfo}, solver::{BFSolver, Solver, SolveLimit}, init_repo, set_demands, solve_singleday, simulate, };
 
 mod test_data;
 use test_data::{CRAFT_OBJECTS, POPULARITY_LIST, DEMAND_LIST};

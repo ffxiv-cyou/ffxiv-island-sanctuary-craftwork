@@ -28,7 +28,7 @@ pub fn simulate_batch(info: &CraftworkInfo, recipe: &[RecipeState]) -> Batch {
 
 #[cfg(test)]
 mod tests {
-    use crate::data::{CraftworkInfo, RecipeState, Recipe, Demand, Popularity};
+    use crate::data::{CraftworkInfo, RecipeState, Recipe, Popularity};
 
     use super::simulate;
 
