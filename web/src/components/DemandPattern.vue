@@ -173,14 +173,7 @@ export default class DemandPattern extends Vue {
         this.cachedDemands[i] = result;
       }
     }
-  }
-
-  applyDemand(day: number) {
-    if (this.cachedDemands.length < day) {
-      return;
-    }
-    this.solver.demands = this.cachedDemands[day - 1];
-    this.solver.updateDemand();
+    this.solver.updatePredictDemands();
   }
 
   applyShare() {
