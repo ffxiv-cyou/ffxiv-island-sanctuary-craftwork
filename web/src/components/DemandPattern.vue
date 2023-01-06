@@ -15,6 +15,7 @@
       <div class="recipe-header">
         <span class="recipe-name">产品名</span>
         <span class="recipe-pop">欢迎度</span>
+        <span class="recipe-value">基础时薪</span>
         <span class="recipe-pattern">需求趋势</span>
         <span class="recipe-demand" v-for="(id) in 7">
           第{{ id }}天
@@ -27,6 +28,7 @@
         <span class="recipe-pop">
           <icon class="mji" :class="popularity(item.Id)" />
         </span>
+        <span class="recipe-value">{{ getBasicPrice(item) }}</span>
         <span class="recipe-pattern pure-form">
           <select class="" v-model="demandPattern[item.Id]">
             <option value=0>未知</option>
@@ -145,6 +147,29 @@ export default class DemandPattern extends Vue {
     return CraftworkData.TrimName(name);
   }
 
+  getBasicPrice(item: CraftworkObject) {
+    let pop = Popularity[this.popPattern][item.Id];
+    let rate = 1;
+    switch(pop) {
+      case 0:
+        rate = 0;
+        break;
+      case 1:
+        rate = 1.4;
+        break;
+      case 2:
+        rate = 1.2;
+        break;
+      case 3:
+        rate = 1.0;
+        break;
+      case 4:
+        rate = 0.8;
+        break;
+    }
+    return (item.Price * rate / item.Time).toFixed(1);
+  }
+
   cachedDemands: number[][] = [];
   getDemand(id: number, day: number) {
     if (this.cachedDemands.length < day) {
@@ -220,6 +245,9 @@ export default class DemandPattern extends Vue {
     flex: 4em;
   }
   .recipe-pop {
+    flex: 1em;
+  }
+  .recipe-value {
     flex: 1em;
   }
   .recipe-pattern {
