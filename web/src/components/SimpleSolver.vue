@@ -5,12 +5,13 @@
       <div class="ban-item" v-for="(val, key) in banList">
         <icon class="item" :class="iconPath(val)" />
         <span>{{ itemName(val) }}</span>
-        <close @click="removeBan(key)"/>
+        <close @click="removeBan(key)" />
       </div>
     </div>
     <legend>推荐队列</legend>
     <div v-for="(val, key) in batches">
-      <batch-view :batch="val" :removeable="true" @remove="addBan(key, $event)" :demands="stepDemands[key]" :pops="stepPops[key]">
+      <batch-view :batch="val" :removeable="true" @remove="addBan(key, $event)"
+        :demands="stepDemands[key]" :pops="stepPops[key]">
         <button class="sched sched-green add-item" @click="apply(key)">+</button>
       </batch-view>
     </div>
@@ -64,7 +65,7 @@ export default class SimpleSolver extends Vue {
   cachedDemands?: number[];
   cachedtension?: number;
 
-  @Watch("banList", { deep: true})
+  @Watch("banList", { deep: true })
   async solve() {
     if (this.cachedDemands === undefined || this.cachedtension === undefined)
       return;
@@ -103,10 +104,6 @@ export default class SimpleSolver extends Vue {
     this.$emit("apply", this.batches[index].steps);
   }
 
-  mounted() {
-    // this.solveBatch();
-  }
-
   iconPath(id: number) {
     return "item-" + CraftworkData.GetRecipe(id).Icon;
   }
@@ -121,21 +118,25 @@ export default class SimpleSolver extends Vue {
   gap: 10px;
   flex-wrap: wrap;
 }
+
 .ban-item {
   display: inline-flex;
   align-items: center;
   height: 32px;
   border: #ccc 1px solid;
   border-radius: 3px;
+
   icon.item {
     width: 32px;
     height: 32px;
     background-size: 32px 32px;
   }
-  * + * {
+
+  *+* {
     margin-left: 5px;
   }
 }
+
 .add-item {
   --scale: 0.65 !important;
 }

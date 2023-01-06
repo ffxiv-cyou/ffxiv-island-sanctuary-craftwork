@@ -1,14 +1,7 @@
 <template>
   <div class="steps">
-    <step v-for="(val, index) in steps" 
-    :class="getClassName(val)" 
-    :step="val"
-    :value="values[index]"
-    :demand="getDemand(index)"
-    :pop="getPopularity(index)"
-    :removeable="removeable"
-    @remove="onRemove(index)"
-    />
+    <step v-for="(val, index) in steps" :class="getClassName(val)" :step="val" :value="values[index]"
+      :demand="getDemand(index)" :pop="getPopularity(index)" :removeable="removeable" @remove="onRemove(index)" />
   </div>
 </template>
 
@@ -21,7 +14,8 @@ import Step from "./Step.vue";
 @Component({
   components: {
     Step: Step
-  }
+  },
+  emits: ["remove"]
 })
 export default class Steps extends Vue {
   @Prop()
@@ -66,12 +60,15 @@ export default class Steps extends Vue {
   display: flex;
   gap: 2px;
 }
+
 .step-4 {
   flex: 4;
 }
+
 .step-6 {
   flex: 6;
 }
+
 .step-8 {
   flex: 8;
 }

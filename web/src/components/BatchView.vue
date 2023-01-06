@@ -22,7 +22,8 @@ import Steps from "./Steps.vue";
 @Component({
   components: {
     Steps: Steps
-  }
+  },
+  emits: ["remove"]
 })
 export default class BatchView extends Vue {
   @Prop()
@@ -36,11 +37,6 @@ export default class BatchView extends Vue {
 
   @Prop()
   pops?: number[];
-
-  @Watch("batch")
-  onBatchChange() {
-
-  }
 
   onRemove(index: number) {
     this.$emit("remove", index);

@@ -29,7 +29,8 @@ import Close from "./Close.vue";
 @Component({
   components: {
     Close: Close
-  }
+  },
+  emits: ["remove"]
 })
 export default class Step extends Vue {
   @Prop()
