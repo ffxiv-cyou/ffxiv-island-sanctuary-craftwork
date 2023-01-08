@@ -2,7 +2,7 @@
   <div class="plan">
     <div class="plan-info info-box">
       <span class="total-value">总收益: {{ sumVal }} &times; {{ workers }} = {{ sumVal * workers }}</span>
-      <span class="share-link">分享链接: <a :href="shareLink" target="_blank">{{ shareLink }}</a></span>
+      <span class="share-link"><a :href="shareLink" target="_blank">分享<span class="hide-lg">链接: {{ shareLink }}</span></a></span>
     </div>
     <div class="plan-batch info-box" v-for="(val, index) in batchValues">
       <div class="plan-batch-info">

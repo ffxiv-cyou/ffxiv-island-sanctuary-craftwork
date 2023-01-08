@@ -39,6 +39,7 @@ export default class App extends Vue {
 .body {
   margin: auto;
   height: calc(100vh - 40px);
+  padding: 0 20px;
 }
 
 header {
@@ -64,6 +65,7 @@ header {
 
 .container {
   display: flex;
+  padding: 0;
 }
 
 .container-left,
@@ -79,5 +81,21 @@ header {
 
 select {
   padding: 0.2em 0.6em !important;
+}
+
+@media (max-width: 1024px) {
+  .hide-lg {
+    display: none !important;
+  }
+}
+@media (max-width: 768px) {
+  .hide-md {
+    display: none !important;
+  }
+}
+@media (max-width: 568px) {
+  .hide-xs {
+    display: none !important;
+  }
 }
 </style>

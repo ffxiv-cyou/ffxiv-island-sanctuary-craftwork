@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="pure-form">
-      <fieldset>
+      <fieldset class="demand-pat">
         <label for="pop-pattern">欢迎度模式</label>
         <input id="pop-pattern" type="number" min=1 max=100 v-model.number="popPattern" />
         <label for="share-link" v-if="!shareMode">
@@ -17,7 +17,7 @@
         <span class="recipe-pop">欢迎度</span>
         <span class="recipe-value">基础时薪</span>
         <span class="recipe-pattern">需求趋势</span>
-        <span class="recipe-demand" v-for="(id) in 7">
+        <span class="recipe-demand hide-xs" v-for="(id) in 7">
           第{{ id }}天
         </span>
       </div>
@@ -46,7 +46,7 @@
             <option value=12>7弱</option>
           </select>
         </span>
-        <span class="recipe-demand" v-for="(day) in 7">
+        <span class="recipe-demand hide-xs" v-for="(day) in 7">
           <icon class="mji mji-box" v-for="() in getDemandIcons(item.Id, day)" />
           <span>({{ getDemand(item.Id, day) }})</span>
         </span>
@@ -237,6 +237,9 @@ export default class DemandPattern extends Vue {
   overflow-y: scroll;
   flex: 1;
 }
+.demand-pat {
+  display: flex;
+}
 
 .recipe-item,
 .recipe-header {
@@ -279,9 +282,6 @@ export default class DemandPattern extends Vue {
   margin: -4px -8px 0 -8px;
 }
 
-.recipe-demand {
-  text-align: right;
-}
 label + input {
   margin-left: 0.5em;
 }

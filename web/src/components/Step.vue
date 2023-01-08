@@ -3,7 +3,7 @@
     <div class="item-img">
       <icon class="item" :class="iconPath" />
     </div>
-    <div class="item-text">
+    <div class="item-text hide-md">
       <span class="item-name">{{ name }}</span>
       <div class="item-desc">
         <span class="step-value">{{ value }}币</span>,

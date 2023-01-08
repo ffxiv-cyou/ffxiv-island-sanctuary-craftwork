@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <predition class="container-left predition-col" :solver="solver" :inputData="packetData" />
+    <predition class="container-left predition-col hide-lg" :solver="solver" :inputData="packetData" />
     <Pattern class="container-right demand-pattern" :solver="solver" :inputShareCode="shareCode"/>
   </div>
 </template>
@@ -31,7 +31,7 @@ export default class PreditionView extends Vue {
 </script>
 <style>
 .predition-col {
-  width: 300px;
+  width: 260px;
 }
 
 </style>
