@@ -54,8 +54,7 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
                 DemandChange::Equal => return DemandPattern::Day2Strong,
                 DemandChange::Increase => return DemandPattern::Day2Weak,
                 // 2F or 2P
-                DemandChange::MassiveDecrease | 
-                DemandChange::MassiveIncrease => {
+                DemandChange::MassiveDecrease | DemandChange::MassiveIncrease => {
                     for i in 2..candidates.len() {
                         candidates[i] = false;
                     }
@@ -103,13 +102,13 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
 }
 
 /// 批量预测
-/// 
+///
 /// days 指单个物品有多少预测天数
 /// seqs 是需求和需求变化的数组，按单个物品的各天的变动优先排序。
 pub fn predict_all(seqs: &[(Demand, DemandChange)], days: usize) -> Vec<DemandPattern> {
     let mut result = vec![];
     for i in (0..seqs.len()).step_by(days) {
-        result.push(predict(&seqs[i..i+days]));
+        result.push(predict(&seqs[i..i + days]));
     }
     result
 }

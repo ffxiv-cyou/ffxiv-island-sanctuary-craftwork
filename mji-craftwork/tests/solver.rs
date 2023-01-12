@@ -1,10 +1,13 @@
-use mji_craftwork::{data::{GameDataRepo, Popularity, Recipe, CraftworkInfo}, solver::{BFSolver, Solver, SolveLimit}, init_repo, set_demands, solve_singleday, simulate, };
+use mji_craftwork::{
+    data::{CraftworkInfo, GameDataRepo, Popularity, Recipe},
+    init_repo, set_demands, simulate, solve_singleday,
+    solver::{BFSolver, SolveLimit, Solver},
+};
 
 mod test_data;
-use test_data::{CRAFT_OBJECTS, POPULARITY_LIST, DEMAND_LIST};
+use test_data::{CRAFT_OBJECTS, DEMAND_LIST, POPULARITY_LIST};
 
 fn load_data<const T: usize>() -> GameDataRepo {
-
     let mut recpies = vec![];
 
     for i in 0..usize::min(CRAFT_OBJECTS.len(), T) {
@@ -22,7 +25,7 @@ fn load_data<const T: usize>() -> GameDataRepo {
     let mut pop_vec = vec![];
     for r in POPULARITY_LIST {
         let mut pop: Vec<Popularity> = vec![];
-        for i in 1..usize::min(r.len(), T+1) {
+        for i in 1..usize::min(r.len(), T + 1) {
             pop.push(r[i].into());
         }
         pop_vec.push(pop);
@@ -68,7 +71,7 @@ fn load_test_demand(repo: &mut GameDataRepo) {
 fn init_test() {
     let mut repo = load_data_init();
     load_test_demand(&mut repo);
-    
+
     solve_singleday(&repo, &CraftworkInfo::new(0, 30, 1, 1), 10, vec![]);
 }
 
@@ -76,12 +79,17 @@ fn init_test() {
 fn predict() {
     let repo = load_data::<51>();
     let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
-    let empty= vec![];
+    let empty = vec![];
     let limit = SolveLimit::new(10, &empty);
     let result = solver.solve(&limit);
     println!("length: {}", result.len());
     for i in 0..20 {
-        println!("val: {},{:?}, {:?}", result[i].get_val(), result[i].get_steps(), result[i].get_values());
+        println!(
+            "val: {},{:?}, {:?}",
+            result[i].get_val(),
+            result[i].get_steps(),
+            result[i].get_values()
+        );
     }
 }
 

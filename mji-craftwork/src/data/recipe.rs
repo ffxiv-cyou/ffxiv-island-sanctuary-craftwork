@@ -51,7 +51,9 @@ impl RecipeState {
         }
     }
     pub fn factor(&self, demand_sub: i16) -> f32 {
-        (Demand::from_val(self.demand as i16 - demand_sub).factor() as u16 * self.popularity.factor() as u16) as f32 / 10000f32
+        (Demand::from_val(self.demand as i16 - demand_sub).factor() as u16
+            * self.popularity.factor() as u16) as f32
+            / 10000f32
     }
     pub fn value(&self) -> u16 {
         self.value

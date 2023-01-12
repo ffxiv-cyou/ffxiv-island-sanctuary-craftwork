@@ -14,7 +14,7 @@ pub enum Demand {
     /// 供过于求
     Low,
     /// 严重供过于求
-    VeryLow
+    VeryLow,
 }
 
 impl Demand {
@@ -46,7 +46,7 @@ impl Demand {
             10..=17 => Self::High,
             2..=9 => Self::Average,
             -6..=1 => Self::Low,
-            i16::MIN..=-7 => Self::VeryLow
+            i16::MIN..=-7 => Self::VeryLow,
         }
     }
 
@@ -70,7 +70,7 @@ impl From<u8> for Demand {
             2 => Self::Average,
             3 => Self::Low,
             4 => Self::VeryLow,
-            _ => panic!()
+            _ => panic!(),
         }
     }
 }
@@ -133,7 +133,7 @@ impl DemandChange {
             2..=4 => Self::Increase,
             -1..=1 => Self::Equal,
             -5..=-2 => Self::Decerease,
-            i16::MIN..=-6 => Self::MassiveDecrease
+            i16::MIN..=-6 => Self::MassiveDecrease,
         }
     }
 }
@@ -146,7 +146,7 @@ impl From<u8> for DemandChange {
             2 => Self::Equal,
             1 => Self::Increase,
             0 => Self::MassiveIncrease,
-            _ => panic!()
+            _ => panic!(),
         }
     }
 }

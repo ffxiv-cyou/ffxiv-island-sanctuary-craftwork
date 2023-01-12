@@ -11,7 +11,7 @@ pub enum Popularity {
     /// 普普通通
     Average,
     /// 无人问津
-    Low
+    Low,
 }
 
 impl Popularity {
@@ -35,7 +35,7 @@ impl From<u8> for Popularity {
             2 => Self::High,
             3 => Self::Average,
             4 => Self::Low,
-            _ => Self::Unknown
+            _ => Self::Unknown,
         }
     }
 }
