@@ -1,6 +1,9 @@
 <template>
-  <div class="batch" v-if="batch">
-    <slot></slot>
+  <div
+    v-if="batch"
+    class="batch"
+  >
+    <slot />
     <div class="batch-value">
       {{ batch.value }}
     </div>
@@ -10,13 +13,14 @@
       :removeable="removeable"
       :demands="demands"
       :pops="pops"
-      @remove="onRemove" />
+      @remove="onRemove"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import type { BatchValues } from "@/model/solver";
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue } from "vue-facing-decorator";
 import Steps from "./Steps.vue";
 
 @Component({

@@ -1,21 +1,33 @@
 <template>
   <div class="container">
-    <craft-setting class="container-left setting" :solver="solver"/>
+    <craft-setting
+      class="container-left setting"
+      :solver="solver"
+    />
     <div class="container-right solve">
       <h1>工坊求解模拟器</h1>
       <p v-if="batches.length == 0">
         首次使用？请先查看帮助页面了解详细使用说明。
       </p>
-      <button @click="load" class="pure-button">解最优</button>
+      <button
+        class="pure-button"
+        @click="load"
+      >
+        解最优
+      </button>
       <div>
-        <batch-view v-for="(val, key) in batches" :batch="val" />
+        <batch-view
+          v-for="(val, key) in batches"
+          :key="key"
+          :batch="val"
+        />
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Ref, Vue } from "vue-facing-decorator";
-import type {  SolverProxy, Batch, BatchValues } from "@/model/solver"
+import { Component, Prop, Vue } from "vue-facing-decorator";
+import type {  SolverProxy, BatchValues } from "@/model/solver"
 import CraftSetting from "@/components/CraftSetting.vue";
 import BatchView from "@/components/BatchView.vue";
 

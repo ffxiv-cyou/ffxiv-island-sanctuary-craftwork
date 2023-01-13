@@ -3,9 +3,19 @@
     <div class="pure-form pure-form-stacked">
       <legend>趋势预测</legend>
       <fieldset>
-        <div class="pure-control-group" v-for="(i) in 4">
+        <div
+          v-for="(i) in 4"
+          :key="i"
+          class="pure-control-group"
+        >
           <label for="aligned-name">第{{ i }}天</label>
-          <input type="text" id="aligned-name" onclick="this.select();" placeholder="抓包数据" v-model="datapacks[i - 1]"  />
+          <input
+            id="aligned-name"
+            v-model="datapacks[i - 1]"
+            type="text"
+            onclick="this.select();"
+            placeholder="抓包数据"
+          >
         </div>
         <p v-if="inputDate >= 4">
           今天是第{{ inputDate + 1 }}天，但趋势预测需要前4天的数据。抓包结果如下：
@@ -17,11 +27,29 @@
           您需要按顺序填入前4天的数据
         </p>
         <div class="pure-controls">
-          <label for="aligned-cb" class="pure-checkbox">
-            <input type="checkbox" id="aligned-cb" v-model="updateUnknownOnly"/> 仅预测未知的趋势
+          <label
+            for="aligned-cb"
+            class="pure-checkbox"
+          >
+            <input
+              id="aligned-cb"
+              v-model="updateUnknownOnly"
+              type="checkbox"
+            > 仅预测未知的趋势
           </label>
-          <button @click="predict" class="pure-button pure-button-primary" :disabled="!validate">预测趋势</button>
-          <button @click="clear" class="pure-button pure-button-warning">重置趋势</button>
+          <button
+            class="pure-button pure-button-primary"
+            :disabled="!validate"
+            @click="predict"
+          >
+            预测趋势
+          </button>
+          <button
+            class="pure-button pure-button-warning"
+            @click="clear"
+          >
+            重置趋势
+          </button>
         </div>
         <div v-if="nextPattern">
           下周欢迎度模式：{{ nextPattern }}
@@ -33,7 +61,7 @@
 <script lang="ts">
 import { Utils } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
-import { Component, Ref, Vue, Prop, Watch } from "vue-facing-decorator";
+import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 @Component({})
 export default class PreditionComponent extends Vue {
   @Prop()

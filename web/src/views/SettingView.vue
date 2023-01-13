@@ -6,22 +6,50 @@
       <fieldset>
         <div class="pure-control-group">
           <label for="level">开拓等级</label>
-          <input id="level" type="number" min=1 max=10 placeholder="1-10" v-model="level" />
+          <input
+            id="level"
+            v-model="level"
+            type="number"
+            min="1"
+            max="10"
+            placeholder="1-10"
+          >
           <span class="pure-form-message-inline">当前开拓等级，大于此等级的配方不会被求解</span>
         </div>
         <div class="pure-control-group">
           <label for="craft-level">工坊等级</label>
-          <input id="craft-level" type="number" min=1 max=3 placeholder="1-3" v-model="craft_level" />
+          <input
+            id="craft-level"
+            v-model="craft_level"
+            type="number"
+            min="1"
+            max="3"
+            placeholder="1-3"
+          >
           <span class="pure-form-message-inline">当前工坊等级，影响产品价格</span>
         </div>
         <div class="pure-control-group">
           <label for="max-tension">干劲上限</label>
-          <input id="max-tension" type="number" min=0 max=35 placeholder="0-35" v-model="max_tension" />
+          <input
+            id="max-tension"
+            v-model="max_tension"
+            type="number"
+            min="0"
+            max="35"
+            placeholder="0-35"
+          >
           <span class="pure-form-message-inline">工坊的干劲上限，影响产品价格</span>
         </div>
         <div class="pure-control-group">
           <label for="workers">工坊数量</label>
-          <input id="workers" type="number" min=1 max=3 placeholder="1-3" v-model="workers"/>
+          <input
+            id="workers"
+            v-model="workers"
+            type="number"
+            min="1"
+            max="3"
+            placeholder="1-3"
+          >
           <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算</span>
         </div>
       </fieldset>
@@ -30,7 +58,7 @@
 </template>
 <script lang="ts">
 import type { SolverProxy } from "@/model/solver";
-import { Component, Prop, Ref, Vue } from "vue-facing-decorator";
+import { Component, Prop, Vue } from "vue-facing-decorator";
 @Component({})
 export default class SettingView extends Vue {
   @Prop()

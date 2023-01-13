@@ -3,12 +3,37 @@
     <div class="pure-form">
       <fieldset class="demand-pat">
         <label for="pop-pattern">欢迎度模式</label>
-        <input id="pop-pattern" type="number" min=1 max=100 v-model.number="popPattern" />
-        <label for="share-link" v-if="!shareMode">
-          <a :href="shareLink" target="_blank">分享链接</a>
+        <input
+          id="pop-pattern"
+          v-model.number="popPattern"
+          type="number"
+          min="1"
+          max="100"
+        >
+        <label
+          v-if="!shareMode"
+          for="share-link"
+        >
+          <a
+            :href="shareLink"
+            target="_blank"
+          >分享链接</a>
         </label>
-        <input v-if="!shareMode" id="share-link" onclick="this.select();" type="text" placeholder="用于分享的趋势代码" v-model="shareLink" />
-        <button v-if="shareMode" class="pure-button" @click="applyShare">导入当前设置</button>
+        <input
+          v-if="!shareMode"
+          id="share-link"
+          v-model="shareLink"
+          onclick="this.select();"
+          type="text"
+          placeholder="用于分享的趋势代码"
+        >
+        <button
+          v-if="shareMode"
+          class="pure-button"
+          @click="applyShare"
+        >
+          导入当前设置
+        </button>
       </fieldset>
     </div>
     <div class="pure-form">
@@ -17,37 +42,59 @@
         <span class="recipe-pop">欢迎度</span>
         <span class="recipe-value">基础时薪</span>
         <span class="recipe-pattern">需求趋势</span>
-        <span class="recipe-demand hide-xs" v-for="(id) in 7">
+        <span
+          v-for="(id) in 7"
+          :key="id"
+          class="recipe-demand hide-xs"
+        >
           第{{ id }}天
         </span>
       </div>
     </div>
     <div class="recipes">
-      <div class="recipe-item" v-for="(item) in objects">
+      <div
+        v-for="(item, index) in objects"
+        :key="index"
+        class="recipe-item"
+      >
         <span class="recipe-name">{{ trimName(item.Name) }}</span>
         <span class="recipe-pop">
-          <icon class="mji" :class="popularity(item.Id)" />
+          <icon
+            class="mji"
+            :class="popularity(item.Id)"
+          />
         </span>
         <span class="recipe-value">{{ getBasicPrice(item) }}</span>
         <span class="recipe-pattern pure-form">
-          <select class="" v-model="demandPattern[item.Id]">
-            <option value=0>未知</option>
-            <option value=1>2强</option>
-            <option value=2>2弱</option>
-            <option value=3>3强</option>
-            <option value=4>3弱</option>
-            <option value=5>4强</option>
-            <option value=6>4弱</option>
-            <option value=7>5强</option>
-            <option value=8>5弱</option>
-            <option value=9>6强</option>
-            <option value=10>6弱</option>
-            <option value=11>7强</option>
-            <option value=12>7弱</option>
+          <select
+            v-model="demandPattern[item.Id]"
+            class=""
+          >
+            <option value="0">未知</option>
+            <option value="1">2强</option>
+            <option value="2">2弱</option>
+            <option value="3">3强</option>
+            <option value="4">3弱</option>
+            <option value="5">4强</option>
+            <option value="6">4弱</option>
+            <option value="7">5强</option>
+            <option value="8">5弱</option>
+            <option value="9">6强</option>
+            <option value="10">6弱</option>
+            <option value="11">7强</option>
+            <option value="12">7弱</option>
           </select>
         </span>
-        <span class="recipe-demand hide-xs" v-for="(day) in 7">
-          <icon class="mji mji-box" v-for="() in getDemandIcons(item.Id, day)" />
+        <span
+          v-for="(day) in 7"
+          :key="day"
+          class="recipe-demand hide-xs"
+        >
+          <icon
+            v-for="(i) in getDemandIcons(item.Id, day)"
+            :key="i"
+            class="mji mji-box"
+          />
           <span>({{ getDemand(item.Id, day) }})</span>
         </span>
       </div>
@@ -56,10 +103,10 @@
 </template>
 <script lang="ts">
 import type { SolverProxy } from "@/model/solver";
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import CraftObjects from "@/data/MJICraftworksObject.json";
-import { CraftworkData, CraftworkObject, DemandUtils, Utils } from "@/model/data";
-import { FromShareCode, ToShareCode, Compress } from "@/model/share";
+import { CraftworkData, CraftworkObject, DemandUtils } from "@/model/data";
+import { FromShareCode, ToShareCode } from "@/model/share";
 import Popularity from "@/data/MJICraftworksPopularity.json";
 
 @Component({

@@ -69,7 +69,13 @@ fn init_test() {
     let repo = load_data_init();
     let demands = load_test_demand();
 
-    solve_singleday(&repo, &CraftworkInfo::new(0, 30, 1, 1), 10, vec![], &demands);
+    solve_singleday(
+        &repo,
+        &CraftworkInfo::new(0, 30, 1, 1),
+        10,
+        vec![],
+        &demands,
+    );
 }
 
 #[test]

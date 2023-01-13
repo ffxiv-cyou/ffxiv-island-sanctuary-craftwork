@@ -1,27 +1,47 @@
 <template>
   <div class="step-item">
     <div class="item-img">
-      <icon class="item" :class="iconPath" />
+      <icon
+        class="item"
+        :class="iconPath"
+      />
     </div>
     <div class="item-text hide-md">
       <span class="item-name">{{ name }}</span>
       <div class="item-desc">
         <span class="step-value">{{ value }}币</span>,
         <span class="step-time">{{ time }}h</span>
-        <span class="step-pop" v-if="pop">
-          <icon class="mji" :class="popularity" />
+        <span
+          v-if="pop"
+          class="step-pop"
+        >
+          <icon
+            class="mji"
+            :class="popularity"
+          />
         </span>
-        <span class="step-demand" v-if="demand">
-          <icon class="mji mji-box" v-for="() in demandBox" />
+        <span
+          v-if="demand"
+          class="step-demand"
+        >
+          <icon
+            v-for="(i) in demandBox"
+            :key="i"
+            class="mji mji-box"
+          />
         </span>
       </div>
     </div>
-    <close v-if="removeable" class="item-remove" @close="onClose" />
+    <close
+      v-if="removeable"
+      class="item-remove"
+      @close="onClose"
+    />
   </div>
 </template>
   
 <script lang="ts">
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue } from "vue-facing-decorator";
 import { CraftworkData, DemandUtils } from "@/model/data";
 import "@/assets/items.css";
 import Close from "./Close.vue";

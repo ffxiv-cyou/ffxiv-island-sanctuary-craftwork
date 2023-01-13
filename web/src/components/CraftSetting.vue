@@ -4,12 +4,19 @@
       <legend>设置</legend>
       <div class="pure-control-group">
         <label for="tension">当前干劲</label>
-        <input id="tension" type="number" min=0 max=35 placeholder="" v-model="tension" />
+        <input
+          id="tension"
+          v-model="tension"
+          type="number"
+          min="0"
+          max="35"
+          placeholder=""
+        >
       </div>
     </form>
     <div class="pure-form pure-form-stacked pure-g">
       <legend>日期</legend>
-      <date-bar v-model="date"/>
+      <date-bar v-model="date" />
     </div>
     <div class="objects-header pure-g">
       <span class="item-name pure-u-8-24">产品名</span>
@@ -18,20 +25,42 @@
       <span class="item-demand pure-u-3-24">禁用</span>
     </div>
     <div class="objects">
-      <div class="object-item pure-form pure-g" v-for="(item, index) in objects">
+      <div
+        v-for="(item, index) in objects"
+        :key="index"
+        class="object-item pure-form pure-g"
+      >
         <span class="item-name pure-u-9-24">{{ trimName(item.Name) }}</span>
         <span class="item-pop pure-u-2-24">
-          <icon class="mji" :class="popularity(item.Id)" />
+          <icon
+            class="mji"
+            :class="popularity(item.Id)"
+          />
         </span>
-        <span class="item-demand-box pure-u-6-24"
+        <span
+          class="item-demand-box pure-u-6-24"
           :class="{'pure-u-6-24': customDemand, 'pure-u-10-24': !customDemand }"
-        @click="changeDemandBox(item.Id)">
-          <icon class="mji mji-box" v-for="() in getDemandBox(demands[item.Id])" />
+          @click="changeDemandBox(item.Id)"
+        >
+          <icon
+            v-for="(i) in getDemandBox(demands[item.Id])"
+            :key="i"
+            class="mji mji-box"
+          />
         </span>
-        <input class="item-demand pure-u-4-24" type="number" placeholder="需求" v-model.number="demands[item.Id]"
-          @change="onDemandChange" v-if="customDemand"/>
+        <input
+          v-if="customDemand"
+          v-model.number="demands[item.Id]"
+          class="item-demand pure-u-4-24"
+          type="number"
+          placeholder="需求"
+          @change="onDemandChange"
+        >
         <span class="item-disable pure-u-3-24">
-          <input type="checkbox" v-model="ban_states[item.Id]" />
+          <input
+            v-model="ban_states[item.Id]"
+            type="checkbox"
+          >
         </span>
       </div>
     </div>
@@ -39,7 +68,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import CraftObjects from "@/data/MJICraftworksObject.json";
 import Popularity from "@/data/MJICraftworksPopularity.json";
 import type { SolverProxy } from "@/model/solver";

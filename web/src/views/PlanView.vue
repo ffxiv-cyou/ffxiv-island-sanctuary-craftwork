@@ -1,15 +1,38 @@
 <template>
   <div class="plan-view">
     <h1>排班表</h1>
-    <dialog ref="dialog" class="solver-dialog">
-      <close class="dialog-close" @click="close" />
-      <simple-solver ref="ssolver" class="solver" :solver="solver" @apply="apply" />
+    <dialog
+      ref="dialog"
+      class="solver-dialog"
+    >
+      <close
+        class="dialog-close"
+        @click="close"
+      />
+      <simple-solver
+        ref="ssolver"
+        class="solver"
+        :solver="solver"
+        @apply="apply"
+      />
     </dialog>
     <div v-if="shareCode">
       <div>排班表可能由于需求和欢迎度设置的不同造成计算结果差异，若有需要请检查需求和欢迎度设置。</div>
-      <div><button class="pure-button" @click="importPlan">导入此排班表</button></div>
+      <div>
+        <button
+          class="pure-button"
+          @click="importPlan"
+        >
+          导入此排班表
+        </button>
+      </div>
     </div>
-    <plan :solver="solver" :steps="steps" @addSteps="addStep" @delSteps="delStep" />
+    <plan
+      :solver="solver"
+      :steps="steps"
+      @add-steps="addStep"
+      @del-steps="delStep"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -17,7 +40,7 @@ import Close from "@/components/Close.vue";
 import SimpleSolver from "@/components/SimpleSolver.vue";
 import { FromShareCode } from "@/model/share";
 import type { SolverProxy } from "@/model/solver";
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Plan from "../components/Plan.vue"
 @Component({
   components: {
@@ -109,7 +132,6 @@ export default class PlanView extends Vue {
 
     this.steps = [];
     let binary = FromShareCode(this.shareCode as string);
-    let current = -1;
     for (let i = 0; i < binary.length; i++) {
       const len = binary[i];
       let arr = Array.from(binary.slice(i + 1, i + 1 + len));

@@ -60,9 +60,9 @@ export class SolverProxy {
 
         await init();
 
-        let recipe = new Uint16Array(6 * Recipes.length);
-        let cols = PopularSheet[0].length;
-        let pops = new Uint8Array(PopularSheet.length * cols);
+        const recipe = new Uint16Array(6 * Recipes.length);
+        const cols = PopularSheet[0].length;
+        const pops = new Uint8Array(PopularSheet.length * cols);
 
         for (let i = 0; i < Recipes.length; i++) {
             const r = Recipes[i];
@@ -112,7 +112,7 @@ export class SolverProxy {
      */
     updatePredictDemands() {
         for (let i = 0; i < 7; i++) {
-            let result = this.demandsFromPredict(this.config.demandPatterns, i);
+            const result = this.demandsFromPredict(this.config.demandPatterns, i);
             if (this.predictDemands.length <= i) {
                 this.predictDemands.push(result);
             } else {
@@ -150,11 +150,11 @@ export class SolverProxy {
      * @returns 配方收益
      */
     simulate(array: number[]): BatchValues {
-        let steps = new Uint8Array(array.length);
+        const steps = new Uint8Array(array.length);
         for (let i = 0; i < steps.length; i++) {
             steps[i] = array[i];
         }
-        let arr = simulate(this.repo, this.info, steps, this.demandsArray);
+        const arr = simulate(this.repo, this.info, steps, this.demandsArray);
         return new BatchValues(array, arr);
     }
 
@@ -164,9 +164,9 @@ export class SolverProxy {
      * @returns 
      */
     simulateWeek(weekSteps: number[][]): BatchValues[] {
-        let batchValues = [];
+        const batchValues = [];
 
-        let demandChanges = []; // 各个配方的需求变动值
+        const demandChanges = []; // 各个配方的需求变动值
         for (let i = 0; i < Recipes.length; i++) {
             demandChanges.push(0);
         }
@@ -174,21 +174,21 @@ export class SolverProxy {
 
         for (let i = 0; i < weekSteps.length; i++) {
             const daySteps = weekSteps[i];
-            let demands = new Int8Array(this.predictDemands[i]);
+            const demands = new Int8Array(this.predictDemands[i]);
             for (let j = 0; j < demandChanges.length; j++) {
                 demands[j] -= demandChanges[j];
             }
 
-            let stepArray = new Uint8Array(daySteps.length);
+            const stepArray = new Uint8Array(daySteps.length);
             for (let i = 0; i < daySteps.length; i++) {
                 stepArray[i] = daySteps[i];
             }
-            let arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray, demands);
-            let values = new BatchValues(daySteps, arr);
+            const arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray, demands);
+            const values = new BatchValues(daySteps, arr);
             batchValues.push(values);
 
             for (let j = 0; j < values.steps.length; j++) {
-                let step = values.steps[j];
+                const step = values.steps[j];
                 if (j == 0) {
                     demandChanges[step] += (1 * this.config.workers);
                 } else {
@@ -208,15 +208,15 @@ export class SolverProxy {
      * @returns 
      */
     solveDay(): BatchValues[] {
-        let banArr = [];
+        const banArr = [];
         for (let i = 0; i < this.banList.length; i++) {
             if (this.banList[i]) {
                 banArr.push(i);
             }
         }
 
-        let banList = new Uint16Array(banArr);
-        let arr = solve_singleday(this.repo, this.info, this.config.level, banList, this.demandsArray);
+        const banList = new Uint16Array(banArr);
+        const arr = solve_singleday(this.repo, this.info, this.config.level, banList, this.demandsArray);
         return BatchValues.fromSimulateArray(arr);
     }
 
@@ -228,11 +228,11 @@ export class SolverProxy {
      * @returns 
      */
     solveDayDetail(demands: number[], banList: number[], tension: number) {
-        let banArr = new Uint16Array(banList);
-        let demandArr = new Int8Array(demands);
+        const banArr = new Uint16Array(banList);
+        const demandArr = new Int8Array(demands);
 
-        let info = this.infoWithTension(tension);
-        let arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr);
+        const info = this.infoWithTension(tension);
+        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr);
 
         return BatchValues.fromSimulateArray(arr);
     }
@@ -254,7 +254,7 @@ export class SolverProxy {
         }
 
         const result = pattern_predict(array, packets.length);
-        let arr = [];
+        const arr = [];
         for (let i = 0; i < result.length; i++) {
             arr.push(result[i] as DemandPattern);
         }
@@ -273,7 +273,7 @@ export class SolverProxy {
             array[i] = pattern[i];
         }
         const result = pattern_demand(array, day);
-        let arr = [];
+        const arr = [];
         for (let i = 0; i < result.length; i++) {
             arr.push(result[i]);
         }
@@ -302,9 +302,9 @@ export class Batch {
     }
 
     static fromArray(array: Uint16Array): Batch {
-        let value = array[0];
-        let count = array[1];
-        let steps = [];
+        const value = array[0];
+        const count = array[1];
+        const steps = [];
         for (let i = 2; i < 8; i++) {
             if (array[i] != 0)
                 steps.push(array[i]);
@@ -313,7 +313,7 @@ export class Batch {
     }
 
     static fromSimulateArray(array: Uint16Array): Batch[] {
-        let result = [];
+        const result = [];
         for (let i = 0; i < array.length; i += 8) {
             result.push(Batch.fromArray(array.slice(i, i + 8)));
         }
@@ -342,9 +342,9 @@ export class BatchValues extends Batch {
     }
 
     static fromArray(array: Uint16Array): BatchValues {
-        let value = array[0];
-        let count = array[1];
-        let steps = [];
+        // const value = array[0];
+        // const count = array[1];
+        const steps = [];
         for (let i = 2; i < 8; i++) {
             if (array[i] != 0)
                 steps.push(array[i]);
@@ -353,7 +353,7 @@ export class BatchValues extends Batch {
     }
 
     static fromSimulateArray(array: Uint16Array): BatchValues[] {
-        let result = [];
+        const result = [];
         for (let i = 0; i < array.length; i += 14) {
             result.push(BatchValues.fromArray(array.slice(i, i + 14)));
         }

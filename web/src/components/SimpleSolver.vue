@@ -1,25 +1,47 @@
 <template>
   <div>
-    <legend v-if="banList.length > 0">禁用列表</legend>
+    <legend v-if="banList.length > 0">
+      禁用列表
+    </legend>
     <div class="ban-list">
-      <div class="ban-item" v-for="(val, key) in banList">
-        <icon class="item" :class="iconPath(val)" />
+      <div
+        v-for="(val, key) in banList"
+        :key="key"
+        class="ban-item"
+      >
+        <icon
+          class="item"
+          :class="iconPath(val)"
+        />
         <span>{{ itemName(val) }}</span>
         <close @click="removeBan(key)" />
       </div>
     </div>
     <legend>推荐队列</legend>
-    <div v-for="(val, key) in batches">
-      <batch-view :batch="val" :removeable="true" @remove="addBan(key, $event)"
-        :demands="stepDemands[key]" :pops="stepPops[key]">
-        <button class="sched sched-green add-item" @click="apply(key)">+</button>
+    <div
+      v-for="(val, key) in batches"
+      :key="key"
+    >
+      <batch-view
+        :batch="val"
+        :removeable="true"
+        :demands="stepDemands[key]"
+        :pops="stepPops[key]"
+        @remove="addBan(key, $event)"
+      >
+        <button
+          class="sched sched-green add-item"
+          @click="apply(key)"
+        >
+          +
+        </button>
       </batch-view>
     </div>
   </div>
 </template>
 <script lang="ts">
-import type { Batch, BatchValues, SolverProxy } from "@/model/solver";
-import { Component, Ref, Vue, Prop, Watch } from "vue-facing-decorator";
+import type { BatchValues, SolverProxy } from "@/model/solver";
+import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import BatchView from "@/components/BatchView.vue";
 import Close from "@/components/Close.vue";
 import { CraftworkData } from "@/model/data";

@@ -1,15 +1,29 @@
 <template>
   <header>
     <nav>
-      <RouterLink to="/">求解器</RouterLink>
-      <RouterLink to="/plan">排班表</RouterLink>
-      <RouterLink to="/pred">需求与趋势</RouterLink>
-      <RouterLink to="/setting">设置</RouterLink>
-      <RouterLink to="/help">帮助</RouterLink>
+      <RouterLink to="/">
+        求解器
+      </RouterLink>
+      <RouterLink to="/plan">
+        排班表
+      </RouterLink>
+      <RouterLink to="/pred">
+        需求与趋势
+      </RouterLink>
+      <RouterLink to="/setting">
+        设置
+      </RouterLink>
+      <RouterLink to="/help">
+        帮助
+      </RouterLink>
     </nav>
   </header>
 
-  <RouterView :solver="solver" v-if="inited" class="body" />
+  <RouterView
+    v-if="inited"
+    :solver="solver"
+    class="body"
+  />
 </template>
 
 <script lang="ts">

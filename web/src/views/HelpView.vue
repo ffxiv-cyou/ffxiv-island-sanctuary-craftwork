@@ -1,8 +1,12 @@
 <template>
   <div class="about">
     <h1>帮助</h1>
-    <p>欢迎使用无人岛工房求解器。在开始前，请先阅读<a href="https://nga.178.com/read.php?tid=33443333"
-        target="_blank">什锦笔筒的《浅析无人岛工坊售价影响因素与冲分路线安排》</a>，了解具体的求解原理。</p>
+    <p>
+      欢迎使用无人岛工房求解器。在开始前，请先阅读<a
+        href="https://nga.178.com/read.php?tid=33443333"
+        target="_blank"
+      >什锦笔筒的《浅析无人岛工坊售价影响因素与冲分路线安排》</a>，了解具体的求解原理。
+    </p>
     <p>接下来将按照重要性介绍各页面的用途。</p>
     <h2>设置页面</h2>
     <p>本页面设定较为重要的参数，请根据自身无人岛的发展情况设置对应参数。</p>
@@ -20,7 +24,8 @@
       <li>分享链接：将本页面的需求趋势分享给他人的链接。</li>
       <li>导入当前设置：应用他人分享的需求趋势设置，会覆盖本地的设置。</li>
       <li>产品名：产品名称。</li>
-      <li>欢迎度
+      <li>
+        欢迎度
         <span>
           <icon class="mji mji-popular-1" />
           <icon class="mji mji-popular-2" />
@@ -56,23 +61,40 @@
       <li>导入此排班表：将他人分享的排班表导入本地，注意会覆盖当前的排班表。</li>
       <li>第x天，1234: 表示当前排班方案的日期与单间工坊的预计收益。</li>
       <li>
-        <button class="sched sched-red">-</button>: 删除当前日期的排班方案。
+        <button class="sched sched-red">
+          -
+        </button>: 删除当前日期的排班方案。
       </li>
       <li>
-        <button class="sched sched-green">+</button>: 为当前日期添加排班方案。点击后会弹出推荐队列选择。
+        <button class="sched sched-green">
+          +
+        </button>: 为当前日期添加排班方案。点击后会弹出推荐队列选择。
       </li>
       <li>
-        <step :value="52" :step="13" />: 
+        <step
+          :value="52"
+          :step="13"
+        />: 
         <span>表示每一步的产品、耗时和预测收入。</span>
       </li>
     </ul>
     <h3>推荐队列选择</h3>
     <p>推荐队列选择会根据需求与趋势表自动生成推荐方案。</p>
     <ul>
-      <li><button class="sched sched-green">+</button>: 将此队列设置为当日的排班方案。</li>
+      <li>
+        <button class="sched sched-green">
+          +
+        </button>: 将此队列设置为当日的排班方案。
+      </li>
       <li>1234: 根据当日排班方案计算得出的当日每间工坊的收益。</li>
       <li>
-        <step :value="52" :step="13" :pop="2" :demand="10" :removeable="true"/>
+        <step
+          :value="52"
+          :step="13"
+          :pop="2"
+          :demand="10"
+          :removeable="true"
+        />
         <ul>
           <li><icon class="mji mji-popular-2" />: 物品的欢迎度。</li>
           <li><icon class="mji mji-box" />: 物品结算时的需求。</li>
@@ -92,7 +114,12 @@
     <h2>ACT插件与悬浮窗</h2>
     <p>ACT插件搭配悬浮窗可以自动填入每日的参数数据。</p>
     <ol>
-      <li>访问<a href="https://github.com/ffxiv-cyou/island-craftwork-act-plugin/releases/latest/" target="_blank">Github</a>下载ACT插件；</li>
+      <li>
+        访问<a
+          href="https://github.com/ffxiv-cyou/island-craftwork-act-plugin/releases/latest/"
+          target="_blank"
+        >Github</a>下载ACT插件；
+      </li>
       <li>使用ACT载入插件，然后重新加载悬浮窗（OverlayPlugin或NGLD）插件；</li>
       <li>在悬浮窗插件设置中，点击左下角的新建按钮，预设选择无人岛工坊助手，点击确定按钮添加悬浮窗；</li>
       <li>进入无人岛，在工坊页面点击调查需求。然后点击悬浮窗的“解析”字样即可打开解析页面。</li>
@@ -107,8 +134,14 @@
     <h1>关于</h1>
     <p>
       &copy; 2022-{{ year }}
-      <a href="https://ffxiv.cyou" target="_blank">狒狒西柚</a> | 
-      <a href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork" target="_blank">源代码</a> | 
+      <a
+        href="https://ffxiv.cyou"
+        target="_blank"
+      >狒狒西柚</a> | 
+      <a
+        href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork"
+        target="_blank"
+      >源代码</a> | 
       ALL FINAL FANTASY XIV CONTENT IS PROPERTY OF SQUARE ENIX CO., LTD
     </p>
   </div>
@@ -118,7 +151,7 @@
 import Close from "@/components/Close.vue";
 import Step from "@/components/Step.vue";
 import Steps from "@/components/Steps.vue";
-import { Component, Ref, Vue } from "vue-facing-decorator";
+import { Component, Vue } from "vue-facing-decorator";
 @Component({
   components: {
     StepsComp: Steps,

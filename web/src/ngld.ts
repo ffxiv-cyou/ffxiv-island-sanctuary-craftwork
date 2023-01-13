@@ -1,7 +1,7 @@
 import "./ngld/common.js";
 
-let element = document.getElementById('token');
-let clostBtn = document.getElementById('close');
+const element = document.getElementById('token');
+const clostBtn = document.getElementById('close');
 if (clostBtn != null) {
   clostBtn.onclick = () => {
     toggleText();
@@ -9,8 +9,8 @@ if (clostBtn != null) {
   };
 }
 
-let basePath = document.location.protocol + "//" + document.location.host;
-let link = document.getElementById('link');
+const basePath = document.location.protocol + "//" + document.location.host;
+const link = document.getElementById('link');
 if (link != null) {
   link.setAttribute('href', basePath);
 }
@@ -31,21 +31,21 @@ function onZoneChange(zone: number) {
 }
 
 function hideText() {
-  let container = document.getElementById("all");
+  const container = document.getElementById("all");
   if (container != null) {
     container.classList.add("hide");
   }
 }
 
 function showText() {
-  let container = document.getElementById("all");
+  const container = document.getElementById("all");
   if (container != null) {
     container.classList.remove("hide");
   }
 }
 
 function toggleText() {
-  let container = document.getElementById("all");
+  const container = document.getElementById("all");
   if (container != null) {
     container.classList.toggle("hide");
   }
@@ -64,7 +64,7 @@ addOverlayListener('onMJIZoneChanged', (data) => {
 startOverlayEvents();
 
 callOverlayHandler({ call: "RequestMJIZoneState" }).then((val) => {
-  let ele = document.getElementById("not-inited");
+  const ele = document.getElementById("not-inited");
   if (ele != null) {
     ele.classList.add("hide");
   }

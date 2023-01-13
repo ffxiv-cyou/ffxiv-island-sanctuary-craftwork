@@ -13,7 +13,7 @@ export function Compress(raw: Uint8Array): string {
     if (raw.length == 0)
         return "";
 
-    let data = gzipSync(raw);
+    const data = gzipSync(raw);
     return fromUint8Array(removeGzipHeader(data), true);
 }
 
@@ -21,13 +21,13 @@ export function Decompress(input: string): Uint8Array {
     if (input == "")
         return new Uint8Array(0);
 
-    let data = toUint8Array(input);
+    const data = toUint8Array(input);
     return gunzipSync(addGzipHeader(data));
 }
 
 function removeGzipHeader(data: Uint8Array): Uint8Array {
-    let dstLen = data.length - 10;
-    let bytes = new Uint8Array(dstLen);
+    const dstLen = data.length - 10;
+    const bytes = new Uint8Array(dstLen);
     bytes[0] = 0x31;
     bytes[1] = 0x34;
     bytes[2] = 0x01;
@@ -37,7 +37,7 @@ function removeGzipHeader(data: Uint8Array): Uint8Array {
 }
 
 function addGzipHeader(data: Uint8Array): Uint8Array {
-    let bytes = new Uint8Array(data.length + 10);
+    const bytes = new Uint8Array(data.length + 10);
     let i = 0;
     bytes[i++] = 0x1F; // header, 2 bytes
     bytes[i++] = 0x8B;

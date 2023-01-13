@@ -1,15 +1,22 @@
 <template>
   <div class="container">
-    <predition class="container-left predition-col hide-lg" :solver="solver" :inputData="packetData" />
-    <Pattern class="container-right demand-pattern" :solver="solver" :inputShareCode="shareCode"/>
+    <predition
+      class="container-left predition-col hide-lg"
+      :solver="solver"
+      :input-data="packetData"
+    />
+    <Pattern
+      class="container-right demand-pattern"
+      :solver="solver"
+      :input-share-code="shareCode"
+    />
   </div>
 </template>
 <script lang="ts">
 import DemandPattern from "@/components/DemandPattern.vue";
 import PreditionComponent from "@/components/DPredition.vue";
-import { Utils } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
-import { Component, Ref, Vue, Prop, Watch } from "vue-facing-decorator";
+import { Component, Vue, Prop } from "vue-facing-decorator";
 @Component({
   components: {
     Predition: PreditionComponent,

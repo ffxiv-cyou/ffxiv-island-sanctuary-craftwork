@@ -1,13 +1,21 @@
 <template>
   <div class="steps">
-    <step v-for="(val, index) in steps" :class="getClassName(val)" :step="val" :value="values[index]"
-      :demand="getDemand(index)" :pop="getPopularity(index)" :removeable="removeable" @remove="onRemove(index)" />
+    <step
+      v-for="(val, index) in steps"
+      :key="index"
+      :class="getClassName(val)"
+      :step="val"
+      :value="values[index]"
+      :demand="getDemand(index)"
+      :pop="getPopularity(index)"
+      :removeable="removeable"
+      @remove="onRemove(index)"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import type { Batch, BatchValues } from "@/model/solver";
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue } from "vue-facing-decorator";
 import { CraftworkData } from "@/model/data";
 import Step from "./Step.vue";
 

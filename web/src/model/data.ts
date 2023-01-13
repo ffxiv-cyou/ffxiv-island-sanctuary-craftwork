@@ -1,4 +1,3 @@
-import PopularSheet from "../data/MJICraftworksPopularity.json";
 import CraftObjects from "@/data/MJICraftworksObject.json";
 
 export class CraftworkObject {
@@ -48,7 +47,7 @@ export class CraftworkData {
 
 export class Utils {
     public static Hex2U8Array(text: string): Uint8Array {
-        let array = new Uint8Array(text.length / 2);
+        const array = new Uint8Array(text.length / 2);
         for (let i = 0; i < text.length; i += 2) {
             array[i / 2] = parseInt(text.substring(i, i + 2), 16);
         }

@@ -1,17 +1,29 @@
 <template>
-  <div class="datebar" role="group" aria-label="...">
-      <button class="sched"
-        :class="{ 'sched-yellow': !isSelected(0), 'sched-green': isSelected(0) }"
-        @click="select(0)"
-      >-</button>
-      <button class="sched" v-for="i in 7"
-        :class="{ 'sched-red': !isSelected(i), 'sched-green': isSelected(i) }"
-        @click="select(i)"
-      >{{ i }}</button>
+  <div
+    class="datebar"
+    role="group"
+    aria-label="..."
+  >
+    <button
+      class="sched"
+      :class="{ 'sched-yellow': !isSelected(0), 'sched-green': isSelected(0) }"
+      @click="select(0)"
+    >
+      -
+    </button>
+    <button
+      v-for="i in 7"
+      :key="i"
+      class="sched"
+      :class="{ 'sched-red': !isSelected(i), 'sched-green': isSelected(i) }"
+      @click="select(i)"
+    >
+      {{ i }}
+    </button>
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Ref, Vue, Watch } from "vue-facing-decorator";
+import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 @Component({
   emits: [
     "update:modelValue"

@@ -87,12 +87,12 @@ export class Config {
   }
 
   public static load(): Config {
-    let cfg = new Config();
-    let str = localStorage.getItem(CONFIG_KEY);
+    const cfg = new Config();
+    const str = localStorage.getItem(CONFIG_KEY);
     if (str == null) {
       return cfg;
     }
-    let obj = JSON.parse(str);
+    const obj = JSON.parse(str);
     cfg._craftLevel = obj._craftLevel;
     cfg._level = obj._level;
     cfg._maxTension = obj._maxTension;
