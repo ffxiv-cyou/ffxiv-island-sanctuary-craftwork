@@ -110,7 +110,7 @@ export default class PreditionComponent extends Vue {
       this.config.demandPatterns[i] = result[i];
     }
 
-    this.config.popPattern = dataArray[0][0] + 1;
+    this.solver.popPattern = dataArray[0][0] + 1;
     this.nextPattern = dataArray[0][1] + 1;
     this.solver.updatePredictDemands();
     this.config.save();

@@ -3,7 +3,6 @@ import Recipes from "../data/MJICraftworksObject.json";
 
 import init, {
     init_repo,
-    set_demands,
     set_pattern,
     solve_singleday,
     GameDataRepo,
@@ -84,26 +83,28 @@ export class SolverProxy {
         this.repo = init_repo(recipe, pops, cols);
         this.inited = true;
 
+        // 写入配置项目
         this.updatePredictDemands();
+        set_pattern(this.repo, this.popPattern);
     }
 
     /**
-     * 设置当前的需求
-     * @param array 需求表
+     * 当前需求Int8Array
      */
-    setDemand(array: number[]) {
-        let demands = new Int8Array(array.length);
-        for (let i = 0; i < demands.length; i++) {
-            demands[i] = array[i];
-        }
-        set_demands(this.repo, demands);
+    get demandsArray() {
+        return new Int8Array(this.demands);
     }
 
     /**
-     * 更新需求
+     * 当前欢迎度模式
      */
-    updateDemand() {
-        this.setDemand(this.demands);
+    get popPattern() {
+        return this.config.popPattern;
+    }
+
+    set popPattern(val: number) {
+        this.config.popPattern = val;
+        set_pattern(this.repo, val);
     }
 
     /**
@@ -128,23 +129,19 @@ export class SolverProxy {
         for (let j = 0; j < this.predictDemands[day].length; j++) {
             this.demands[j] = this.predictDemands[day][j];
         }
-        this.setDemand(this.predictDemands[day]);
     }
 
     get info() {
         return this.infoWithTension(this.tension);
     }
 
+    /**
+     * 生成指定干劲的值
+     * @param tension 干劲
+     * @returns Info
+     */
     infoWithTension(tension: number): CraftworkInfo {
         return new CraftworkInfo(tension, this.config.maxTension, this.config.craftLevel, this.config.workers);
-    }
-
-    /**
-     * 设置当前的人气状态
-     * @param index 人气模式
-     */
-    setPopularityPattern(index: number) {
-        set_pattern(this.repo, index);
     }
 
     /**
@@ -153,21 +150,23 @@ export class SolverProxy {
      * @returns 配方收益
      */
     simulate(array: number[]): BatchValues {
-        set_pattern(this.repo, this.config.popPattern);
-
         let steps = new Uint8Array(array.length);
         for (let i = 0; i < steps.length; i++) {
             steps[i] = array[i];
         }
-        let arr = simulate(this.repo, this.info, steps);
+        let arr = simulate(this.repo, this.info, steps, this.demandsArray);
         return new BatchValues(array, arr);
     }
 
+    /**
+     * 模拟一整周的求解。注意只考虑连击
+     * @param weekSteps 每一天的配方
+     * @returns 
+     */
     simulateWeek(weekSteps: number[][]): BatchValues[] {
         let batchValues = [];
-        set_pattern(this.repo, this.config.popPattern);
 
-        let demandChanges = [];
+        let demandChanges = []; // 各个配方的需求变动值
         for (let i = 0; i < Recipes.length; i++) {
             demandChanges.push(0);
         }
@@ -175,17 +174,16 @@ export class SolverProxy {
 
         for (let i = 0; i < weekSteps.length; i++) {
             const daySteps = weekSteps[i];
-            let demands = this.predictDemands[i];
+            let demands = new Int8Array(this.predictDemands[i]);
             for (let j = 0; j < demandChanges.length; j++) {
-                this.demands[j] = demands[j] - demandChanges[j];
+                demands[j] -= demandChanges[j];
             }
-            this.updateDemand();
 
             let stepArray = new Uint8Array(daySteps.length);
             for (let i = 0; i < daySteps.length; i++) {
                 stepArray[i] = daySteps[i];
             }
-            let arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray);
+            let arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray, demands);
             let values = new BatchValues(daySteps, arr);
             batchValues.push(values);
 
@@ -210,8 +208,6 @@ export class SolverProxy {
      * @returns 
      */
     solveDay(): BatchValues[] {
-        set_pattern(this.repo, this.config.popPattern);
-
         let banArr = [];
         for (let i = 0; i < this.banList.length; i++) {
             if (this.banList[i]) {
@@ -220,20 +216,23 @@ export class SolverProxy {
         }
 
         let banList = new Uint16Array(banArr);
-        let arr = solve_singleday(this.repo, this.info, this.config.level, banList);
+        let arr = solve_singleday(this.repo, this.info, this.config.level, banList, this.demandsArray);
         return BatchValues.fromSimulateArray(arr);
     }
 
+    /**
+     * 使用指定的需求值求解当天的最优值
+     * @param demands 
+     * @param banList 
+     * @param tension 
+     * @returns 
+     */
     solveDayDetail(demands: number[], banList: number[], tension: number) {
-        set_pattern(this.repo, this.config.popPattern);
         let banArr = new Uint16Array(banList);
         let demandArr = new Int8Array(demands);
-        set_demands(this.repo, demandArr);
 
         let info = this.infoWithTension(tension);
-        let arr = solve_singleday(this.repo, info, this.config.level, banArr);
-
-        this.updateDemand(); // 还原demand 的修改
+        let arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr);
 
         return BatchValues.fromSimulateArray(arr);
     }

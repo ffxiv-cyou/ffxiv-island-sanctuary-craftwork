@@ -7,7 +7,7 @@ use crate::data::{CraftworkInfo, Recipe};
 
 pub trait Solver {
     /// 解最优
-    fn solve(&self, limit: &SolveLimit) -> Vec<Batch>;
+    fn solve(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch>;
     fn update_info(&mut self, info: CraftworkInfo);
 }
 
@@ -18,15 +18,19 @@ pub struct SolveLimit<'a> {
     /// 禁用配方
     ban_list: &'a [u16],
     /// 结果数量
-    pub max_result: usize
+    pub max_result: usize,
 }
 
 impl<'a> SolveLimit<'a> {
     pub fn new(level: u8, ban_list: &'a [u16]) -> SolveLimit {
-        Self { level, ban_list, max_result: 100 }
+        Self {
+            level,
+            ban_list,
+            max_result: 100,
+        }
     }
 
     pub fn check(&self, recipe: &Recipe) -> bool {
-        return recipe.level <= self.level && !self.ban_list.contains(&recipe.id)
+        return recipe.level <= self.level && !self.ban_list.contains(&recipe.id);
     }
 }

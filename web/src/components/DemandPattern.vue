@@ -92,14 +92,14 @@ export default class DemandPattern extends Vue {
     if (this.inputShareCode) {
       return this.inputPopPattern;
     }
-    return this.config.popPattern;
+    return this.solver.popPattern;
   }
 
   set popPattern(val: number) {
     if (this.inputShareCode) {
       this.inputPopPattern = val;
     } else {
-      this.config.popPattern = val;
+      this.solver.popPattern = val;
     }
   }
 
@@ -205,7 +205,7 @@ export default class DemandPattern extends Vue {
     for (let i = 0; i < this.inputPatterns.length; i++) {
       this.config.demandPatterns[i] = this.inputPatterns[i];
     }
-    this.config.popPattern = this.inputPopPattern;
+    this.solver.popPattern = this.inputPopPattern;
     this.config.save();
     this.solver.updatePredictDemands();
     this.$router.push('/pred');

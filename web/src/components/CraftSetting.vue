@@ -69,7 +69,7 @@ export default class CraftSetting extends Vue {
   }
 
   get pop_pattern() {
-    return this.config.popPattern;
+    return this.solver.popPattern;
   }
 
   get objects() {

@@ -1,6 +1,6 @@
 use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo, Popularity, Recipe},
-    init_repo, set_demands, simulate, solve_singleday,
+    init_repo, simulate, solve_singleday,
     solver::{BFSolver, SolveLimit, Solver},
 };
 
@@ -36,8 +36,6 @@ fn load_data<const T: usize>() -> GameDataRepo {
     repo.set_popular_pattern(current_pop as usize);
     // let next_pop = DEMAND_LIST[1];
 
-    let demands = vec![9; T];
-    repo.set_demands(&demands);
     repo
 }
 
@@ -62,27 +60,28 @@ fn load_data_init() -> GameDataRepo {
     init_repo(recipes, pop_vec, 62)
 }
 
-fn load_test_demand(repo: &mut GameDataRepo) {
-    let demands = vec![9; 62];
-    set_demands(repo, &demands);
+fn load_test_demand() -> Vec<i8> {
+    vec![9; 62]
 }
 
 #[test]
 fn init_test() {
-    let mut repo = load_data_init();
-    load_test_demand(&mut repo);
+    let repo = load_data_init();
+    let demands = load_test_demand();
 
-    solve_singleday(&repo, &CraftworkInfo::new(0, 30, 1, 1), 10, vec![]);
+    solve_singleday(&repo, &CraftworkInfo::new(0, 30, 1, 1), 10, vec![], &demands);
 }
 
 #[test]
 fn predict() {
     let repo = load_data::<51>();
+    let demands = load_test_demand();
     let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
     let empty = vec![];
     let limit = SolveLimit::new(10, &empty);
-    let result = solver.solve(&limit);
+    let result = solver.solve(&limit, &demands);
     println!("length: {}", result.len());
+    assert_eq!(result.len(), limit.max_result);
     for i in 0..20 {
         println!(
             "val: {},{:?}, {:?}",
@@ -95,15 +94,11 @@ fn predict() {
 
 #[test]
 fn simulator() {
-    let mut repo = load_data_init();
-    load_test_demand(&mut repo);
+    let repo = load_data_init();
+    let demands = load_test_demand();
 
     let state = CraftworkInfo::new(0, 35, 1, 1);
     let arr = vec![13, 23, 13, 23];
-    let result = simulate(&repo, &state, arr);
-    println!("{:?}", result);
-    assert_ne!(result[0], 0);
-    assert_ne!(result[1], 0);
-    assert_ne!(result[2], 0);
-    assert_ne!(result[3], 0);
+    let result = simulate(&repo, &state, arr, &demands);
+    assert_eq!(result, [38, 240, 78, 246, 0, 0]);
 }

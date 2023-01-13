@@ -54,7 +54,7 @@ export default class SimpleSolver extends Vue {
     let props = [];
     for (let i = 0; i < steps.length; i++) {
       const element = steps[i];
-      props[i] = Popularity[this.solver.config.popPattern][element];
+      props[i] = Popularity[this.solver.popPattern][element];
     }
     return props;
   }
@@ -83,7 +83,7 @@ export default class SimpleSolver extends Vue {
       for (let i = 0; i < steps.length; i++) {
         let step = steps[i];
         this.stepDemands[b][i] = this.cachedDemands[step];
-        this.stepPops[b][i] = Popularity[this.solver.config.popPattern][step];
+        this.stepPops[b][i] = Popularity[this.solver.popPattern][step];
         for (let j = 0; j < i; j++) {
           if (steps[j] == step) {
             this.stepDemands[b][i] -= (j === 0 ? 1 : 2) * this.solver.config.workers;
