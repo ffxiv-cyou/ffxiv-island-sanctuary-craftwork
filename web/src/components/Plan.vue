@@ -7,33 +7,42 @@
         target="_blank"
       >分享<span class="hide-lg">链接: {{ shareLink }}</span></a></span>
     </div>
-    <div
-      v-for="(val, index) in batchValues"
-      :key="index"
-      class="plan-batch info-box"
-    >
-      <div class="plan-batch-info">
-        <span>第{{ index+1 }}天</span>
-        <span>{{ val.value }}</span>
+    <div class="plan-body">
+      <div class="plan-batches">
+        <div
+          v-for="(val, index) in batchValues"
+          :key="index"
+          class="plan-batch info-box"
+        >
+          <div class="plan-batch-info">
+            <span>第{{ index+1 }}天</span>
+            <span>{{ val.value }}</span>
+          </div>
+          <button
+            v-if="steps[index].length == 0"
+            class="sched sched-green"
+            :disabled="isMax"
+            @click="add(index)"
+          >
+            +
+          </button>
+          <button
+            v-else
+            class="sched sched-red"
+            @click="del(index)"
+          >
+            -
+          </button>
+          <steps-comp
+            :values="val.stepValues"
+            :steps="val.steps"
+          />
+        </div>
       </div>
-      <button
-        v-if="steps[index].length == 0"
-        class="sched sched-green"
-        :disabled="isMax"
-        @click="add(index)"
-      >
-        +
-      </button>
-      <button
-        v-else
-        class="sched sched-red"
-        @click="del(index)"
-      >
-        -
-      </button>
-      <steps-comp
-        :values="val.stepValues"
-        :steps="val.steps"
+      <ingrid-comp
+        class="plan-ingridients info-box"
+        :steps="flatSteps"
+        :workers="workers"
       />
     </div>
   </div>
@@ -42,10 +51,12 @@
 import { ToShareCode } from "@/model/share";
 import type { SolverProxy, BatchValues } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
+import Ingridients from "./Ingridients.vue";
 import Steps from "./Steps.vue";
 @Component({
   components: {
-    StepsComp: Steps
+    StepsComp: Steps,
+    IngridComp: Ingridients
   },
   emits: ["addSteps", "delSteps"]
 })
@@ -68,6 +79,10 @@ export default class PlanView extends Vue {
       sum += this.batchValues[i].value;
     }
     return sum;
+  }
+
+  get flatSteps() {
+    return [].concat(...this.steps);
   }
   
   @Watch("steps", { deep: true })
@@ -116,7 +131,8 @@ export default class PlanView extends Vue {
 <style lang="scss">
 .plan-batch {
   display: flex;
-  margin: 2px;
+  margin: 4px;
+  height: 42px;
 }
 .plan-batch-info {
   display: inline-flex;
@@ -158,5 +174,17 @@ export default class PlanView extends Vue {
     text-decoration: none;
     user-select: all;
   }
+}
+
+.plan-body {
+  display: flex;
+}
+.plan-batches {
+  flex: 1;
+}
+.plan-ingridients {
+  flex: 150px 0 0;
+  overflow-y: auto;
+  max-height: 330px;
 }
 </style>
