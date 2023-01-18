@@ -30,9 +30,10 @@ export default class Close extends Vue {
 </script>
 <style>
 .close-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  padding: 0;
   box-shadow: none;
   border: none;
   fill: #666;

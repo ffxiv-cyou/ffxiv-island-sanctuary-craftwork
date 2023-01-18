@@ -70,19 +70,7 @@
             v-model="demandPattern[item.Id]"
             class=""
           >
-            <option value="0">未知</option>
-            <option value="1">2强</option>
-            <option value="2">2弱</option>
-            <option value="3">3强</option>
-            <option value="4">3弱</option>
-            <option value="5">4强</option>
-            <option value="6">4弱</option>
-            <option value="7">5强</option>
-            <option value="8">5弱</option>
-            <option value="9">6强</option>
-            <option value="10">6弱</option>
-            <option value="11">7强</option>
-            <option value="12">7弱</option>
+            <option v-for="(value, index) in patternNames" :value="index">{{ value }}</option>
           </select>
         </span>
         <span
@@ -105,7 +93,7 @@
 import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import CraftObjects from "@/data/MJICraftworksObject.json";
-import { CraftworkData, CraftworkObject, DemandUtils } from "@/model/data";
+import { CraftworkData, CraftworkObject, DemandUtils, PatternNames } from "@/model/data";
 import { FromShareCode, ToShareCode } from "@/model/share";
 import Popularity from "@/data/MJICraftworksPopularity.json";
 
@@ -126,6 +114,10 @@ export default class DemandPattern extends Vue {
 
   get config() {
     return this.solver.config;
+  }
+
+  get patternNames() {
+    return PatternNames;
   }
 
   get demandPattern() {

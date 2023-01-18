@@ -54,6 +54,23 @@ export enum ItemCategory {
     Catch,
 }
 
+export const PatternNames: string[] = 
+[
+    "未知",
+    "2强",
+    "2弱",
+    "3强",
+    "3弱",
+    "4强",
+    "4弱",
+    "5强",
+    "5弱",
+    "6强",
+    "6弱",
+    "7强",
+    "7弱",
+];
+
 export class CraftworkData {
     public static GetRecipe(id: number): CraftworkObject {
         return CraftObjects[id];

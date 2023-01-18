@@ -18,15 +18,15 @@
       </div>
     </div>
     <legend>推荐队列</legend>
-    <div
-      v-for="(val, key) in batches"
-      :key="key"
-    >
+    <div>
       <batch-view
+        v-for="(val, key) in batches"
+        :key="key"
         :batch="val"
         :removeable="true"
         :demands="stepDemands[key]"
         :pops="stepPops[key]"
+        :patterns="patterns"
         @remove="addBan(key, $event)"
       >
         <button
@@ -79,6 +79,10 @@ export default class SimpleSolver extends Vue {
       props[i] = Popularity[this.solver.popPattern][element];
     }
     return props;
+  }
+
+  get patterns() {
+    return this.solver.config.demandPatterns;
   }
 
   stepDemands: number[][] = [];

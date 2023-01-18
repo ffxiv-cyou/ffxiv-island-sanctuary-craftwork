@@ -7,10 +7,18 @@
       />
     </div>
     <div class="item-text hide-md">
-      <span class="item-name">{{ name }}</span>
+      <div class="item-primary">
+        <span class="item-name">{{ name }}</span>
+        <close
+          v-if="removeable"
+          class="item-remove"
+          @close="onClose"
+        />
+      </div>
       <div class="item-desc">
-        <span class="step-value">{{ value }}币</span>,
-        <span class="step-time">{{ time }}h</span>
+        <span class="step-value text">{{ value }}币</span>
+        <span class="step-time text">{{ time }}h</span>
+        <span class="step-pattern text" v-if="pattern">{{ patternName }}</span>
         <span
           v-if="pop"
           class="step-pop"
@@ -32,17 +40,12 @@
         </span>
       </div>
     </div>
-    <close
-      v-if="removeable"
-      class="item-remove"
-      @close="onClose"
-    />
   </div>
 </template>
   
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-facing-decorator";
-import { CraftworkData, DemandUtils } from "@/model/data";
+import { CraftworkData, DemandUtils, PatternNames } from "@/model/data";
 import "@/assets/items.css";
 import Close from "./Close.vue";
 
@@ -68,6 +71,9 @@ export default class Step extends Vue {
   @Prop()
   removeable?: boolean;
 
+  @Prop()
+  pattern?: number;
+
   get name() {
     return CraftworkData.TrimName(CraftworkData.GetRecipe(this.step).Name);
   }
@@ -84,6 +90,10 @@ export default class Step extends Vue {
   get demandBox(): number {
     if (!this.demand) return 2;
     return DemandUtils.GetDemand(this.demand);
+  }
+  get patternName(): string {
+    if (!this.pattern) return PatternNames[0];
+    return PatternNames[this.pattern];
   }
   onClose() {
     this.$emit("remove");
@@ -112,6 +122,12 @@ export default class Step extends Vue {
       flex: 1;
     }
 
+    .item-primary {
+      .item-remove {
+        float: right;
+      }
+    }
+
     .item-desc {
       color: #666;
       font-size: 14px;
@@ -120,6 +136,9 @@ export default class Step extends Vue {
       }
       .mji-box+.mji-box {
         margin-left: -10px !important;
+      }
+      span.text + span.text::before {
+        content: ",";
       }
     }
   }

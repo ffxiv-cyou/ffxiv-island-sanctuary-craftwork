@@ -54,7 +54,6 @@
           class="item-demand pure-u-4-24"
           type="number"
           placeholder="需求"
-          @change="onDemandChange"
         >
         <span class="item-disable pure-u-3-24">
           <input
@@ -145,11 +144,6 @@ export default class CraftSetting extends Vue {
     return "mji-popular-" + Popularity[this.pop_pattern][id].toString()
   }
 
-  onDemandChange() {
-    if (this.solver)
-      this.solver.updateDemand();
-  }
-
   getDemandBox(val: number) {
     return DemandUtils.GetDemand(val);
   }
@@ -160,7 +154,6 @@ export default class CraftSetting extends Vue {
     let current = DemandUtils.GetDemand(this.demands[id]);
     let next = (current + 1) % 5;
     this.demands[id] = DemandUtils.FromDemand(next);
-    this.onDemandChange();
   }
 }
 </script>

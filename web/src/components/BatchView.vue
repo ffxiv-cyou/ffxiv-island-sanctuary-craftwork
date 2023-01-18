@@ -12,6 +12,7 @@
       :values="batch.stepValues"
       :removeable="removeable"
       :demands="demands"
+      :patterns="patterns"
       :pops="pops"
       @remove="onRemove"
     />
@@ -38,6 +39,9 @@ export default class BatchView extends Vue {
 
   @Prop()
   demands?: number[];
+
+  @Prop()
+  patterns?: number[];
 
   @Prop()
   pops?: number[];

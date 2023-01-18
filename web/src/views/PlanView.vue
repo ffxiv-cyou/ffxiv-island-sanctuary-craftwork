@@ -156,7 +156,8 @@ export default class PlanView extends Vue {
   width: 1200px;
   max-height: calc(100vh - 120px);
   overflow-y: scroll;
-  margin: 20px;
+  margin: 20px 0 0 0;
+  padding: 0 10px;
 }
 
 .solver-dialog {

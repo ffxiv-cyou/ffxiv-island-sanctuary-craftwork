@@ -7,6 +7,7 @@
       :step="val"
       :value="values[index]"
       :demand="getDemand(index)"
+      :pattern="getPattern(val)"
       :pop="getPopularity(index)"
       :removeable="removeable"
       @remove="onRemove(index)"
@@ -36,6 +37,9 @@ export default class Steps extends Vue {
   demands?: number[];
 
   @Prop()
+  patterns?: number[];
+
+  @Prop()
   pops?: number[]
 
   @Prop()
@@ -48,6 +52,11 @@ export default class Steps extends Vue {
   getDemand(index: number) {
     if (!this.demands || this.demands.length <= index) return undefined;
     return this.demands[index];
+  }
+
+  getPattern(id: number) {
+    if (!this.patterns || this.patterns.length <= id) return undefined;
+    return this.patterns[id];
   }
 
   getPopularity(index: number) {
