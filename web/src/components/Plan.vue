@@ -5,7 +5,12 @@
       <span class="share-link"><a
         :href="shareLink"
         target="_blank"
-      >分享<span class="hide-lg">链接: {{ shareLink }}</span></a></span>
+      >分享<span class="hide-lg">: </span></a><span class="hide-lg share-link-url">{{ shareLink }}</span></span>
+      <close
+        v-if="removeable"
+        class="plan-remove"
+        @close="onClose"
+      />
     </div>
     <div class="plan-body">
       <div class="plan-batches">
@@ -51,14 +56,16 @@
 import { ToShareCode } from "@/model/share";
 import type { SolverProxy, BatchValues } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
+import Close from "./Close.vue";
 import Ingridients from "./Ingridients.vue";
 import Steps from "./Steps.vue";
 @Component({
   components: {
     StepsComp: Steps,
-    IngridComp: Ingridients
+    IngridComp: Ingridients,
+    Close: Close
   },
-  emits: ["addSteps", "delSteps"]
+  emits: ["addSteps", "delSteps", "remove"]
 })
 export default class PlanView extends Vue {
   @Prop()
@@ -66,6 +73,9 @@ export default class PlanView extends Vue {
 
   @Prop()
   steps!: number[][];
+
+  @Prop()
+  removeable?: boolean;
 
   get workers() {
     return this.solver.config.workers;
@@ -95,6 +105,10 @@ export default class PlanView extends Vue {
     this.recalculateValue();
   }
 
+  onClose() {
+    this.$emit("remove");
+  }
+  
   add(index: number) {
     this.$emit("addSteps", index);
   }
@@ -166,13 +180,21 @@ export default class PlanView extends Vue {
 
 .plan-info {
   padding: 4px;
-}
-.share-link {
-  float: right;
-  a {
-    color: inherit;
-    text-decoration: none;
-    user-select: all;
+  display: flex;
+  gap: 4px;
+  .share-link {
+    flex: 1;
+    text-align: right;
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .share-link-url {
+      user-select: all;
+    }
+  }
+  .plan-remove {
+    float: right;
   }
 }
 
@@ -187,4 +209,5 @@ export default class PlanView extends Vue {
   overflow-y: auto;
   max-height: 330px;
 }
+
 </style>

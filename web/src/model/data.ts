@@ -136,7 +136,7 @@ export class DemandUtils {
      */
     public static FromDemand(val: number): number {
         switch (val) {
-            case 0: return 25;
+            case 0: return 24;
             case 1: return 13;
             case 2: return 9;
             case 3: return 0;

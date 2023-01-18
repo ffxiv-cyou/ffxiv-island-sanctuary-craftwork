@@ -52,12 +52,14 @@ export default class App extends Vue {
 <style lang="scss">
 .body {
   margin: auto;
-  height: calc(100vh - 40px);
-  padding: 0 20px;
+  padding: 40px 20px 20px 20px;
 }
 
 header {
+  position: fixed;
+  width: 100%;
   height: 40px;
+  z-index: 50;
   line-height: 20px;
   background: #938560;
   padding-left: 10px;
@@ -79,7 +81,10 @@ header {
 
 .container {
   display: flex;
-  padding: 0;
+  height: calc(100vh - 40px);
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
 }
 
 .container-left,

@@ -71,7 +71,7 @@
           :key="id"
           class="recipe-demand hide-xs"
         >
-        <sort-label
+          <sort-label
             :active="sortMethod === id + 4"
             :active-up="sortDir"
             @click="sort(id + 4, $event)"
@@ -99,8 +99,9 @@
             class=""
           >
             <option
-              v-for="(value, index) in patternNames"
-              :value="index"
+              v-for="(value, id) in patternNames"
+              :key="id"
+              :value="id"
             >{{ value }}</option>
           </select>
         </span>
