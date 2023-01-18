@@ -110,7 +110,7 @@ impl DemandChange {
         match self {
             DemandChange::MassiveIncrease => i16::MAX,
             DemandChange::Increase => 5,
-            DemandChange::Equal => 1,
+            DemandChange::Equal => 2,
             DemandChange::Decerease => -2,
             DemandChange::MassiveDecrease => -6,
         }
@@ -118,8 +118,8 @@ impl DemandChange {
     /// 真实需求值下限，包括本数
     pub fn lower_bound(&self) -> i16 {
         match self {
-            DemandChange::MassiveIncrease => 5,
-            DemandChange::Increase => 2,
+            DemandChange::MassiveIncrease => 6,
+            DemandChange::Increase => 3,
             DemandChange::Equal => -1,
             DemandChange::Decerease => -5,
             DemandChange::MassiveDecrease => -999,
@@ -129,9 +129,9 @@ impl DemandChange {
     /// 根据真实需求值映射到区间
     pub fn from_val(val: i16) -> Self {
         match val {
-            5..=i16::MAX => Self::MassiveIncrease,
-            2..=4 => Self::Increase,
-            -1..=1 => Self::Equal,
+            6..=i16::MAX => Self::MassiveIncrease,
+            3..=5 => Self::Increase,
+            -1..=2 => Self::Equal,
             -5..=-2 => Self::Decerease,
             i16::MIN..=-6 => Self::MassiveDecrease,
         }
