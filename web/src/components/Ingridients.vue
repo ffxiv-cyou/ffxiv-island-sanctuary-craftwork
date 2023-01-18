@@ -21,7 +21,7 @@ export default class Ingridients extends Vue {
   steps!: number[];
 
   @Prop()
-  workers: number;
+  workers?: number;
 
   get factor() {
     return this.workers ?? 1;
@@ -56,7 +56,10 @@ export default class Ingridients extends Vue {
       });
     });
     
-    return [...resMap.entries()].sort((a, b) => a[0] - b[0]);
+    return [...resMap.entries()].sort((a, b) => {
+      let delta = MJIItemData.GetCategory(b[0]) - MJIItemData.GetCategory(a[0]);
+      return delta ? delta : a[0] - b[0];
+    });
   }
 
   getName(id: number) {

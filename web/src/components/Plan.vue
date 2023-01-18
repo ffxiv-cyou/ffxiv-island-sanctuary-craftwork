@@ -5,7 +5,7 @@
       <span class="share-link"><a
         :href="shareLink"
         target="_blank"
-      >分享<span class="hide-lg">: </span></a><span class="hide-lg share-link-url">{{ shareLink }}</span></span>
+      >分享</a><span class="hide-lg">: </span><span class="hide-lg share-link-url">{{ shareLink }}</span></span>
       <close
         v-if="removeable"
         class="plan-remove"
@@ -187,7 +187,6 @@ export default class PlanView extends Vue {
     text-align: right;
     a {
       color: inherit;
-      text-decoration: none;
     }
     .share-link-url {
       user-select: all;
