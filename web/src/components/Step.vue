@@ -18,7 +18,10 @@
       <div class="item-desc">
         <span class="step-value text">{{ value }}币</span>
         <span class="step-time text">{{ time }}h</span>
-        <span class="step-pattern text" v-if="pattern">{{ patternName }}</span>
+        <span
+          v-if="pattern"
+          class="step-pattern text"
+        >{{ patternName }}</span>
         <span
           v-if="pop"
           class="step-pop"

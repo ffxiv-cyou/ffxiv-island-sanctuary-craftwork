@@ -38,16 +38,44 @@
     </div>
     <div class="pure-form">
       <div class="recipe-header">
-        <span class="recipe-name">产品名</span>
-        <span class="recipe-pop">欢迎度</span>
-        <span class="recipe-value">基础时薪</span>
-        <span class="recipe-pattern">需求趋势</span>
+        <span class="recipe-name">
+          <sort-label
+            :active="sortMethod === 1"
+            :active-up="sortDir"
+            @click="sort(1, $event)"
+          >产品名</sort-label>
+        </span>
+        <span class="recipe-pop">
+          <sort-label
+            :active="sortMethod === 2"
+            :active-up="sortDir"
+            @click="sort(2, $event)"
+          >欢迎度</sort-label>
+        </span>
+        <span class="recipe-value">
+          <sort-label
+            :active="sortMethod === 3"
+            :active-up="sortDir"
+            @click="sort(3, $event)"
+          >基础时薪</sort-label>
+        </span>
+        <span class="recipe-pattern">
+          <sort-label
+            :active="sortMethod === 4"
+            :active-up="sortDir"
+            @click="sort(4, $event)"
+          >需求趋势</sort-label>
+        </span>
         <span
           v-for="(id) in 7"
           :key="id"
           class="recipe-demand hide-xs"
         >
-          第{{ id }}天
+        <sort-label
+            :active="sortMethod === id + 4"
+            :active-up="sortDir"
+            @click="sort(id + 4, $event)"
+          >第{{ id }}天</sort-label>
         </span>
       </div>
     </div>
@@ -64,13 +92,16 @@
             :class="popularity(item.Id)"
           />
         </span>
-        <span class="recipe-value">{{ getBasicPrice(item) }}</span>
+        <span class="recipe-value">{{ getBasicPriceStr(item) }}</span>
         <span class="recipe-pattern pure-form">
           <select
             v-model="demandPattern[item.Id]"
             class=""
           >
-            <option v-for="(value, index) in patternNames" :value="index">{{ value }}</option>
+            <option
+              v-for="(value, index) in patternNames"
+              :value="index"
+            >{{ value }}</option>
           </select>
         </span>
         <span
@@ -96,20 +127,33 @@ import CraftObjects from "@/data/MJICraftworksObject.json";
 import { CraftworkData, CraftworkObject, DemandUtils, PatternNames } from "@/model/data";
 import { FromShareCode, ToShareCode } from "@/model/share";
 import Popularity from "@/data/MJICraftworksPopularity.json";
+import SortLabel from "./SortLabel.vue";
 
 @Component({
   emits: [
     "close"
-  ]
+  ],
+  components: {
+    SortLabel: SortLabel
+  }
 })
 export default class DemandPattern extends Vue {
   @Prop()
   solver!: SolverProxy;
 
+  /**
+   * 输入的分享代码
+   */
   @Prop()
   inputShareCode?: string;
 
+  /**
+   * 分享代码得到的趋势
+   */
   inputPatterns: number[] = [];
+  /**
+   * 分享代码得到的流行趋势
+   */
   inputPopPattern: number = 0;
 
   get config() {
@@ -178,15 +222,56 @@ export default class DemandPattern extends Vue {
     }
   }
 
+  sortMethod: number = 0;
+  sortDir: boolean = true;
+
+  sort(method: number, dir: boolean) {
+    this.sortMethod = method;
+    this.sortDir = dir;
+  }
+
   get objects(): CraftworkObject[] {
-    return CraftObjects.filter((v) => v.Name);
+    // 对列表排序
+    return CraftObjects.filter((v) => v.Name).sort((a, b) => {
+      let delta = 0;
+      switch (this.sortMethod) {
+        case 1:
+          delta = a.Id - b.Id;
+          break;
+        case 2:
+          delta = Popularity[this.popPattern][a.Id] - Popularity[this.popPattern][b.Id];
+          delta = -delta; // 欢迎度是0最高，所以在这反过来
+          break;
+        case 3:
+          delta = this.getBasicPriceNum(a) - this.getBasicPriceNum(b);
+          break;
+        case 4:
+          delta = this.demandPattern[a.Id] - this.demandPattern[b.Id];
+          break;
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+          let day = this.sortMethod - 4;
+          delta = this.getDemand(a.Id, day) - this.getDemand(b.Id, day);
+          break;
+        default:
+          delta = a.Id - b.Id;
+          break;
+      }
+      return this.sortDir ? delta : -delta;
+    });
   }
 
   trimName(name: string) {
     return CraftworkData.TrimName(name);
   }
 
-  getBasicPrice(item: CraftworkObject) {
+  getBasicPriceNum(item: CraftworkObject) {
     let pop = Popularity[this.popPattern][item.Id];
     let rate = 1;
     switch(pop) {
@@ -206,7 +291,11 @@ export default class DemandPattern extends Vue {
         rate = 0.8;
         break;
     }
-    return (item.Price * rate / item.Time).toFixed(1);
+    return (item.Price * rate / item.Time);
+  }
+
+  getBasicPriceStr(item: CraftworkObject) {
+    return this.getBasicPriceNum(item).toFixed(1);
   }
 
   cachedDemands: number[][] = [];
