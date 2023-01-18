@@ -1,7 +1,6 @@
 <template>
   <div
     class="dialog"
-    @click="close"
   >
     <close
       class="dialog-close"
