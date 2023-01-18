@@ -50,7 +50,8 @@ import Popularity from "@/data/MJICraftworksPopularity.json";
   components: {
     BatchView: BatchView,
     Close: Close
-  }
+  },
+  emits: [ "apply" ]
 })
 export default class SimpleSolver extends Vue {
   @Prop()

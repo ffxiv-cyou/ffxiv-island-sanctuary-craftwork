@@ -32,6 +32,16 @@
       />
     </div>
     <div v-else>
+      <div class="pure-form">
+        <label for="reverse-solve">
+          <input
+            id="reverse-solve"
+            v-model="reverseSolve"
+            type="checkbox"
+          >
+          倒序求解
+        </label>
+      </div>
       <plan
         v-for="(plan, key) in plans"
         :key="key"
@@ -72,19 +82,45 @@ export default class PlanView extends Vue {
   @Prop()
   solver!: SolverProxy;
 
+  /**
+   * 分享的排班表
+   */
   shareSteps: number[][] = [];
 
+  /**
+   * 排班表存储
+   */
   plans: number[][][] = [];
 
+  /**
+   * 求解器当前日期
+   */
   currentDay: number = 0;
+
+  /**
+   * 求解器当前排班表索引
+   */
   currentIndex: number = 0;
 
   get shareCode() {
     return this.$route.params["share"];
   }
 
+  /**
+   * 求解器窗口状态
+   */
   solverDialog = false;
 
+  /**
+   * 反向求解
+   */
+  reverseSolve = false;
+
+  /**
+   * 为排班添加某天的内容
+   * @param id 排班表Index
+   * @param day 天数
+   */
   addStep(id: number, day: number) {
     this.currentDay = day;
     this.currentIndex = id;
@@ -96,33 +132,50 @@ export default class PlanView extends Vue {
     }
     let tension = 0;
     let plan = this.plans[id];
-    for (let i = 0; i < this.currentDay; i++) {
-      let steps = plan[i];
-      if (steps.length > 0)
-        tension += (steps.length - 1) * this.solver.config.workers;
-      for (let j = 0; j < steps.length; j++) {
-        demands[steps[j]] -= ((j == 0) ? 1 : 2) * this.solver.config.workers;
-      }
+
+    for (let i = this.reverseSolve ? plan.length - 1 : 0; i != day; i += this.reverseSolve ? -1 : 1) {
+        let steps = plan[i];
+        if (steps.length > 0)
+          tension += (steps.length - 1) * this.solver.config.workers;
+        for (let j = 0; j < steps.length; j++) {
+          demands[steps[j]] -= ((j == 0) ? 1 : 2) * this.solver.config.workers;
+        }
     }
 
     this.solverDialog = true;
     (this.$refs["ssolver"] as SimpleSolver).solveBatch(demands, tension);
   }
 
+  /**
+   * 应用排班表
+   * @param steps 步骤
+   */
   apply(steps: number[]) {
     this.close();
     this.plans[this.currentIndex][this.currentDay] = steps;
     this.onStepChange();
   }
+
+  /**
+   * 关闭求解器弹窗
+   */
   close() {
     this.solverDialog = false;
   }
 
+  /**
+   * 为排班表删除某天的内容
+   * @param id 排班表Index
+   * @param day 天数
+   */
   delStep(id: number, day: number) {
     this.plans[id][day] = [];
     this.onStepChange();
   }
 
+  /**
+   * 从存储中载入历史排班表
+   */
   load() {
     let plans = [];
     let planStr = localStorage.getItem("MJIPlans");
@@ -141,32 +194,51 @@ export default class PlanView extends Vue {
     }
   }
 
+  /**
+   * 保存当前排班表
+   */
   save() {
     localStorage.setItem("MJIPlans", JSON.stringify(this.plans));
   }
 
+  /**
+   * 新建一个排班表
+   */
   createPlan() {
     this.plans.push([[],[],[],[],[],[],[]]);
     this.onStepChange();
   }
 
+  /**
+   * 删除排班表
+   * @param id 排班表Index
+   */
   removePlan(id: number) {
     this.plans.splice(id, 1);
     this.onStepChange();
   }
 
+  /**
+   * 导入排班表
+   */
   importPlan() {
     this.plans.push(this.shareSteps);
     this.save();
     this.$router.push('/plan');
   }
 
+  /**
+   * 排班表变动后保存
+   */
   onStepChange() {
     if (!this.shareCode) {
       this.save();
     }
   }
 
+  /**
+   * 分享代码变动后更新
+   */
   @Watch("shareCode")
   onShareCodeChange() {
     if (!this.shareCode) 

@@ -16,7 +16,8 @@ import Close from "@/components/Close.vue";
 @Component({
   components: {
     Close: Close
-  }
+  },
+  emits: [ "close" ]
 })
 export default class Dialog extends Vue {
   close() {
