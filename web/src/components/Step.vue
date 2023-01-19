@@ -128,6 +128,9 @@ export default class Step extends Vue {
     .item-desc {
       color: #666;
       font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
       icon.mji {
         --scale: 0.4;
       }

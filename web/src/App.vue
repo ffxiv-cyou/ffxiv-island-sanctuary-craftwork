@@ -50,6 +50,11 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+html {
+  font-family: "Helvetica", "Segoe UI", "Arial", "PingFang SC", "Helvetica Neue", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei" ,sans-serif;
+  font-size: 16px;
+}
+
 .body {
   margin: auto;
   padding: 40px 20px 20px 20px;
