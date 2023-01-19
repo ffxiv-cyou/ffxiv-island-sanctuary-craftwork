@@ -33,7 +33,7 @@ export default class SortLabel extends Vue {
 <style lang="scss">
 .sort-btn {
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: text-top;
   button {
     display: block;
     height: 10px;
@@ -41,6 +41,8 @@ export default class SortLabel extends Vue {
     background: none;
     border: none;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
   }
 
   button {
@@ -48,12 +50,12 @@ export default class SortLabel extends Vue {
   }
 
   button.is-active {
-    color: inherit;
+    color: inherit !important;
   }
 }
 .sort-label:hover {
   .sort-btn button {
-    color: inherit;
+    color: rgba(128, 128, 128, 1);
   }
 }
 </style>

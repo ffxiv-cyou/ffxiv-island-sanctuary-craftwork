@@ -118,13 +118,7 @@ export default class Step extends Vue {
     height: 40px;
   }
   .item-text {
-    display: flex;
-    flex-direction: column;
     flex: 1;
-    * {
-      flex: 1;
-    }
-
     .item-primary {
       .item-remove {
         float: right;

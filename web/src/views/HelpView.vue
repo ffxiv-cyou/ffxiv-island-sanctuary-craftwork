@@ -173,8 +173,6 @@ export default class TemplateView extends Vue {
 
 <style lang="scss" scoped>
 .about {
-  display: flex;
-  flex-direction: column;
   max-width: 1000px;
   line-height: 1.5;
   p, ul, ol {

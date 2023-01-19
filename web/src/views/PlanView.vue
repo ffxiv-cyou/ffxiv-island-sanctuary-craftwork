@@ -3,7 +3,6 @@
     <h1>排班表</h1>
     <popup
       v-show="solverDialog"
-      class="solver-dialog"
       @close="close"
     >
       <simple-solver
@@ -262,21 +261,15 @@ export default class PlanView extends Vue {
 </script>
 <style>
 .plan-view {
-  display: flex;
-  flex-direction: column;
   max-width: 1200px;
 }
 
 .solver {
-  width: 1200px;
+  max-width: 1200px;
   max-height: calc(100vh - 120px);
   overflow-y: scroll;
   margin: 60px auto;
-  padding: 0 10px;
+  padding: 10px;
   background: white;
-}
-
-.solver-dialog {
-  padding: 0;
 }
 </style>

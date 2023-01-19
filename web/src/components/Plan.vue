@@ -164,9 +164,9 @@ export default class PlanView extends Vue {
     filter: grayscale(1);
   }
 
+  border: 24px solid #000;
   border-image: url("@/assets/mji_bg.png") 64 64 repeat;
   border-image-width: 48px;
-  padding: 24px;
   background: url("@/assets/mji_bghv.png") repeat;
   background-clip: content-box;
 }

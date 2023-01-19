@@ -101,7 +101,5 @@ export default class SettingView extends Vue {
 <style>
 .setting-page {
   max-width: 1000px;
-  display: flex;
-  flex-direction: column;
 }
 </style>
