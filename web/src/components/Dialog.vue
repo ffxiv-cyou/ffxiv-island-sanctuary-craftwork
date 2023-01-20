@@ -1,11 +1,16 @@
 <template>
   <div class="dialog">
-    <div class="dialog-background" @click="close"></div>
+    <div
+      class="dialog-background"
+      @click="close"
+    />
     <close
       class="dialog-close"
       @close="close"
     />
-    <div class="dialog-content"><slot /></div>
+    <div class="dialog-content">
+      <slot />
+    </div>
   </div>
 </template>
 <script lang="ts">

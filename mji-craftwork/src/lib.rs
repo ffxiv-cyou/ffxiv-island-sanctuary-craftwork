@@ -20,23 +20,17 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 /// 初始化数据
 ///
 /// 传入数据格式如下：
-/// recipes: id theme1 theme2 level time value
+/// recipes: id theme1 theme2 level time value cost
 ///
 #[wasm_bindgen]
 pub fn init_repo(recipes: Vec<u16>, pop_pattern: Vec<u8>, pop_pattern_row: usize) -> GameDataRepo {
+    console_error_panic_hook::set_once();
+
     let mut recp = vec![];
     let mut pops = vec![];
 
-    let recp_len = recipes.len() / 6;
-    for i in 0..recp_len {
-        recp.push(Recipe {
-            id: recipes[i * 6 + 0],
-            theme1: recipes[i * 6 + 1] as u8,
-            theme2: recipes[i * 6 + 2] as u8,
-            level: recipes[i * 6 + 3] as u8,
-            craft_time: recipes[i * 6 + 4] as u8,
-            value: recipes[i * 6 + 5],
-        });
+    for i in (0..recipes.len()).step_by(7) {
+        recp.push(Recipe::from_array(&recipes[i..i + 7]));
     }
 
     for i in 0..pop_pattern.len() {
@@ -85,6 +79,7 @@ pub fn simulate(
 ///
 /// 返回所有可能的解的数组，数组结构如下
 /// - value 总价
+/// - cost 成本
 /// - step_count 步骤数目
 /// - steps[6] 每一步的物品ID
 /// - values[6] 每一步的价格
@@ -95,14 +90,16 @@ pub fn solve_singleday(
     level: u8,
     ban_list: Vec<u16>,
     demands: &[i8],
+    with_cost: bool,
 ) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
-    let limit = SolveLimit::new(level, &ban_list);
+    let limit = SolveLimit::new(level, &ban_list, with_cost);
     let batches = solver.solve(&limit, demands);
 
     let mut ret = vec![];
     for b in batches {
         ret.push(b.get_val());
+        ret.push(b.get_cost());
         ret.push(b.seq as u16);
         ret.extend_from_slice(b.get_steps());
         ret.extend_from_slice(b.get_values());

@@ -15,6 +15,8 @@ pub struct Recipe {
     pub craft_time: u8,
     /// 产物基础价格
     pub value: u16,
+    /// 原料价格
+    pub cost: u16,
 }
 
 impl Recipe {
@@ -26,6 +28,19 @@ impl Recipe {
             level: 0,
             craft_time: 0,
             value: 0,
+            cost: 0,
+        }
+    }
+
+    pub fn from_array(arr: &[u16]) -> Self {
+        Recipe {
+            id: arr[0],
+            theme1: arr[1] as u8,
+            theme2: arr[2] as u8,
+            level: arr[3] as u8,
+            craft_time: arr[4] as u8,
+            value: arr[5],
+            cost: arr[6],
         }
     }
 }
@@ -35,6 +50,7 @@ impl Recipe {
 pub struct RecipeState {
     id: u16,
     value: u16,
+    cost: u16,
     time: u8,
     demand: i8,
     popularity: Popularity,
@@ -45,6 +61,7 @@ impl RecipeState {
         Self {
             id: recipe.id,
             value: recipe.value,
+            cost: recipe.cost,
             time: recipe.craft_time,
             demand,
             popularity,
@@ -57,6 +74,9 @@ impl RecipeState {
     }
     pub fn value(&self) -> u16 {
         self.value
+    }
+    pub fn cost(&self) -> u16 {
+        self.cost
     }
     pub fn id(&self) -> u16 {
         self.id

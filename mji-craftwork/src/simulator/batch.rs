@@ -7,8 +7,12 @@ pub struct Batch {
     pub steps: [u16; 6],
     /// 单价
     pub values: [u16; 6],
+    /// 用于比较的总价
+    pub cmp_value: u16,
     /// 总价
     pub value: u16,
+    /// 总成本
+    pub cost: u16,
     /// 总耗时
     pub time: u16,
 }
@@ -20,7 +24,9 @@ impl Batch {
             steps: [0; 6],
             values: [0; 6],
             value: 0,
+            cost: 0,
             time: 0,
+            cmp_value: 0,
         }
     }
 
@@ -34,7 +40,7 @@ impl Batch {
     }
 
     /// 添加一个新步骤
-    pub fn push(&self, id: u16, mut val: u16, time: u16) -> Self {
+    pub fn push(&self, id: u16, mut val: u16, cost: u16, time: u16) -> Self {
         if self.seq >= self.steps.len() {
             panic!("Step overflow! {:?}", self.steps)
         }
@@ -48,7 +54,9 @@ impl Batch {
             steps: self.steps,
             values: self.values,
             value: self.value + val,
+            cost: self.cost + cost,
             time: self.time + time,
+            cmp_value: self.cmp_value,
         };
         ret.steps[self.seq] = id;
         ret.values[self.seq] = val;
@@ -75,6 +83,17 @@ impl Batch {
     pub fn get_val(&self) -> u16 {
         self.value
     }
+    pub fn get_cost(&self) -> u16 {
+        self.cost
+    }
+    /// 设置比较用的值
+    pub fn set_cmp_value(&mut self, with_cost: bool) {
+        if with_cost {
+            self.cmp_value = self.value - self.cost
+        } else {
+            self.cmp_value = self.value
+        }
+    }
     pub fn get_steps(&self) -> &[u16] {
         &self.steps
     }
@@ -85,22 +104,22 @@ impl Batch {
 
 impl PartialOrd for Batch {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let a = self.value as usize * 10 + self.seq;
-        let b = other.value as usize * 10 + other.seq;
+        let a = self.cmp_value as usize * 10 + self.seq;
+        let b = other.cmp_value as usize * 10 + other.seq;
         b.partial_cmp(&a)
     }
 }
 
 impl PartialEq for Batch {
     fn eq(&self, other: &Self) -> bool {
-        self.value == other.value && self.seq == other.seq
+        self.cmp_value == other.cmp_value && self.seq == other.seq
     }
 }
 
 impl Ord for Batch {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        let a = self.value as usize * 10 + self.seq;
-        let b = other.value as usize * 10 + other.seq;
+        let a = self.cmp_value as usize * 10 + self.seq;
+        let b = other.cmp_value as usize * 10 + other.seq;
         b.cmp(&a)
     }
 }

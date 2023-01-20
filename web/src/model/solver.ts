@@ -60,18 +60,19 @@ export class SolverProxy {
 
         await init();
 
-        const recipe = new Uint16Array(6 * Recipes.length);
+        const recipe = new Uint16Array(7 * Recipes.length);
         const cols = PopularSheet[0].length;
         const pops = new Uint8Array(PopularSheet.length * cols);
 
         for (let i = 0; i < Recipes.length; i++) {
             const r = Recipes[i];
-            recipe[i * 6 + 0] = r.Id;
-            recipe[i * 6 + 1] = r.Theme0;
-            recipe[i * 6 + 2] = r.Theme1;
-            recipe[i * 6 + 3] = r.Level;
-            recipe[i * 6 + 4] = r.Time;
-            recipe[i * 6 + 5] = r.Price;
+            recipe[i * 7 + 0] = r.Id;
+            recipe[i * 7 + 1] = r.Theme0;
+            recipe[i * 7 + 2] = r.Theme1;
+            recipe[i * 7 + 3] = r.Level;
+            recipe[i * 7 + 4] = r.Time;
+            recipe[i * 7 + 5] = r.Price;
+            recipe[i * 7 + 6] = r.Cost;
         }
         for (let i = 0; i < PopularSheet.length; i++) {
             const r = PopularSheet[i];
@@ -155,7 +156,7 @@ export class SolverProxy {
             steps[i] = array[i];
         }
         const arr = simulate(this.repo, this.info, steps, this.demandsArray);
-        return new BatchValues(array, arr);
+        return BatchValues.fromSteps(array, arr);
     }
 
     /**
@@ -184,7 +185,7 @@ export class SolverProxy {
                 stepArray[i] = daySteps[i];
             }
             const arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray, demands);
-            const values = new BatchValues(daySteps, arr);
+            const values = BatchValues.fromSteps(daySteps, arr);
             batchValues.push(values);
 
             for (let j = 0; j < values.steps.length; j++) {
@@ -214,10 +215,7 @@ export class SolverProxy {
                 banArr.push(i);
             }
         }
-
-        const banList = new Uint16Array(banArr);
-        const arr = solve_singleday(this.repo, this.info, this.config.level, banList, this.demandsArray);
-        return BatchValues.fromSimulateArray(arr);
+        return this.solveDayDetail(this.demands, banArr, this.tension)
     }
 
     /**
@@ -232,7 +230,7 @@ export class SolverProxy {
         const demandArr = new Int8Array(demands);
 
         const info = this.infoWithTension(tension);
-        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr);
+        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr, this.config.withCost);
 
         return BatchValues.fromSimulateArray(arr);
     }
@@ -327,35 +325,42 @@ export class BatchValues extends Batch {
      */
     public stepValues: number[];
 
-    constructor(steps: number[], values: Uint16Array) {
-        let value = 0;
-        for (let i = 0; i < values.length; i++) {
-            value += values[i];
-        }
+    public cost: number;
 
+    constructor(value: number, cost: number, steps: number[], values: Uint16Array) {
         super(value, steps.length, steps);
 
+        this.cost = cost;
         this.stepValues = [];
         for (let i = 0; i < steps.length; i++) {
             this.stepValues.push(values[i]);
         }
     }
 
+    static fromSteps(steps: number[], values: Uint16Array) {
+        let value = 0;
+        for (let i = 0; i < values.length; i++) {
+            value += values[i];
+        }
+        return new BatchValues(value, 0, steps, values);
+    }
+
     static fromArray(array: Uint16Array): BatchValues {
-        // const value = array[0];
-        // const count = array[1];
+        const value = array[0];
+        const cost = array[1];
+        // const count = array[2];
         const steps = [];
-        for (let i = 2; i < 8; i++) {
+        for (let i = 3; i < 9; i++) {
             if (array[i] != 0)
                 steps.push(array[i]);
         }
-        return new BatchValues(steps, array.slice(8));
+        return new BatchValues(value, cost, steps, array.slice(9));
     }
 
     static fromSimulateArray(array: Uint16Array): BatchValues[] {
         const result = [];
-        for (let i = 0; i < array.length; i += 14) {
-            result.push(BatchValues.fromArray(array.slice(i, i + 14)));
+        for (let i = 0; i < array.length; i += 15) {
+            result.push(BatchValues.fromArray(array.slice(i, i + 15)));
         }
         return result;
     }

@@ -9,6 +9,8 @@ export class CraftworkObject {
     Icon!: number;
     // 基础价格
     Price!: number;
+    // 成本
+    Cost!: number;
     // 等级
     Level!: number;
     // 所需时间

@@ -21,7 +21,7 @@ pub fn simulate_batch(info: &CraftworkInfo, recipe: &[RecipeState]) -> Batch {
         let demand_sub = batch.get_produce(r.id()) * info.workers;
         let val = simulate(&info, r, demand_sub);
         info = info.next();
-        batch = batch.push(r.id(), val, r.craft_time() as u16);
+        batch = batch.push(r.id(), val, r.cost(), r.craft_time() as u16);
     }
     batch
 }
@@ -42,6 +42,7 @@ mod tests {
             level: 6,
             craft_time: 4,
             value: 32,
+            cost: 0,
         };
         let state = RecipeState::new(recipe, 17, Popularity::High);
 

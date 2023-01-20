@@ -76,6 +76,19 @@ export class Config {
     this.save();
   }
 
+  _withCost: boolean = false;
+
+  /**
+   * 是否考虑成本
+   */
+  public get withCost() {
+    return this._withCost;
+  }
+  public set withCost(val: boolean) {
+    this._withCost = val;
+    this.save();
+  }
+
   constructor() {
     for (let i = 0; i < Recipes.length; i++) {
       this.demandPatterns.push(0);
@@ -99,6 +112,7 @@ export class Config {
     cfg._popPattern = obj._popPattern;
     cfg._workers = obj._workers;
     cfg.demandPatterns = obj.demandPatterns;
+    cfg._withCost = obj._withCost ?? false;
 
     return cfg;
   }

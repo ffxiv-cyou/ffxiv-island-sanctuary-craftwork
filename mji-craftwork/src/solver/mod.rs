@@ -19,14 +19,17 @@ pub struct SolveLimit<'a> {
     ban_list: &'a [u16],
     /// 结果数量
     pub max_result: usize,
+    /// 是否考虑成本
+    pub with_cost: bool,
 }
 
 impl<'a> SolveLimit<'a> {
-    pub fn new(level: u8, ban_list: &'a [u16]) -> SolveLimit {
+    pub fn new(level: u8, ban_list: &'a [u16], with_cost: bool) -> SolveLimit {
         Self {
             level,
             ban_list,
             max_result: 100,
+            with_cost,
         }
     }
 

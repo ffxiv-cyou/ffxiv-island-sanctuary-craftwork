@@ -52,6 +52,18 @@
           >
           <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算</span>
         </div>
+        <div class="pure-control-group">
+          <label for="with-cost">成本计算</label>
+          <label for="with-cost">
+            <input
+              id="with-cost"
+              v-model="withCost"
+              type="checkbox"
+            >
+            推荐时考虑成本
+          </label>
+          <span class="pure-form-message-inline">计算推荐队列时将材料单独卖出的收益从工坊收益中减去</span>
+        </div>
       </fieldset>
     </div>
   </div>
@@ -96,6 +108,12 @@ export default class SettingView extends Vue {
     this.config.workers = val;
   }
 
+  get withCost() {
+    return this.config.withCost;
+  }
+  set withCost(val: boolean) {
+    this.config.withCost = val;
+  }
 }
 </script>
 <style>

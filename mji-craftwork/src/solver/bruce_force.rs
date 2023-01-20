@@ -24,7 +24,8 @@ where
         self.solve_sub(limit, demands, &mut ret, Batch::new(), self.info.clone());
         // 结果排序
         let mut heap = BinaryHeap::new();
-        for item in ret {
+        for mut item in ret {
+            item.set_cmp_value(limit.with_cost);
             if heap.len() >= limit.max_result {
                 heap.pop();
             }
@@ -88,7 +89,7 @@ where
             let s = self.data.state(id, demands[id]);
             let demand_sub = current.get_produce(s.id()) * info.workers;
             let val = simulate(&info, &s, demand_sub);
-            let current = current.push(r.id, val, r.craft_time as u16);
+            let current = current.push(r.id, val, r.cost, r.craft_time as u16);
 
             if current.get_time() > 20 {
                 // 当前工序结束
