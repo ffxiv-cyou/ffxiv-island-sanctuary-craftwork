@@ -52,17 +52,19 @@
           >
           <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算</span>
         </div>
+      </fieldset>
+      <fieldset>
+        <legend>求解器/推荐队列</legend>
         <div class="pure-control-group">
-          <label for="with-cost">成本计算</label>
           <label for="with-cost">
             <input
               id="with-cost"
               v-model="withCost"
               type="checkbox"
             >
-            推荐时考虑成本
+            按净收益排序
           </label>
-          <span class="pure-form-message-inline">计算推荐队列时将材料单独卖出的收益从工坊收益中减去</span>
+          <span class="pure-form-message-inline">求解时按净收益排序。净收益 = 工坊收益 - 将材料单独卖出的收益。</span>
         </div>
       </fieldset>
     </div>
