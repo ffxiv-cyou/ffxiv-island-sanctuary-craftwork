@@ -109,13 +109,14 @@ export default class SimpleSolver extends Vue {
 
       for (let i = 0; i < steps.length; i++) {
         let step = steps[i];
-        this.stepDemands[b][i] = this.cachedDemands[step];
-        this.stepPops[b][i] = Popularity[this.solver.popPattern][step];
-        for (let j = 0; j <= i; j++) {
+        let demand = this.cachedDemands[step];
+        for (let j = 0; j < i; j++) {
           if (steps[j] == step) {
-            this.stepDemands[b][i] -= (j === 0 ? 1 : 2) * this.solver.config.workers;
+            demand -= (j === 0 ? 1 : 2) * this.solver.config.workers;
           }
         }
+        this.stepDemands[b].push(demand);
+        this.stepPops[b].push(Popularity[this.solver.popPattern][step]);
       }
     }
   }

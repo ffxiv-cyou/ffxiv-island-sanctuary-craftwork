@@ -23,7 +23,7 @@
           class="step-pattern text"
         >{{ patternName }}</span>
         <span
-          v-if="pop"
+          v-if="pop !== undefined"
           class="step-pop"
         >
           <icon
@@ -32,7 +32,7 @@
           />
         </span>
         <span
-          v-if="demand"
+          v-if="demand !== undefined"
           class="step-demand"
         >
           <icon
