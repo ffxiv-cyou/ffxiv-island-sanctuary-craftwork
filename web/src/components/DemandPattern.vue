@@ -180,6 +180,7 @@ export default class DemandPattern extends Vue {
   }
 
   set popPattern(val: number) {
+    if (val <= 0) return;
     if (this.inputShareCode) {
       this.inputPopPattern = val;
     } else {
