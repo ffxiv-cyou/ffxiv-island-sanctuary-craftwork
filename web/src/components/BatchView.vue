@@ -9,6 +9,7 @@
       <span class="bench-cost">-{{ batch.cost }}</span>
     </div>
     <steps 
+      :solver="solver"
       :steps="batch.steps"
       :values="batch.stepValues"
       :removeable="removeable"
@@ -21,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import type { BatchValues } from "@/model/solver";
+import type { BatchValues, SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue } from "vue-facing-decorator";
 import Steps from "./Steps.vue";
 
@@ -32,6 +33,9 @@ import Steps from "./Steps.vue";
   emits: ["remove"]
 })
 export default class BatchView extends Vue {
+  @Prop()
+  solver!: SolverProxy;
+
   @Prop()
   batch!: BatchValues;
 

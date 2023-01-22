@@ -48,9 +48,10 @@
   
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-facing-decorator";
-import { CraftworkData, DemandUtils, PatternNames } from "@/model/data";
+import { DemandUtils, PatternNames } from "@/model/data";
 import "@/assets/items.css";
 import Close from "./Close.vue";
+import { CraftworkData, type CraftworkObject } from "@/data/data";
 
 @Component({
   components: {
@@ -60,7 +61,7 @@ import Close from "./Close.vue";
 })
 export default class Step extends Vue {
   @Prop()
-  step!: number;
+  step!: CraftworkObject;
 
   @Prop()
   value!: number;
@@ -78,13 +79,13 @@ export default class Step extends Vue {
   pattern?: number;
 
   get name() {
-    return CraftworkData.TrimName(CraftworkData.GetRecipe(this.step).Name);
+    return CraftworkData.TrimName(this.step.Name);
   }
   get time() {
-    return CraftworkData.GetRecipe(this.step).Time;
+    return this.step.Time;
   }
   get iconPath() {
-    return "item-" + CraftworkData.GetRecipe(this.step).Icon;
+    return "item-" + this.step.Icon;
   }
   get popularity(): string {
     if (!this.pop) return "mji-popular-2"
@@ -124,12 +125,16 @@ export default class Step extends Vue {
         float: right;
       }
     }
+    .item-name,
+    .item-desc {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .item-desc {
       color: #666;
       font-size: 14px;
-      white-space: nowrap;
-      overflow: hidden;
       width: 100%;
       icon.mji {
         --scale: 0.4;

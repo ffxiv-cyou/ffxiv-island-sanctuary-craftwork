@@ -12,11 +12,15 @@
   </div>
 </template>
 <script lang="ts">
-import { CraftworkData, MJIItemData } from "@/model/data";
+import { CraftworkData } from "@/data/data";
+import type { SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop } from "vue-facing-decorator";
 
 @Component({})
 export default class Ingridients extends Vue {
+  @Prop()
+  solver!: SolverProxy;
+
   @Prop()
   steps!: number[];
 
@@ -41,7 +45,7 @@ export default class Ingridients extends Vue {
     let resMap = new Map<number, number>();
     
     stMap.forEach((value, key) => {
-      let recipe = CraftworkData.GetRecipe(key);
+      let recipe = this.solver.Recipes[key];
       recipe.Ingredients.forEach(ing => {
         if (ing.Count === 0)
           return;
@@ -57,20 +61,19 @@ export default class Ingridients extends Vue {
     });
     
     return [...resMap.entries()].sort((a, b) => {
-      let delta = MJIItemData.GetCategory(b[0]) - MJIItemData.GetCategory(a[0]);
+      let delta = this.solver.data.GetItem(b[0]).Category - this.solver.data.GetItem(a[0]).Category;
       return delta ? delta : a[0] - b[0];
     });
   }
 
   getName(id: number) {
-    // return MJIItemData.GetItem(id).Name;
-    return MJIItemData.TrimName(MJIItemData.GetItem(id).Name);
+    return CraftworkData.TrimName(this.solver.data.GetItem(id).Name);
   }
   getIconPath(id: number) {
-    return "item-" + MJIItemData.GetItem(id).Icon;
+    return "item-" + this.solver.data.GetItem(id).Icon;
   }
   getCategory(id: number) {
-    return "category-" + MJIItemData.GetCategory(id);
+    return "category-" + this.solver.data.GetItem(id).Category;
   }
 }
 </script>

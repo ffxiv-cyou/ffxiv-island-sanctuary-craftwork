@@ -2,336 +2,403 @@
   {
     "Id": 0,
     "Name": "无人岛棕榈叶",
-    "Icon": 25026
+    "Icon": 25026,
+    "Category": 1
   },
   {
     "Id": 1,
     "Name": "无人岛苹果",
-    "Icon": 25308
+    "Icon": 25308,
+    "Category": 1
   },
   {
     "Id": 2,
     "Name": "无人岛小树枝",
-    "Icon": 22416
+    "Icon": 22416,
+    "Category": 1
   },
   {
     "Id": 3,
     "Name": "无人岛石材",
-    "Icon": 21451
+    "Icon": 21451,
+    "Category": 1
   },
   {
     "Id": 4,
     "Name": "无人岛双壳贝",
-    "Icon": 29031
+    "Icon": 29031,
+    "Category": 1
   },
   {
     "Id": 5,
     "Name": "无人岛球藻",
-    "Icon": 25225
+    "Icon": 25225,
+    "Category": 1
   },
   {
     "Id": 6,
     "Name": "无人岛珊瑚",
-    "Icon": 29060
+    "Icon": 29060,
+    "Category": 1
   },
   {
     "Id": 7,
     "Name": "无人岛草叶",
-    "Icon": 25010
+    "Icon": 25010,
+    "Category": 1
   },
   {
     "Id": 8,
     "Name": "无人岛砂砾",
-    "Icon": 21464
+    "Icon": 21464,
+    "Category": 1
   },
   {
     "Id": 9,
     "Name": "无人岛原木",
-    "Icon": 22407
+    "Icon": 22407,
+    "Category": 1
   },
   {
     "Id": 10,
     "Name": "无人岛棕榈原木",
-    "Icon": 22410
+    "Icon": 22410,
+    "Category": 1
   },
   {
     "Id": 11,
     "Name": "无人岛藤蔓",
-    "Icon": 21672
+    "Icon": 21672,
+    "Category": 1
   },
   {
     "Id": 12,
     "Name": "无人岛树液",
-    "Icon": 22642
+    "Icon": 22642,
+    "Category": 1
   },
   {
     "Id": 13,
     "Name": "无人岛铜矿",
-    "Icon": 21209
+    "Icon": 21209,
+    "Category": 1
   },
   {
     "Id": 14,
     "Name": "无人岛石灰岩",
-    "Icon": 22615
+    "Icon": 22615,
+    "Category": 1
   },
   {
     "Id": 15,
     "Name": "无人岛岩盐",
-    "Icon": 22617
+    "Icon": 22617,
+    "Category": 1
   },
   {
     "Id": 16,
     "Name": "无人岛甘蔗",
-    "Icon": 22452
+    "Icon": 22452,
+    "Category": 1
   },
   {
     "Id": 17,
     "Name": "无人岛棉花",
-    "Icon": 21652
+    "Icon": 21652,
+    "Category": 1
   },
   {
     "Id": 18,
     "Name": "无人岛麻",
-    "Icon": 25213
+    "Icon": 25213,
+    "Category": 1
   },
   {
     "Id": 19,
     "Name": "无人岛黏土",
-    "Icon": 22634
+    "Icon": 22634,
+    "Category": 1
   },
   {
     "Id": 20,
     "Name": "无人岛锡砂",
-    "Icon": 21204
+    "Icon": 21204,
+    "Category": 1
   },
   {
     "Id": 21,
     "Name": "无人岛铁矿",
-    "Icon": 21202
+    "Icon": 21202,
+    "Category": 1
   },
   {
     "Id": 22,
     "Name": "无人岛石英",
-    "Icon": 20019
+    "Icon": 20019,
+    "Category": 1
   },
   {
     "Id": 23,
     "Name": "无人岛花岗岩",
-    "Icon": 21251
+    "Icon": 21251,
+    "Category": 1
   },
   {
     "Id": 24,
     "Name": "无人岛海水鱼",
-    "Icon": 29012
+    "Icon": 29012,
+    "Category": 1
   },
   {
     "Id": 25,
     "Name": "无人岛乌贼",
-    "Icon": 29177
+    "Icon": 29177,
+    "Category": 1
   },
   {
     "Id": 26,
     "Name": "无人岛水母",
-    "Icon": 29657
+    "Icon": 29657,
+    "Category": 1
   },
   {
     "Id": 27,
     "Name": "无人岛香荠",
-    "Icon": 22627
+    "Icon": 22627,
+    "Category": 2
   },
   {
     "Id": 28,
     "Name": "无人岛石榴石原石",
-    "Icon": 21456
+    "Icon": 21456,
+    "Category": 2
   },
   {
     "Id": 29,
     "Name": "无人岛云杉原木",
-    "Icon": 22413
+    "Icon": 22413,
+    "Category": 2
   },
   {
     "Id": 30,
     "Name": "无人岛锤头鲨",
-    "Icon": 29026
+    "Icon": 29026,
+    "Category": 2
   },
   {
     "Id": 31,
     "Name": "无人岛银矿",
-    "Icon": 21211
+    "Icon": 21211,
+    "Category": 2
   },
   {
     "Id": 32,
     "Name": "海岛新薯的芽块",
-    "Icon": 23704
+    "Icon": 23704,
+    "Category": 3
   },
   {
     "Id": 33,
     "Name": "海岛甘蓝的种子",
-    "Icon": 23703
+    "Icon": 23703,
+    "Category": 3
   },
   {
     "Id": 34,
     "Name": "海岛莓果的种子",
-    "Icon": 23701
+    "Icon": 23701,
+    "Category": 3
   },
   {
     "Id": 35,
     "Name": "海岛南瓜的种子",
-    "Icon": 23702
+    "Icon": 23702,
+    "Category": 3
   },
   {
     "Id": 36,
     "Name": "海岛洋葱的种子",
-    "Icon": 23705
+    "Icon": 23705,
+    "Category": 3
   },
   {
     "Id": 37,
     "Name": "海岛番茄的种子",
-    "Icon": 23707
+    "Icon": 23707,
+    "Category": 3
   },
   {
     "Id": 38,
     "Name": "海岛小麦的种子",
-    "Icon": 23714
+    "Icon": 23714,
+    "Category": 3
   },
   {
     "Id": 39,
     "Name": "海岛玉米的种子",
-    "Icon": 23706
+    "Icon": 23706,
+    "Category": 3
   },
   {
     "Id": 40,
     "Name": "海岛高山萝卜的种子",
-    "Icon": 23708
+    "Icon": 23708,
+    "Category": 3
   },
   {
     "Id": 41,
     "Name": "海岛小萝卜的种子",
-    "Icon": 23709
+    "Icon": 23709,
+    "Category": 3
   },
   {
     "Id": 42,
     "Name": "海岛新薯",
-    "Icon": 25204
+    "Icon": 25204,
+    "Category": 4
   },
   {
     "Id": 43,
     "Name": "海岛甘蓝",
-    "Icon": 25208
+    "Icon": 25208,
+    "Category": 4
   },
   {
     "Id": 44,
     "Name": "海岛莓果",
-    "Icon": 25306
+    "Icon": 25306,
+    "Category": 4
   },
   {
     "Id": 45,
     "Name": "海岛南瓜",
-    "Icon": 25232
+    "Icon": 25232,
+    "Category": 4
   },
   {
     "Id": 46,
     "Name": "海岛洋葱",
-    "Icon": 25203
+    "Icon": 25203,
+    "Category": 4
   },
   {
     "Id": 47,
     "Name": "海岛番茄",
-    "Icon": 25209
+    "Icon": 25209,
+    "Category": 4
   },
   {
     "Id": 48,
     "Name": "海岛小麦",
-    "Icon": 25357
+    "Icon": 25357,
+    "Category": 4
   },
   {
     "Id": 49,
     "Name": "海岛玉米",
-    "Icon": 25352
+    "Icon": 25352,
+    "Category": 4
   },
   {
     "Id": 50,
     "Name": "海岛高山萝卜",
-    "Icon": 25215
+    "Icon": 25215,
+    "Category": 4
   },
   {
     "Id": 51,
     "Name": "海岛小萝卜",
-    "Icon": 25231
+    "Icon": 25231,
+    "Category": 4
   },
   {
     "Id": 52,
     "Name": "牧场动物的绒毛",
-    "Icon": 21655
+    "Icon": 21655,
+    "Category": 5
   },
   {
     "Id": 53,
     "Name": "牧场动物的尖爪",
-    "Icon": 22301
+    "Icon": 22301,
+    "Category": 5
   },
   {
     "Id": 54,
     "Name": "牧场动物的兽毛",
-    "Icon": 21624
+    "Icon": 21624,
+    "Category": 5
   },
   {
     "Id": 55,
     "Name": "牧场动物的羽毛",
-    "Icon": 21908
+    "Icon": 21908,
+    "Category": 5
   },
   {
     "Id": 56,
     "Name": "牧场动物的鸟蛋",
-    "Icon": 25251
+    "Icon": 25251,
+    "Category": 5
   },
   {
     "Id": 57,
     "Name": "牧场动物的甲壳",
-    "Icon": 22257
+    "Icon": 22257,
+    "Category": 5
   },
   {
     "Id": 58,
     "Name": "牧场动物的尖牙",
-    "Icon": 22303
+    "Icon": 22303,
+    "Category": 5
   },
   {
     "Id": 59,
     "Name": "牧场动物的角片",
-    "Icon": 22206
+    "Icon": 22206,
+    "Category": 5
   },
   {
     "Id": 60,
     "Name": "牧场动物的乳汁",
-    "Icon": 24453
+    "Icon": 24453,
+    "Category": 5
   },
   {
     "Id": 61,
     "Name": "无人岛果实饲料",
-    "Icon": 23710
+    "Icon": 23710,
+    "Category": 6
   },
   {
     "Id": 62,
     "Name": "无人岛蔬菜饲料",
-    "Icon": 27555
+    "Icon": 27555,
+    "Category": 6
   },
   {
     "Id": 63,
     "Name": "无人岛高级蔬菜饲料",
-    "Icon": 23711
+    "Icon": 23711,
+    "Category": 6
   },
   {
     "Id": 64,
     "Name": "捕兽网",
-    "Icon": 23717
+    "Icon": 23717,
+    "Category": 7
   },
   {
     "Id": 65,
     "Name": "捕兽绳",
-    "Icon": 23720
+    "Icon": 23720,
+    "Category": 7
   },
   {
     "Id": 66,
     "Name": "捕兽用催眠球",
-    "Icon": 23721
+    "Icon": 23721,
+    "Category": 7
   }
 ]

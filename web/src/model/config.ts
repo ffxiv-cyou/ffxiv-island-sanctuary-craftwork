@@ -1,10 +1,32 @@
-import Recipes from "../data/MJICraftworksObject.json";
+import { Region } from "@/data/data";
 
 const CONFIG_KEY = "MJICraftworksConfig";
 
 export class Config {
 
+  _region: Region = Region.CN;
   _level: number = 10;
+  _maxTension: number = 35;
+  _craftLevel: number = 2;
+  _workers: number = 3;
+  _popPattern: number = 1;
+  _withCost: boolean = false;
+
+  /**
+   * 需求变化规律表
+   */
+  public demandPatterns: number[] = [];
+
+  /**
+   * 数据区域
+   */
+  public get region() {
+    return this._region;
+  }
+  public set region(val: Region) {
+    this._region = val;
+    this.save();
+  }
 
   /**
    * 开拓等级，用于过滤配方，1-10
@@ -17,8 +39,6 @@ export class Config {
     this.save();
   }
 
-  _maxTension: number = 35;
-
   /**
    * 最大干劲
    */
@@ -30,8 +50,6 @@ export class Config {
     this.save();
   }
 
-  _craftLevel: number = 2;
-
   /**
    * 工坊等级，0-2
    */
@@ -42,8 +60,6 @@ export class Config {
     this._craftLevel = val;
     this.save();
   }
-
-  _workers: number = 3;
 
   /**
    * 同时运行的工房数量（1-3）
@@ -58,13 +74,6 @@ export class Config {
   }
 
   /**
-   * 需求变化规律表
-   */
-  public demandPatterns: number[] = [];
-
-  _popPattern: number = 1;
-
-  /**
    * 欢迎度模式
    */
   public get popPattern() {
@@ -75,8 +84,6 @@ export class Config {
     this._popPattern = val;
     this.save();
   }
-
-  _withCost: boolean = false;
 
   /**
    * 是否考虑成本
@@ -89,8 +96,8 @@ export class Config {
     this.save();
   }
 
-  constructor() {
-    for (let i = 0; i < Recipes.length; i++) {
+  constructor(len: number) {
+    for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
     }
   }
@@ -99,13 +106,14 @@ export class Config {
     localStorage.setItem(CONFIG_KEY, JSON.stringify(this));
   }
 
-  public static load(): Config {
-    const cfg = new Config();
+  public static load(recipeLen: number): Config {
+    const cfg = new Config(recipeLen);
     const str = localStorage.getItem(CONFIG_KEY);
     if (str == null) {
       return cfg;
     }
     const obj = JSON.parse(str);
+    cfg._region = obj._region ?? 1;
     cfg._craftLevel = obj._craftLevel;
     cfg._level = obj._level;
     cfg._maxTension = obj._maxTension;

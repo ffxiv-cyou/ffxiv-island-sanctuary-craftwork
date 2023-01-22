@@ -1,6 +1,4 @@
-import PopularSheet from "../data/MJICraftworksPopularity.json";
-import Recipes from "../data/MJICraftworksObject.json";
-
+import { CraftworkData, Region } from "@/data/data";
 import init, {
     init_repo,
     set_pattern,
@@ -16,6 +14,11 @@ import { Config } from "./config";
 
 export class SolverProxy {
     repo!: GameDataRepo;
+
+    /**
+     * 数据Repo
+     */
+    public data: CraftworkData;
 
     /**
      * 配置
@@ -44,11 +47,28 @@ export class SolverProxy {
      */
     public predictDemands: number[][] = [];
 
+    /**
+     * 配方表
+     */
+    get Recipes() {
+        return this.data.Recipes;
+    }
+
+    /**
+     * 欢迎度表
+     */
+    get Popularity() {
+        return this.data.Popularity;
+    }
+
     constructor() {
-        this.config = Config.load();
-        for (let i = 0; i < Recipes.length; i++) {
+        this.data = new CraftworkData(Region.Global);
+        this.config = Config.load(this.Recipes.length);
+        for (let i = 0; i < this.Recipes.length; i++) {
             this.banList.push(false);
         }
+        this.data.SetRegion(this.config.region);
+
         init().catch((e) => {
             throw e;
         });
@@ -59,13 +79,16 @@ export class SolverProxy {
             return;
 
         await init();
+        this.loadData();
+    }
 
-        const recipe = new Uint16Array(7 * Recipes.length);
-        const cols = PopularSheet[0].length;
-        const pops = new Uint8Array(PopularSheet.length * cols);
-
-        for (let i = 0; i < Recipes.length; i++) {
-            const r = Recipes[i];
+    /**
+     * 载入数据
+     */
+    loadData() {
+        const recipe = new Uint16Array(7 * this.Recipes.length);
+        for (let i = 0; i < this.Recipes.length; i++) {
+            const r = this.Recipes[i];
             recipe[i * 7 + 0] = r.Id;
             recipe[i * 7 + 1] = r.Theme0;
             recipe[i * 7 + 2] = r.Theme1;
@@ -74,8 +97,11 @@ export class SolverProxy {
             recipe[i * 7 + 5] = r.Price;
             recipe[i * 7 + 6] = r.Cost;
         }
-        for (let i = 0; i < PopularSheet.length; i++) {
-            const r = PopularSheet[i];
+
+        const cols = this.data.Popularity[0].length;
+        const pops = new Uint8Array(this.data.Popularity.length * cols);
+        for (let i = 0; i < this.data.Popularity.length; i++) {
+            const r = this.data.Popularity[i];
             for (let j = 0; j < r.length; j++) {
                 pops[i * cols + j] = r[j];
             }
@@ -84,16 +110,9 @@ export class SolverProxy {
         this.repo = init_repo(recipe, pops, cols);
         this.inited = true;
 
-        // 写入配置项目
+        // 更新缓存
         this.updatePredictDemands();
         set_pattern(this.repo, this.popPattern);
-    }
-
-    /**
-     * 当前需求Int8Array
-     */
-    get demandsArray() {
-        return new Int8Array(this.demands);
     }
 
     /**
@@ -106,6 +125,18 @@ export class SolverProxy {
     set popPattern(val: number) {
         this.config.popPattern = val;
         set_pattern(this.repo, val);
+    }
+
+    /**
+     * 当前区域
+     */
+    get region() {
+        return this.config.region;
+    }
+
+    set region(val: Region) {
+        this.config.region = val;
+        this.data.SetRegion(val);
     }
 
     /**
@@ -155,7 +186,7 @@ export class SolverProxy {
         for (let i = 0; i < steps.length; i++) {
             steps[i] = array[i];
         }
-        const arr = simulate(this.repo, this.info, steps, this.demandsArray);
+        const arr = simulate(this.repo, this.info, steps, new Int8Array(this.demands));
         return BatchValues.fromSteps(array, arr);
     }
 
@@ -168,7 +199,7 @@ export class SolverProxy {
         const batchValues = [];
 
         const demandChanges = []; // 各个配方的需求变动值
-        for (let i = 0; i < Recipes.length; i++) {
+        for (let i = 0; i < this.Recipes.length; i++) {
             demandChanges.push(0);
         }
         let tensionAdd = 0;

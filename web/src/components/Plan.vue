@@ -39,6 +39,7 @@
             -
           </button>
           <steps-comp
+            :solver="solver"
             :values="val.stepValues"
             :steps="val.steps"
           />
@@ -46,6 +47,7 @@
       </div>
       <ingrid-comp
         class="plan-ingridients info-box"
+        :solver="solver"
         :steps="flatSteps"
         :workers="workers"
       />

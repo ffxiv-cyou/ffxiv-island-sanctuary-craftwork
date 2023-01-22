@@ -19,6 +19,7 @@
         <batch-view
           v-for="(val, key) in batches"
           :key="key"
+          :solver="solver"
           :batch="val"
         />
       </div>

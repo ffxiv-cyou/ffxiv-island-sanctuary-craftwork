@@ -5,6 +5,17 @@
       <legend>工坊基础设置</legend>
       <fieldset>
         <div class="pure-control-group">
+          <label for="region">
+            <input
+              id="region"
+              v-model="region"
+              type="checkbox"
+            >
+            国际服
+          </label>
+          <span class="pure-form-message-inline">勾选后使用国际服配方，注意需求真值表不会改变。</span>
+        </div>
+        <div class="pure-control-group">
           <label for="level">开拓等级</label>
           <input
             id="level"
@@ -71,6 +82,7 @@
   </div>
 </template>
 <script lang="ts">
+import { Region } from "@/data/data";
 import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue } from "vue-facing-decorator";
 @Component({})
@@ -115,6 +127,14 @@ export default class SettingView extends Vue {
   }
   set withCost(val: boolean) {
     this.config.withCost = val;
+  }
+
+  get region() {
+    return this.solver.region === 0;
+  }
+
+  set region(val: boolean) {
+    this.solver.region = val ? Region.Global : Region.CN;
   }
 }
 </script>

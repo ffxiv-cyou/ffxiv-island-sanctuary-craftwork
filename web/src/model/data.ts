@@ -1,61 +1,3 @@
-import CraftObjects from "@/data/MJICraftworksObject.json";
-import ItemPouch from "@/data/MJIItemPouch.json";
-
-export class CraftworkObject {
-    Id!: number;
-    // 产物名称
-    Name!: string;
-    // 图标
-    Icon!: number;
-    // 基础价格
-    Price!: number;
-    // 成本
-    Cost!: number;
-    // 等级
-    Level!: number;
-    // 所需时间
-    Time!: number;
-    // 类别1
-    Theme0!: number;
-    // 类别2
-    Theme1!: number;
-    // 配方
-    Ingredients!: CraftworkIngredient[];
-}
-
-export class CraftworkIngredient {
-    // 原料ID
-    Id!: number;
-    // 原料数量
-    Count!: number;
-}
-
-export class ItemName {
-    Id!: number;
-    Name!: string;
-    // 图标
-    Icon!: number;
-}
-
-export enum ItemCategory {
-    // 未知
-    Unknown,
-    // 采集物品
-    Gathering,
-    // 远征
-    Explore,
-    // 种子
-    Seed,
-    // 农场产品
-    LandProduct,
-    // 牧场产品
-    FramProduct,
-    // 饲料
-    Feed,
-    // 捕兽
-    Catch,
-}
-
 export const PatternNames: string[] = 
 [
     "未知",
@@ -72,40 +14,6 @@ export const PatternNames: string[] =
     "7强",
     "7弱",
 ];
-
-export class CraftworkData {
-    public static GetRecipe(id: number): CraftworkObject {
-        return CraftObjects[id];
-    }
-    public static TrimName(name: string) {
-        if (name.startsWith("海岛")) return name.slice(2);
-        if (name.startsWith("开拓工房")) return name.slice(4);
-        return name;
-    }
-}
-
-export class MJIItemData {
-    public static GetItem(id: number): ItemName {
-        return ItemPouch[id];
-    }
-    public static TrimName(name: string) {
-        if (name.startsWith("海岛")) return name.slice(2);
-        if (name.startsWith("牧场动物的")) return name.slice(5);
-        if (name.startsWith("无人岛")) return name.slice(3);
-        return name;
-    }
-    public static GetCategory(id: number): ItemCategory {
-        if (id < 0) return ItemCategory.Unknown;
-        if (id <= 26) return ItemCategory.Gathering;
-        if (id <= 31) return ItemCategory.Explore;
-        if (id <= 41) return ItemCategory.Seed;
-        if (id <= 51) return ItemCategory.LandProduct;
-        if (id <= 60) return ItemCategory.FramProduct;
-        if (id <= 63) return ItemCategory.Feed;
-        if (id <= 66) return ItemCategory.Catch;
-        return ItemCategory.Unknown;
-    }
-}
 
 export class Utils {
     public static Hex2U8Array(text: string): Uint8Array {

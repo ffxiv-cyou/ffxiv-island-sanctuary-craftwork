@@ -124,10 +124,9 @@
 <script lang="ts">
 import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
-import CraftObjects from "@/data/MJICraftworksObject.json";
-import { CraftworkData, CraftworkObject, DemandUtils, PatternNames } from "@/model/data";
+import { DemandUtils, PatternNames } from "@/model/data";
+import { CraftworkData, CraftworkObject} from "@/data/data";
 import { FromShareCode, ToShareCode } from "@/model/share";
-import Popularity from "@/data/MJICraftworksPopularity.json";
 import SortLabel from "./SortLabel.vue";
 
 @Component({
@@ -234,14 +233,14 @@ export default class DemandPattern extends Vue {
 
   get objects(): CraftworkObject[] {
     // 对列表排序
-    return CraftObjects.filter((v) => v.Name).sort((a, b) => {
+    return this.solver.Recipes.filter((v) => v.Name).sort((a, b) => {
       let delta = 0;
       switch (this.sortMethod) {
         case 1:
           delta = a.Id - b.Id;
           break;
         case 2:
-          delta = Popularity[this.popPattern][a.Id] - Popularity[this.popPattern][b.Id];
+          delta = this.solver.Popularity[this.popPattern][a.Id] - this.solver.Popularity[this.popPattern][b.Id];
           delta = -delta; // 欢迎度是0最高，所以在这反过来
           break;
         case 3:
@@ -274,7 +273,7 @@ export default class DemandPattern extends Vue {
   }
 
   getBasicPriceNum(item: CraftworkObject) {
-    let pop = Popularity[this.popPattern][item.Id];
+    let pop = this.solver.Popularity[this.popPattern][item.Id];
     let rate = 1;
     switch(pop) {
       case 0:
@@ -313,9 +312,9 @@ export default class DemandPattern extends Vue {
   }
 
   popularity(id: number): string {
-    if (this.popPattern >= Popularity.length)
+    if (this.popPattern >= this.solver.Popularity.length)
       return "mji-popular-3";
-    return "mji-popular-" + Popularity[this.popPattern][id].toString()
+    return "mji-popular-" + this.solver.Popularity[this.popPattern][id].toString()
   }
 
   @Watch("config.demandPatterns", { deep: true })
@@ -346,6 +345,9 @@ export default class DemandPattern extends Vue {
     try {
       this.solver.init().then(() => {
         this.reloadDemand();
+        // fix length
+        while (this.config.demandPatterns.length < this.solver.data.Recipes.length)
+          this.config.demandPatterns.push(0);
       });
     }
     catch{}

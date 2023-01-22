@@ -77,7 +77,7 @@
       <li>
         <step
           :value="52"
-          :step="13"
+          :step="demoStep"
         />: 
         <span>表示每一步的产品、耗时和预测收入。</span>
       </li>
@@ -95,7 +95,7 @@
       <li>
         <step
           :value="52"
-          :step="13"
+          :step="demoStep"
           :pop="2"
           :demand="10"
           :pattern="1"
@@ -158,6 +158,7 @@
 import Close from "@/components/Close.vue";
 import Step from "@/components/Step.vue";
 import Steps from "@/components/Steps.vue";
+import CraftObjectsCN from "@/data/cn/MJICraftworksObject.json";
 import { Component, Vue } from "vue-facing-decorator";
 @Component({
   components: {
@@ -169,6 +170,9 @@ import { Component, Vue } from "vue-facing-decorator";
 export default class TemplateView extends Vue {
   get year() {
     return new Date().getFullYear();
+  }
+  get demoStep() {
+    return CraftObjectsCN[13];
   }
 }
 </script>

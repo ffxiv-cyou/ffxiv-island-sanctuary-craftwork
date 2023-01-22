@@ -68,11 +68,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
-import CraftObjects from "@/data/MJICraftworksObject.json";
-import Popularity from "@/data/MJICraftworksPopularity.json";
 import type { SolverProxy } from "@/model/solver";
-import { CraftworkData, DemandUtils } from "@/model/data";
+import { DemandUtils } from "@/model/data";
 import DateBar from "./DateBar.vue";
+import { CraftworkData } from "@/data/data";
 
 @Component({
   components: {
@@ -101,7 +100,7 @@ export default class CraftSetting extends Vue {
   }
 
   get objects() {
-    return CraftObjects.filter((v) => v.Name);
+    return this.solver.Recipes.filter((v) => v.Name);
   }
 
   get demands() {
@@ -125,7 +124,7 @@ export default class CraftSetting extends Vue {
   }
 
   mounted() {
-    while (this.demands.length < CraftObjects.length)
+    while (this.demands.length < this.solver.Recipes.length)
       this.demands.push(9);
   }
 
@@ -139,9 +138,9 @@ export default class CraftSetting extends Vue {
   }
 
   popularity(id: number): string {
-    if (this.pop_pattern >= Popularity.length)
+    if (this.pop_pattern >= this.solver.Popularity.length)
       return "mji-popular-3";
-    return "mji-popular-" + Popularity[this.pop_pattern][id].toString()
+    return "mji-popular-" + this.solver.Popularity[this.pop_pattern][id].toString()
   }
 
   getDemandBox(val: number) {

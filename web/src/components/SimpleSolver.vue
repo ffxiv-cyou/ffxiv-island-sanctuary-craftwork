@@ -22,6 +22,7 @@
       <batch-view
         v-for="(val, key) in batches"
         :key="key"
+        :solver="solver"
         :batch="val"
         :removeable="true"
         :demands="stepDemands[key]"
@@ -44,8 +45,7 @@ import type { BatchValues, SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import BatchView from "@/components/BatchView.vue";
 import Close from "@/components/Close.vue";
-import { CraftworkData } from "@/model/data";
-import Popularity from "@/data/MJICraftworksPopularity.json";
+import { CraftworkData } from "@/data/data";
 @Component({
   components: {
     BatchView: BatchView,
@@ -77,7 +77,7 @@ export default class SimpleSolver extends Vue {
     let props = [];
     for (let i = 0; i < steps.length; i++) {
       const element = steps[i];
-      props[i] = Popularity[this.solver.popPattern][element];
+      props[i] = this.solver.Popularity[this.solver.popPattern][element];
     }
     return props;
   }
@@ -116,7 +116,7 @@ export default class SimpleSolver extends Vue {
           }
         }
         this.stepDemands[b].push(demand);
-        this.stepPops[b].push(Popularity[this.solver.popPattern][step]);
+        this.stepPops[b].push(this.solver.Popularity[this.solver.popPattern][step]);
       }
     }
   }
@@ -133,10 +133,10 @@ export default class SimpleSolver extends Vue {
   }
 
   iconPath(id: number) {
-    return "item-" + CraftworkData.GetRecipe(id).Icon;
+    return "item-" + this.solver.data.GetRecipe(id).Icon;
   }
   itemName(id: number) {
-    return CraftworkData.TrimName(CraftworkData.GetRecipe(id).Name);
+    return CraftworkData.TrimName(this.solver.data.GetRecipe(id).Name);
   }
 }
 </script>

@@ -4,7 +4,7 @@
       v-for="(val, index) in steps"
       :key="index"
       :class="getClassName(val)"
-      :step="val"
+      :step="getStep(val)"
       :value="values[index]"
       :demand="getDemand(index)"
       :pattern="getPattern(val)"
@@ -17,8 +17,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-facing-decorator";
-import { CraftworkData } from "@/model/data";
 import Step from "./Step.vue";
+import type { CraftworkObject } from "@/data/data";
+import type { SolverProxy } from "@/model/solver";
 
 @Component({
   components: {
@@ -27,6 +28,9 @@ import Step from "./Step.vue";
   emits: ["remove"]
 })
 export default class Steps extends Vue {
+  @Prop()
+  solver!: SolverProxy;
+
   @Prop()
   steps!: number[];
 
@@ -45,8 +49,12 @@ export default class Steps extends Vue {
   @Prop()
   removeable?: boolean;
 
+  getStep(id: number): CraftworkObject {
+    return this.solver.data.GetRecipe(id);
+  }
+
   getClassName(id: number) {
-    return "step-" + CraftworkData.GetRecipe(id).Time;
+    return "step-" + this.getStep(id).Time;
   }
 
   getDemand(index: number) {
