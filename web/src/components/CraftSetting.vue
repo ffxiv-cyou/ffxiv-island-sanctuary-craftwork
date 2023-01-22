@@ -172,6 +172,11 @@ export default class CraftSetting extends Vue {
   padding-bottom: 5px;
 }
 
+.item-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .item-pop,
 .item-demand {
   overflow: hidden;

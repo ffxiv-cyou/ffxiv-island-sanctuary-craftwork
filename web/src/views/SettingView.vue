@@ -22,8 +22,8 @@
             v-model="level"
             type="number"
             min="1"
-            max="10"
-            placeholder="1-10"
+            max="12"
+            placeholder="1-12"
           >
           <span class="pure-form-message-inline">当前开拓等级，大于此等级的配方不会被求解</span>
         </div>

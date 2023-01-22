@@ -78,8 +78,8 @@ where
             }
             // 连击过滤
             let batch_check = first_batch
-                || (last.theme1 != 0 && last.theme1 == r.theme1)
-                || (last.theme2 != 0 && last.theme2 == r.theme2)
+                || (last.theme1 != 0 && (last.theme1 == r.theme1 || last.theme1 == r.theme2))
+                || (last.theme2 != 0 && (last.theme2 == r.theme1 || last.theme2 == r.theme2))
                 || (last.theme1 == 0 && last.theme2 == 0);
             if !batch_check {
                 return;
