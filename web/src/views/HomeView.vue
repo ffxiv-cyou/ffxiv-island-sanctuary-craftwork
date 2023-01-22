@@ -56,6 +56,7 @@ export default class Home extends Vue {
   display: inline-flex;
   flex-direction: column;
   background: #bfb8a6;
+  padding-bottom: 0 !important;
 }
 .solve {
   overflow-y: scroll;

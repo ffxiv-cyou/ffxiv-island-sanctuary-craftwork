@@ -8,12 +8,12 @@
     </div>
     <div class="item-text hide-md">
       <div class="item-primary">
-        <span class="item-name">{{ name }}</span>
         <close
           v-if="removeable"
           class="item-remove"
           @close="onClose"
         />
+        <span class="item-name">{{ name }}</span>
       </div>
       <div class="item-desc">
         <span class="step-value text">{{ value }}币</span>
@@ -120,6 +120,8 @@ export default class Step extends Vue {
   }
   .item-text {
     flex: 1;
+    line-height: 1.15;
+    padding-right: 2px;
     .item-primary {
       .item-remove {
         float: right;
@@ -132,8 +134,10 @@ export default class Step extends Vue {
       text-overflow: ellipsis;
     }
     .item-name {
-      max-width: calc(100% - 20px);
       display: inline-block;
+    }
+    .item-remove + .item-name {
+      max-width: calc(100% - 20px);
     }
 
     .item-desc {

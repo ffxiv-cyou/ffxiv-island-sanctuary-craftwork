@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="pure-form">
-      <fieldset class="demand-pat">
+      <fieldset class="pure-g">
         <label for="pop-pattern">欢迎度模式</label>
         <input
           id="pop-pattern"
@@ -14,10 +14,7 @@
           v-if="!shareMode"
           for="share-link"
         >
-          <a
-            :href="shareLink"
-            target="_blank"
-          >分享链接</a>
+          分享链接
         </label>
         <input
           v-if="!shareMode"
@@ -370,10 +367,6 @@ export default class DemandPattern extends Vue {
   overflow-y: scroll;
   flex: 1;
 }
-.demand-pat {
-  display: flex;
-}
-
 .recipe-item,
 .recipe-header {
   display: flex;

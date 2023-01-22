@@ -11,6 +11,7 @@
     <h2>设置页面</h2>
     <p>本页面设定较为重要的参数，请根据自身无人岛的发展情况设置对应参数。</p>
     <ul>
+      <li>国际服：控制配方版本，勾选后会使用国际服配方和名字。注意当前需求真实值尚未更新到国际服的需求值，排班表计算可能会出错。</li>
       <li>开拓等级：当前开拓等级（1-10），用于过滤配方。</li>
       <li>工坊等级：当前工房的等级（1-3），影响产品价格的计算。</li>
       <li>干劲上限：当前工房的干劲上限，影响产品价格的计算。</li>
@@ -159,7 +160,8 @@ import Close from "@/components/Close.vue";
 import Step from "@/components/Step.vue";
 import Steps from "@/components/Steps.vue";
 import CraftObjectsCN from "@/data/cn/MJICraftworksObject.json";
-import { Component, Vue } from "vue-facing-decorator";
+import type { SolverProxy } from "@/model/solver";
+import { Component, Prop, Vue } from "vue-facing-decorator";
 @Component({
   components: {
     StepsComp: Steps,
@@ -168,6 +170,9 @@ import { Component, Vue } from "vue-facing-decorator";
   }
 })
 export default class TemplateView extends Vue {
+  @Prop()
+  solver!: SolverProxy;
+
   get year() {
     return new Date().getFullYear();
   }
