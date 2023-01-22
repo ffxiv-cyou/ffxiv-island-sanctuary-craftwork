@@ -132,7 +132,7 @@ export default class PreditionComponent extends Vue {
       return;
 
     let result = this.solver.predictFromPackets(dataArray);
-    for (let i = 0; i < this.config.demandPatterns.length; i++) {
+    for (let i = 0; i < this.config.demandPatterns.length && i < result.length; i++) {
       if (this.config.demandPatterns[i] != 0 && this.updateUnknownOnly)
         continue;
       this.config.demandPatterns[i] = result[i];

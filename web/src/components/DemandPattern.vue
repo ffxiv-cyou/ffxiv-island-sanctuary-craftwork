@@ -327,6 +327,7 @@ export default class DemandPattern extends Vue {
         this.cachedDemands[i] = result;
       }
     }
+    this.config.save();
     this.solver.updatePredictDemands();
   }
 

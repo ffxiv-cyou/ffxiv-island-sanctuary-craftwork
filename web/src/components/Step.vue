@@ -131,6 +131,10 @@ export default class Step extends Vue {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .item-name {
+      max-width: calc(100% - 20px);
+      display: inline-block;
+    }
 
     .item-desc {
       color: #666;
