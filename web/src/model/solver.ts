@@ -137,6 +137,7 @@ export class SolverProxy {
     set region(val: Region) {
         this.config.region = val;
         this.data.SetRegion(val);
+        this.loadData();
     }
 
     /**
