@@ -139,6 +139,7 @@ export class CraftworkData {
         if (name.startsWith("牧场动物的")) return name.slice(5);
         if (name.startsWith("无人岛")) return name.slice(3);
         if (name.startsWith("Island")) return name.slice(7);
+        if (name.startsWith("Raw Island")) return name.slice(11);
         if (name.startsWith("Sanctuary")) return name.slice(10);
         if (name.startsWith("Isleworks")) return name.slice(10);
         return name;

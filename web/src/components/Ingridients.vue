@@ -7,7 +7,7 @@
       :class="getCategory(value[0])"
     >
       <span class="ingridient-name">{{ getName(value[0]) }}</span>
-      <span class="ingridient-count">&times; {{ value[1] * factor }}</span>
+      <span class="ingridient-count">&times;{{ value[1] * factor }}</span>
     </div>
   </div>
 </template>
@@ -85,7 +85,11 @@ export default class Ingridients extends Vue {
   padding: 2px 4px;
 
   .ingridient-name {
-
+    max-width: calc(100% - 2em);
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .ingridient-count {
     float: right;
