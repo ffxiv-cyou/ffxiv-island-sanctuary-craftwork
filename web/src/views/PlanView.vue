@@ -38,7 +38,7 @@
             v-model="reverseSolve"
             type="checkbox"
           >
-          倒序求解
+          使用全表计算需求变动
         </label>
       </div>
       <plan
@@ -132,13 +132,19 @@ export default class PlanView extends Vue {
     let tension = 0;
     let plan = this.plans[id];
 
-    for (let i = this.reverseSolve ? plan.length - 1 : 0; i != day; i += this.reverseSolve ? -1 : 1) {
-        let steps = plan[i];
-        if (steps.length > 0)
-          tension += (steps.length - 1) * this.solver.config.workers;
-        for (let j = 0; j < steps.length; j++) {
-          demands[steps[j]] -= ((j == 0) ? 1 : 2) * this.solver.config.workers;
-        }
+    // 计算干劲叠加
+    for (let i = 0; i < day; i++) {
+      let steps = plan[i];
+      if (steps.length > 0)
+        tension += (steps.length - 1) * this.solver.config.workers;
+    }
+
+    // 计算需求变动
+    for (let i = 0; i < (this.reverseSolve ? plan.length : day); i++) {
+      let steps = plan[i];
+      for (let j = 0; j < steps.length; j++) {
+        demands[steps[j]] -= ((j == 0) ? 1 : 2) * this.solver.config.workers;
+      }
     }
 
     this.solverDialog = true;
