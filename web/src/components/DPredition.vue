@@ -24,7 +24,7 @@
           {{ inputData }}
         </code>
         <p v-if="!validate">
-          您需要按顺序填入前4天的数据
+          您需要从第1天开始按顺序填写数据
         </p>
         <div class="pure-controls">
           <label
