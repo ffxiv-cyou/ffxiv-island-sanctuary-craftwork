@@ -24,7 +24,7 @@
           {{ inputData }}
         </code>
         <p v-if="!validate">
-          您需要从第1天开始按顺序填写数据
+          趋势预测需要从第1天开始按顺序填写数据
         </p>
         <div class="pure-controls">
           <label
@@ -39,7 +39,6 @@
           </label>
           <button
             class="pure-button pure-button-primary"
-            :disabled="!validate"
             @click="predict"
           >
             预测趋势
@@ -128,8 +127,16 @@ export default class PreditionComponent extends Vue {
       }
       else break;
     }
-    if (dataArray.length == 0)
+    if (dataArray.length == 0) {
+      for (let i = 0; i < this.datapacks.length; i++) {
+        if (this.datapacks[i]) {
+          let data = Utils.Hex2U8Array(this.datapacks[i]);
+          this.solver.popPattern = data[0] + 1;
+          this.nextPattern = data[1] + 1;
+        }
+      }
       return;
+    }
 
     let result = this.solver.predictFromPackets(dataArray);
     for (let i = 0; i < this.config.demandPatterns.length && i < result.length; i++) {
