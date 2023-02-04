@@ -23,6 +23,7 @@
     v-if="inited"
     :solver="solver"
     class="body"
+    :step-style="style"
   />
 </template>
 
@@ -45,6 +46,10 @@ export default class App extends Vue {
   async mounted() {
     await this.solver.init();
     this.inited = true;
+  }
+
+  get style() {
+    return this.solver.config.styleStepWidth ? "monospace": "";
   }
 }
 </script>

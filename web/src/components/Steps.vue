@@ -98,4 +98,11 @@ export default class Steps extends Vue {
 .step-8 {
   width: calc(100% / 3 - 2px);
 }
+
+[step-style=monospace] {
+  .step-6,
+  .step-8 {
+    width: calc(100% / 6 - 2px);
+  }
+}
 </style>

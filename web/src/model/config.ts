@@ -11,6 +11,7 @@ export class Config {
   _workers: number = 3;
   _popPattern: number = 1;
   _withCost: boolean = false;
+  _styleStepWidth: boolean = false;
 
   /**
    * 需求变化规律表
@@ -96,6 +97,17 @@ export class Config {
     this.save();
   }
 
+  /**
+   * 步骤是否等宽
+   */
+  public get styleStepWidth() {
+    return this._styleStepWidth;
+  }
+  public set styleStepWidth(val: boolean) {
+    this._styleStepWidth = val;
+    this.save();
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -121,6 +133,7 @@ export class Config {
     cfg._workers = obj._workers;
     cfg.demandPatterns = obj.demandPatterns;
     cfg._withCost = obj._withCost ?? false;
+    cfg._styleStepWidth = obj._styleStepWidth ?? false;
 
     return cfg;
   }

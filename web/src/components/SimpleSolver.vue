@@ -20,6 +20,7 @@
     <legend>推荐队列</legend>
     <div>
       <batch-view
+        class="info-box"
         v-for="(val, key) in batches"
         :key="key"
         :solver="solver"
@@ -151,8 +152,9 @@ export default class SimpleSolver extends Vue {
   display: inline-flex;
   align-items: center;
   height: 32px;
-  border: #ccc 1px solid;
-  border-radius: 3px;
+  background: rgb(214,211,206);
+  border-radius: 5px;
+  border: 1px solid rgba(131, 85, 0, 0.5);
 
   icon.item {
     width: 32px;

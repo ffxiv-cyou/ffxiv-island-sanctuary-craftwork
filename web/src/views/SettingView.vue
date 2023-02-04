@@ -2,8 +2,8 @@
   <div class="setting-page">
     <h1>设置</h1>
     <div class="pure-form pure-form-aligned">
-      <legend>工坊基础设置</legend>
       <fieldset>
+        <legend>基础设置</legend>
         <div class="pure-control-group">
           <label for="region">
             <input
@@ -15,6 +15,9 @@
           </label>
           <span class="pure-form-message-inline">勾选后使用国际服配方，注意需求真值表不会改变。</span>
         </div>
+      </fieldset>
+      <fieldset>
+        <legend>工坊设置</legend>
         <div class="pure-control-group">
           <label for="level">开拓等级</label>
           <input
@@ -78,6 +81,20 @@
           <span class="pure-form-message-inline">求解时按净收益排序。净收益 = 工坊收益 - 将材料单独卖出的收益。</span>
         </div>
       </fieldset>
+      <fieldset>
+        <legend>样式设置</legend>
+        <div class="pure-control-group">
+          <label for="step-monospace">
+            <input
+              id="step-monospace"
+              v-model="stepMonospace"
+              type="checkbox"
+            >
+            步骤等宽
+          </label>
+          <span class="pure-form-message-inline">将排班表和求解器中步骤的宽度将设置为固定值，不再根据每一步的耗时设定宽度。</span>
+        </div>
+      </fieldset>
     </div>
   </div>
 </template>
@@ -135,6 +152,14 @@ export default class SettingView extends Vue {
 
   set region(val: boolean) {
     this.solver.region = val ? Region.Global : Region.CN;
+  }
+
+  get stepMonospace() {
+    return this.config.styleStepWidth;
+  }
+  
+  set stepMonospace(val: boolean) {
+    this.config.styleStepWidth = val;
   }
 }
 </script>
