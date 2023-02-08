@@ -24,6 +24,15 @@ icon.mji-popular-1 {
 icon.mji-popular-4 {
     background-position: calc(var(--scale) * -160px) calc(var(--scale) * -0px);
 }
+icon.blue-coin {
+    --scale: 1;
+    width: calc(var(--scale) * 36px);
+    height: calc(var(--scale) * 36px);
+    background-size: calc(var(--scale) * 36px) calc(var(--scale) * 36px);
+    display: inline-block;
+    vertical-align: bottom;
+    background-image: url("./065096.png");
+}
 
 button.sched {
     background: transparent;

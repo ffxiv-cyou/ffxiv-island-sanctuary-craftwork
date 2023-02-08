@@ -16,7 +16,7 @@
         <span class="item-name">{{ name }}</span>
       </div>
       <div class="item-desc">
-        <span class="step-value text">{{ value }}币</span>
+        <span class="step-value text"><icon class="blue-coin" />{{ value }}</span>
         <span class="step-time text">{{ time }}h</span>
         <span
           v-if="pattern"
@@ -122,6 +122,7 @@ export default class Step extends Vue {
     flex: 1;
     line-height: 1.15;
     padding-right: 2px;
+    width: calc(100% - 44px);
     .item-primary {
       .item-remove {
         float: right;
@@ -135,6 +136,7 @@ export default class Step extends Vue {
     }
     .item-name {
       display: inline-block;
+      max-width: 100%;
     }
     .item-remove + .item-name {
       max-width: calc(100% - 20px);
@@ -144,7 +146,8 @@ export default class Step extends Vue {
       color: #666;
       font-size: 14px;
       width: 100%;
-      icon.mji {
+      icon.mji,
+      icon.blue-coin {
         --scale: 0.4;
       }
       .mji-box+.mji-box {
