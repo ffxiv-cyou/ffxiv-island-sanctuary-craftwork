@@ -52,11 +52,12 @@ export default class Home extends Vue {
 </script>
 <style>
 .setting {
-  width: 300px;
+  width: 310px;
   display: inline-flex;
   flex-direction: column;
   background: #bfb8a6;
   padding-bottom: 0 !important;
+  padding-right: 0 !important;
 }
 .solve {
   overflow-y: scroll;

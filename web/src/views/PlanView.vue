@@ -52,7 +52,7 @@
         @del-steps="delStep(key, $event)"
       />
       <button
-        class="pure-button"
+        class="pure-button add-plan-button"
         style="width: 100%"
         @click="createPlan"
       >
@@ -277,5 +277,9 @@ export default class PlanView extends Vue {
   margin: 60px auto;
   padding: 10px;
   background: white;
+}
+
+.add-plan-button {
+  margin-top: 10px;
 }
 </style>

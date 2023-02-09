@@ -364,6 +364,9 @@ export default class DemandPattern extends Vue {
 .recipes {
   overflow-y: scroll;
   flex: 1;
+  // fix margin
+  margin-right: -10px;
+  margin-bottom: -10px;
 }
 .recipe-item,
 .recipe-header {
