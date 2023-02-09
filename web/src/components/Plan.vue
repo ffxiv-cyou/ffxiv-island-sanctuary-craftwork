@@ -1,7 +1,7 @@
 <template>
   <div class="plan">
     <div class="plan-info info-box">
-      <span class="total-value">总收益: {{ sumVal }} &times; {{ workers }} = {{ sumVal * workers }}</span>
+      <span class="total-value">总收益: <icon class="blue-coin" />{{ sumVal }} &times; {{ workers }} = <icon class="blue-coin" />{{ sumVal * workers }}</span>
       <span class="share-link"><a
         :href="shareLink"
         target="_blank"
@@ -21,7 +21,8 @@
         >
           <div class="plan-batch-info">
             <span>第{{ index+1 }}天</span>
-            <span>{{ val.value }}</span>
+            <span v-if="steps[index].length == 0">休息</span>
+            <span v-else><icon class="blue-coin" />{{ val.value }}</span>
           </div>
           <button
             v-if="steps[index].length == 0"
@@ -38,7 +39,11 @@
           >
             -
           </button>
+          <div v-if="steps[index].length == 0" class="plan-rest">
+            <icon class="sched sched-rest" />
+          </div>
           <steps-comp
+            v-else
             :solver="solver"
             :values="val.stepValues"
             :steps="val.steps"
@@ -152,7 +157,7 @@ export default class PlanView extends Vue {
 }
 .plan-batch-info {
   display: inline-flex;
-  width: 50px;
+  width: 56px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -209,6 +214,18 @@ export default class PlanView extends Vue {
   flex: 150px 0 0;
   overflow-y: auto;
   max-height: 330px;
+}
+.plan-rest {
+  flex: 1;
+  background: rgba(214, 211, 206, 0.8);
+  border-radius: 5px;
+  border: 1px solid rgba(131, 85, 0, 0.5);
+  box-sizing: border-box;
+  text-align: center;
+  icon {
+    display: inline-block;
+    --scale: 0.8;
+  }
 }
 
 </style>

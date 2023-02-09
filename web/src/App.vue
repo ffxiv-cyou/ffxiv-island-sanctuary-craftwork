@@ -59,6 +59,9 @@ html {
   font-family: "Helvetica", "Segoe UI", "Arial", "PingFang SC", "Helvetica Neue", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei" ,sans-serif;
   font-size: 16px;
 }
+icon.blue-coin {
+  --scale: 0.4444444444;
+}
 
 .body {
   margin: auto;

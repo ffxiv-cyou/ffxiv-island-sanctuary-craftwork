@@ -36,23 +36,35 @@ icon.blue-coin {
 
 button.sched {
     background: transparent;
-    background-image: url("./mjicraftschedule_hr1.png");
     border: none;
     color: white;
-
-    --scale: 1;
-
-    width: calc(var(--scale) * 64px);
-    height: calc(var(--scale) * 64px);
-    background-size: calc(var(--scale) * 384px) calc(var(--scale) * 232px);
     cursor: pointer;
 }
-button.sched-red {
+
+icon.sched,
+button.sched {
+    --scale: 1;
+    background-size: calc(var(--scale) * 384px) calc(var(--scale) * 232px);
+    background-image: url("./mjicraftschedule_hr1.png");
+}
+
+.sched.sched-red,
+.sched.sched-green,
+.sched.sched-yellow {
+    width: calc(var(--scale) * 64px);
+    height: calc(var(--scale) * 64px);
+}
+.sched.sched-red {
     background-position: calc(var(--scale) * -132px) calc(var(--scale) * -96px);
 }
-button.sched-green {
+.sched.sched-green {
     background-position: calc(var(--scale) * -196px) calc(var(--scale) * -96px);
 }
-button.sched-yellow {
+.sched.sched-yellow {
     background-position: calc(var(--scale) * -260px) calc(var(--scale) * -96px);
+}
+.sched.sched-rest {
+    width: calc(var(--scale) * 46px);
+    height: calc(var(--scale) * 46px);
+    background-position: calc(var(--scale) * -150px) calc(var(--scale) * -160px);
 }
