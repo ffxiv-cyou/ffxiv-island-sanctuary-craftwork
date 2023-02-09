@@ -18,13 +18,13 @@
       <legend>日期</legend>
       <date-bar v-model="date" />
     </div>
-    <div class="objects-header pure-g">
-      <span class="item-name pure-u-8-24">产品名</span>
-      <span class="item-pop pure-u-4-24">欢迎度</span>
-      <span class="item-demand pure-u-9-24">需求</span>
-      <span class="item-demand pure-u-3-24">禁用</span>
-    </div>
     <div class="objects">
+      <div class="objects-header pure-g">
+        <span class="item-name pure-u-8-24">产品名</span>
+        <span class="item-pop pure-u-4-24">欢迎度</span>
+        <span class="item-demand pure-u-9-24">需求</span>
+        <span class="item-demand pure-u-3-24">禁用</span>
+      </div>
       <div
         v-for="(item, index) in objects"
         :key="index"
@@ -168,8 +168,12 @@ export default class CraftSetting extends Vue {
   height: 20px;
   line-height: 20px;
   border-bottom: 1px solid #e5e5e5;
-  margin: 5px 10px 5px 0;
-  padding-bottom: 5px;
+  margin-bottom: 5px;
+  padding: 5px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #bfb8a6;
 }
 
 .item-name {

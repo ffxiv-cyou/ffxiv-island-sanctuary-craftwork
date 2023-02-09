@@ -33,7 +33,7 @@
         </button>
       </fieldset>
     </div>
-    <div class="pure-form">
+    <div class="recipes">
       <div class="recipe-header">
         <span class="recipe-name">
           <sort-label
@@ -75,8 +75,6 @@
           >第{{ id }}天</sort-label>
         </span>
       </div>
-    </div>
-    <div class="recipes">
       <div
         v-for="(item, index) in objects"
         :key="index"
@@ -370,6 +368,9 @@ export default class DemandPattern extends Vue {
 .recipe-item,
 .recipe-header {
   display: flex;
+  * {
+    white-space: nowrap;
+  }
   .recipe-name {
     flex: 4em;
   }
@@ -393,10 +394,19 @@ export default class DemandPattern extends Vue {
   line-height: 38px;
 }
 
+.recipe-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .recipe-header {
-  margin-right: 19px;
   border-bottom: 1px solid #999;
   margin-bottom: 5px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: white;
 }
 
 .mji-box+.mji-box {
