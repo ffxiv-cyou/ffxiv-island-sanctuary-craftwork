@@ -44,7 +44,7 @@ export default class Dialog extends Vue {
   position: absolute;
   background: rgba(0, 0, 0, 0.5);
 }
-.dialog-content {
+.dialog-content>* {
   position: relative;
 }
 .dialog-close {

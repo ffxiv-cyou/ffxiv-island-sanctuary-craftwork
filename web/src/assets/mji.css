@@ -1,0 +1,44 @@
+.mji-wooden-plate {
+  border: 24px solid rgba(0, 0, 0, 0);
+  border-image: url("@/assets/mji_bg.png") 64 64 repeat;
+  border-image-width: 48px;
+  background: url("@/assets/mji_bghv.png") repeat;
+  background-clip: content-box;
+}
+
+.mji-info-box {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  margin: 4px;
+  border: 1px #deceb5 solid;
+}
+
+.mji-step-box {
+  background: rgb(214,211,206);
+  border-radius: 5px;
+  border: 1px solid rgba(131, 85, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.mji-title,
+.mji-hr {
+  border-bottom: 2px rgb(156,134,115) solid;
+}
+
+.mji-title {
+  line-height: 1.5em;
+  margin-bottom: 3px;
+}
+
+.mji-text-brown {
+  color: rgb(82,49,33);
+  font-weight: 500;
+}
+.mji-text-orange {
+  color: rgb(170, 94, 58);
+  font-weight: 500;
+}
+
+.mji-text-small {
+  font-size: 0.85em;
+}

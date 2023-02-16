@@ -6,7 +6,7 @@
     <slot />
     <div class="batch-value">
       <span class="bench-value"><icon class="blue-coin" />{{ batch.value }}</span>
-      <span class="bench-cost">(-{{ batch.cost }})</span>
+      <span class="bench-cost mji-text-small">(-{{ batch.cost }})</span>
     </div>
     <steps 
       :solver="solver"
@@ -60,7 +60,6 @@ export default class BatchView extends Vue {
 <style lang="scss">
 .batch {
   display: flex;
-  margin: 4px;
   align-items: center;
 }
 
@@ -73,8 +72,7 @@ export default class BatchView extends Vue {
     display: block;
   }
   .bench-cost {
-    color: #999;
-    font-size: 14px;
+    color: #333;
   }
 }
 </style>

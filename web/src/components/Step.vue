@@ -1,5 +1,5 @@
 <template>
-  <div class="step-item">
+  <div class="step-item mji-step-box">
     <div class="item-img">
       <icon
         class="item"
@@ -107,10 +107,6 @@ export default class Step extends Vue {
   
 <style lang="scss">
 .step-item {
-  background: rgb(214,211,206);
-  border-radius: 5px;
-  border: 1px solid rgba(131, 85, 0, 0.5);
-  box-sizing: border-box;
   height: 42px;
   display: inline-flex !important;
   align-items: center;

@@ -17,6 +17,7 @@
       </button>
       <div>
         <batch-view
+          class="mji-info-box"
           v-for="(val, key) in batches"
           :key="key"
           :solver="solver"

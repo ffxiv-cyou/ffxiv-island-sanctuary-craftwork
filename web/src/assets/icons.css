@@ -24,6 +24,21 @@ icon.mji-popular-1 {
 icon.mji-popular-4 {
     background-position: calc(var(--scale) * -160px) calc(var(--scale) * -0px);
 }
+icon.mji-change-2-up {
+    background-position: calc(var(--scale) * -0px) calc(var(--scale) * -40px);
+}
+icon.mji-change-1-up {
+    background-position: calc(var(--scale) * -40px) calc(var(--scale) * -40px);
+}
+icon.mji-change-0 {
+    background-position: calc(var(--scale) * -80px) calc(var(--scale) * -40px);
+}
+icon.mji-change-1-down {
+    background-position: calc(var(--scale) * -120px) calc(var(--scale) * -40px);
+}
+icon.mji-change-2-down {
+    background-position: calc(var(--scale) * -160px) calc(var(--scale) * -40px);
+}
 icon.blue-coin {
     --scale: 1;
     width: calc(var(--scale) * 36px);
@@ -39,6 +54,10 @@ button.sched {
     border: none;
     color: white;
     cursor: pointer;
+    vertical-align: middle;
+}
+button.sched:disabled {
+    filter: grayscale(0.7);
 }
 
 icon.sched,
@@ -47,12 +66,31 @@ button.sched {
     background-size: calc(var(--scale) * 384px) calc(var(--scale) * 232px);
     background-image: url("./mjicraftschedule_hr1.png");
 }
+.sched.sched-check,
+.sched.sched-set-rest,
+.sched.sched-demand,
+.sched.sched-delete {
+    width: calc(var(--scale) * 96px);
+    height: calc(var(--scale) * 96px);
+}
 
 .sched.sched-red,
 .sched.sched-green,
 .sched.sched-yellow {
     width: calc(var(--scale) * 64px);
     height: calc(var(--scale) * 64px);
+}
+.sched.sched-check {
+    background-position: calc(var(--scale) * -0px) calc(var(--scale) * -0px);
+}
+.sched.sched-set-rest {
+    background-position: calc(var(--scale) * -96px) calc(var(--scale) * -0px);
+}
+.sched.sched-demand {
+    background-position: calc(var(--scale) * -192px) calc(var(--scale) * -0px);
+}
+.sched.sched-delete {
+    background-position: calc(var(--scale) * -288px) calc(var(--scale) * -0px);
 }
 .sched.sched-red {
     background-position: calc(var(--scale) * -132px) calc(var(--scale) * -96px);
@@ -63,6 +101,7 @@ button.sched {
 .sched.sched-yellow {
     background-position: calc(var(--scale) * -260px) calc(var(--scale) * -96px);
 }
+
 .sched.sched-rest {
     width: calc(var(--scale) * 46px);
     height: calc(var(--scale) * 46px);

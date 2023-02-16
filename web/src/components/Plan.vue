@@ -1,6 +1,6 @@
 <template>
-  <div class="plan">
-    <div class="plan-info info-box">
+  <div class="plan mji-wooden-plate">
+    <div class="plan-info mji-info-box">
       <span class="total-value">总收益: <icon class="blue-coin" />{{ sumVal }} &times; {{ workers }} = <icon class="blue-coin" />{{ sumVal * workers }}</span>
       <span class="share-link"><a
         :href="shareLink"
@@ -17,12 +17,12 @@
         <div
           v-for="(val, index) in batchValues"
           :key="index"
-          class="plan-batch info-box"
+          class="plan-batch mji-info-box"
         >
           <div class="plan-batch-info">
             <span>第{{ index+1 }}天</span>
-            <span v-if="steps[index].length == 0">休息</span>
-            <span v-else><icon class="blue-coin" />{{ val.value }}</span>
+            <span class="value" v-if="steps[index].length == 0">休息</span>
+            <span class="value" v-else><icon class="blue-coin" />{{ val.value }}</span>
           </div>
           <button
             v-if="steps[index].length == 0"
@@ -51,7 +51,7 @@
         </div>
       </div>
       <ingrid-comp
-        class="plan-ingridients info-box"
+        class="plan-ingridients mji-info-box"
         :solver="solver"
         :steps="flatSteps"
         :workers="workers"
@@ -161,28 +161,17 @@ export default class PlanView extends Vue {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1px;
+  .value {
+    font-size: 0.9em;
+  }
 }
 
 .plan {
   button.sched {
     --scale: 0.6;
   }
-  button.sched:disabled {
-    filter: grayscale(1);
-  }
 
-  border: 24px solid #000;
-  border-image: url("@/assets/mji_bg.png") 64 64 repeat;
-  border-image-width: 48px;
-  background: url("@/assets/mji_bghv.png") repeat;
-  background-clip: content-box;
-}
-
-.info-box {
-  background: rgba(0,0,0,0.1);
-  border-radius: 5px;
-  margin: 4px;
-  border: 1px #deceb5 solid;
 }
 
 .plan-info {
@@ -217,7 +206,7 @@ export default class PlanView extends Vue {
 }
 .plan-rest {
   flex: 1;
-  background: rgba(214, 211, 206, 0.8);
+  background: rgba(214, 211, 206, 0.5);
   border-radius: 5px;
   border: 1px solid rgba(131, 85, 0, 0.5);
   box-sizing: border-box;

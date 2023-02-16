@@ -33,6 +33,7 @@ import HomePage from "@/views/HomeView.vue";
 import { SolverProxy } from "./model/solver";
 import "purecss";
 import "@/assets/icons.css";
+import "@/assets/mji.css";
 
 @Component({
   components: {

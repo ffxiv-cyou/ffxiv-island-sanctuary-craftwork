@@ -1,13 +1,16 @@
 <template>
-  <div>
-    <legend v-if="banList.length > 0">
+  <div class="solver-view mji-wooden-plate">
+    <legend class="mji-title mji-text-brown">
+      推荐队列
+    </legend>
+    <legend class="mji-title mji-text-orange mji-text-small" v-if="banList.length > 0">
       禁用列表
     </legend>
     <div class="ban-list">
       <div
         v-for="(val, key) in banList"
         :key="key"
-        class="ban-item"
+        class="ban-item mji-step-box"
       >
         <icon
           class="item"
@@ -17,10 +20,14 @@
         <close @click="removeBan(key)" />
       </div>
     </div>
-    <legend>推荐队列</legend>
-    <div>
+    <legend class="batch-header mji-title mji-text-orange mji-text-small">
+      <span class="batch-apply">应用</span>
+      <span class="batch-value">收益</span>
+      <span>队列</span>
+    </legend>
+    <div class="batches">
       <batch-view
-        class="info-box"
+        class="mji-info-box"
         v-for="(val, key) in batches"
         :key="key"
         :solver="solver"
@@ -142,19 +149,32 @@ export default class SimpleSolver extends Vue {
 }
 </script>
 <style lang="scss">
+.solver-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.batch-header {
+  span {
+    display: inline-block;
+  }
+  .batch-apply {
+    width: 48px;
+    text-align: center;
+  }
+}
+
 .ban-list {
   display: flex;
-  gap: 10px;
+  gap: 5px;
   flex-wrap: wrap;
+  margin-bottom: 5px;
 }
 
 .ban-item {
   display: inline-flex;
   align-items: center;
   height: 32px;
-  background: rgb(214,211,206);
-  border-radius: 5px;
-  border: 1px solid rgba(131, 85, 0, 0.5);
 
   icon.item {
     width: 32px;
@@ -169,5 +189,8 @@ export default class SimpleSolver extends Vue {
 
 .add-item {
   --scale: 0.65 !important;
+}
+.batches {
+  overflow-y: scroll;
 }
 </style>
