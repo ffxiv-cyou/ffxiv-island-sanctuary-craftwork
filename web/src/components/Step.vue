@@ -131,7 +131,7 @@ export default class Step extends Vue {
       text-overflow: ellipsis;
     }
     .item-name {
-      display: inline-block;
+      display: block;
       max-width: 100%;
     }
     .item-remove + .item-name {
