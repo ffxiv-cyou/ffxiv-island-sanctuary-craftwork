@@ -12,6 +12,7 @@ export class Config {
   _popPattern: number = 1;
   _withCost: boolean = false;
   _styleStepWidth: boolean = false;
+  _totalDemand: boolean = false;
 
   /**
    * 需求变化规律表
@@ -108,6 +109,17 @@ export class Config {
     this.save();
   }
 
+  /**
+   * 是否使用整个排班表计算需求变动
+   */
+  public get totalDemand() {
+    return this._totalDemand;
+  }
+  public set totalDemand(val: boolean) {
+    this._totalDemand = val;
+    this.save();
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -134,6 +146,7 @@ export class Config {
     cfg.demandPatterns = obj.demandPatterns;
     cfg._withCost = obj._withCost ?? false;
     cfg._styleStepWidth = obj._styleStepWidth ?? false;
+    cfg._totalDemand = obj._totalDemand ?? false;
 
     return cfg;
   }

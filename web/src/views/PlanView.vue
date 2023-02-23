@@ -31,16 +31,6 @@
       />
     </div>
     <div v-else>
-      <div class="pure-form">
-        <label for="reverse-solve">
-          <input
-            id="reverse-solve"
-            v-model="reverseSolve"
-            type="checkbox"
-          >
-          使用全表计算需求变动
-        </label>
-      </div>
       <plan
         v-for="(plan, key) in plans"
         :key="key"
@@ -111,11 +101,6 @@ export default class PlanView extends Vue {
   solverDialog = false;
 
   /**
-   * 反向求解
-   */
-  reverseSolve = false;
-
-  /**
    * 为排班添加某天的内容
    * @param id 排班表Index
    * @param day 天数
@@ -140,7 +125,7 @@ export default class PlanView extends Vue {
     }
 
     // 计算需求变动
-    for (let i = 0; i < (this.reverseSolve ? plan.length : day); i++) {
+    for (let i = 0; i < (this.solver.config.totalDemand ? plan.length : day); i++) {
       let steps = plan[i];
       for (let j = 0; j < steps.length; j++) {
         demands[steps[j]] -= ((j == 0) ? 1 : 2) * this.solver.config.workers;

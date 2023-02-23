@@ -80,6 +80,17 @@
           </label>
           <span class="pure-form-message-inline">求解时按净收益排序。净收益 = 工坊收益 - 将材料单独卖出的收益。</span>
         </div>
+        <div class="pure-control-group">
+          <label for="total-demand">
+            <input
+              id="total-demand"
+              v-model="totalDemand"
+              type="checkbox"
+            >
+            按全表计算需求
+          </label>
+          <span class="pure-form-message-inline">使用整周的产量计算需求变动，而不是使用当天之前的产量计算。<br>启用后会导致排班表和推荐队列中的显示的需求与收益不一致。</span>
+        </div>
       </fieldset>
       <fieldset>
         <legend>样式设置</legend>
@@ -160,6 +171,14 @@ export default class SettingView extends Vue {
   
   set stepMonospace(val: boolean) {
     this.config.styleStepWidth = val;
+  }
+
+  get totalDemand() {
+    return this.config.totalDemand;
+  }
+  
+  set totalDemand(val: boolean) {
+    this.config.totalDemand = val;
   }
 }
 </script>
