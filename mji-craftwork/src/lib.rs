@@ -70,6 +70,7 @@ pub fn simulate(
 
     let batch = simulator::simulate_batch(state, &recp);
     let mut ret = Vec::<u16>::new();
+    ret.push(batch.get_cost());
     ret.extend_from_slice(batch.get_values());
 
     ret

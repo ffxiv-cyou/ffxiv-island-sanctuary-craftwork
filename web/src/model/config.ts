@@ -13,6 +13,7 @@ export class Config {
   _withCost: boolean = false;
   _styleStepWidth: boolean = false;
   _totalDemand: boolean = false;
+  _allWorkerValue: boolean = true;
 
   /**
    * 需求变化规律表
@@ -120,6 +121,17 @@ export class Config {
     this.save();
   }
 
+  /**
+   * 计算总价时乘上工坊数量
+   */
+  public get allWorkerValue() {
+    return this._allWorkerValue;
+  }
+  public set allWorkerValue(val: boolean) {
+    this._allWorkerValue = val;
+    this.save();
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -147,6 +159,7 @@ export class Config {
     cfg._withCost = obj._withCost ?? false;
     cfg._styleStepWidth = obj._styleStepWidth ?? false;
     cfg._totalDemand = obj._totalDemand ?? false;
+    cfg._allWorkerValue = obj._allWorkerValue ?? false;
 
     return cfg;
   }

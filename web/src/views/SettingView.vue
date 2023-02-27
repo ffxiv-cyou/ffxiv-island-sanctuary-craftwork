@@ -105,6 +105,17 @@
           </label>
           <span class="pure-form-message-inline">将排班表和求解器中步骤的宽度将设置为固定值，不再根据每一步的耗时设定宽度。</span>
         </div>
+        <div class="pure-control-group">
+          <label for="all-worker-value">
+            <input
+              id="all-worker-value"
+              v-model="allWorkerValue"
+              type="checkbox"
+            >
+            显示总工坊收益
+          </label>
+          <span class="pure-form-message-inline">在排班表中显示对应工坊数量的总收益，而不是显示单间工坊的收益。</span>
+        </div>
       </fieldset>
     </div>
   </div>
@@ -180,10 +191,24 @@ export default class SettingView extends Vue {
   set totalDemand(val: boolean) {
     this.config.totalDemand = val;
   }
+
+  get allWorkerValue() {
+    return this.config.allWorkerValue;
+  }
+  
+  set allWorkerValue(val: boolean) {
+    this.config.allWorkerValue = val;
+  }
 }
 </script>
-<style>
+<style lang="scss">
 .setting-page {
   max-width: 1000px;
+  .pure-control-group {
+    min-height: 1.75em;
+  }
+  input[type="number"] {
+    width: 5em;
+  }
 }
 </style>

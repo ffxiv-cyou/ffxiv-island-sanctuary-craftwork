@@ -18,6 +18,7 @@ fn load_data<const T: usize>() -> GameDataRepo {
             level: CRAFT_OBJECTS[i][13] as u8,
             craft_time: CRAFT_OBJECTS[i][14] as u8,
             value: CRAFT_OBJECTS[i][15],
+            cost: 0,
         };
         recpies.push(rec);
     }
@@ -75,6 +76,7 @@ fn init_test() {
         10,
         vec![],
         &demands,
+        false,
     );
 }
 
@@ -84,7 +86,7 @@ fn predict() {
     let demands = load_test_demand();
     let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
     let empty = vec![];
-    let limit = SolveLimit::new(10, &empty);
+    let limit = SolveLimit::new(10, &empty, false);
     let result = solver.solve(&limit, &demands);
     println!("length: {}", result.len());
     assert_eq!(result.len(), limit.max_result);

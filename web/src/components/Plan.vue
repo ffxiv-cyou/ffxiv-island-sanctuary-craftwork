@@ -1,7 +1,7 @@
 <template>
   <div class="plan mji-wooden-plate">
     <div class="plan-info mji-info-box">
-      <span class="total-value">总收益: <icon class="blue-coin" />{{ sumVal }} &times; {{ workers }} = <icon class="blue-coin" />{{ sumVal * workers }}</span>
+      <span class="total-value">收益: <icon class="blue-coin" />{{ sumVal * factor }} (<icon class="blue-coin" />{{ -sumCost * factor }})</span>
       <span class="share-link"><a
         :href="shareLink"
         target="_blank"
@@ -22,7 +22,7 @@
           <div class="plan-batch-info">
             <span>第{{ index+1 }}天</span>
             <span class="value" v-if="steps[index].length == 0">休息</span>
-            <span class="value" v-else><icon class="blue-coin" />{{ val.value }}</span>
+            <span class="value" v-else><icon class="blue-coin" />{{ val.value * factor }}</span>
           </div>
           <button
             v-if="steps[index].length == 0"
@@ -88,12 +88,24 @@ export default class PlanView extends Vue {
     return this.solver.config.workers;
   }
 
+  get factor() {
+    return this.solver.config.allWorkerValue ? this.workers : 1;
+  }
+
   batchValues: BatchValues[] = [];
 
   get sumVal() {
     let sum = 0;
     for (let i = 0; i < this.batchValues.length; i++) {
       sum += this.batchValues[i].value;
+    }
+    return sum;
+  }
+
+  get sumCost() {
+    let sum = 0;
+    for (let i = 0; i < this.batchValues.length; i++) {
+      sum += this.batchValues[i].cost;
     }
     return sum;
   }

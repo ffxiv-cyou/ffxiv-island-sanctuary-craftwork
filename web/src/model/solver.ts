@@ -371,10 +371,10 @@ export class BatchValues extends Batch {
 
     static fromSteps(steps: number[], values: Uint16Array) {
         let value = 0;
-        for (let i = 0; i < values.length; i++) {
+        for (let i = 1; i < values.length; i++) {
             value += values[i];
         }
-        return new BatchValues(value, 0, steps, values);
+        return new BatchValues(value, values[0], steps, values.slice(1));
     }
 
     static fromArray(array: Uint16Array): BatchValues {
