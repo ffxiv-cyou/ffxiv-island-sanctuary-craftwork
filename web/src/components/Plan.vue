@@ -21,8 +21,14 @@
         >
           <div class="plan-batch-info">
             <span>第{{ index+1 }}天</span>
-            <span class="value" v-if="steps[index].length == 0">休息</span>
-            <span class="value" v-else><icon class="blue-coin" />{{ val.value * factor }}</span>
+            <span
+              v-if="steps[index].length == 0"
+              class="value"
+            >休息</span>
+            <span
+              v-else
+              class="value"
+            ><icon class="blue-coin" />{{ val.value * factor }}</span>
           </div>
           <button
             v-if="steps[index].length == 0"
@@ -39,7 +45,10 @@
           >
             -
           </button>
-          <div v-if="steps[index].length == 0" class="plan-rest">
+          <div
+            v-if="steps[index].length == 0"
+            class="plan-rest"
+          >
             <icon class="sched sched-rest" />
           </div>
           <steps-comp

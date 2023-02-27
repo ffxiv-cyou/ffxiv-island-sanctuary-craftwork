@@ -3,9 +3,22 @@
     <div class="pure-form">
       <legend>历史需求与趋势预测</legend>
       <fieldset>
-        <div v-for="(i) in 7" :key="i" class="pure-control-group">
-          <label class="aligned-name" :for="'day' + i">第{{ i }}天</label>
-          <input :id="'day' + i" v-model="datapacks[i - 1]" type="text" onclick="this.select();" placeholder="抓包数据">
+        <div
+          v-for="(i) in 7"
+          :key="i"
+          class="pure-control-group"
+        >
+          <label
+            class="aligned-name"
+            :for="'day' + i"
+          >第{{ i }}天</label>
+          <input
+            :id="'day' + i"
+            v-model="datapacks[i - 1]"
+            type="text"
+            onclick="this.select();"
+            placeholder="抓包数据"
+          >
         </div>
         <p v-if="inputDate >= 4">
           趋势预测仅需前4天的数据
@@ -14,25 +27,47 @@
           趋势预测需要从第1天开始按顺序填写数据
         </p>
         <div class="pure-controls">
-          <label for="aligned-cb" class="pure-checkbox">
-            <input id="aligned-cb" v-model="updateUnknownOnly" type="checkbox"> 仅预测未知的趋势
+          <label
+            for="aligned-cb"
+            class="pure-checkbox"
+          >
+            <input
+              id="aligned-cb"
+              v-model="updateUnknownOnly"
+              type="checkbox"
+            > 仅预测未知的趋势
           </label>
-          <button class="pure-button pure-button-primary" @click="predict">
+          <button
+            class="pure-button pure-button-primary"
+            @click="predict"
+          >
             预测趋势
           </button>
-          <button class="pure-button pure-button-warning" @click="clear">
+          <button
+            class="pure-button pure-button-warning"
+            @click="clear"
+          >
             重置趋势
           </button>
-          <button class="sched sched-demand view-demand" @click="changeVisible = true">
-          </button>
+          <button
+            class="sched sched-demand view-demand"
+            @click="changeVisible = true"
+          />
         </div>
         <div v-if="nextPattern">
           下周欢迎度模式：{{ nextPattern }}
         </div>
       </fieldset>
     </div>
-    <popup @close="changeVisible = false" v-if="changeVisible">
-      <demand-change :solver="solver" :datapacks="datapacks" class="demand-view"/>
+    <popup
+      v-if="changeVisible"
+      @close="changeVisible = false"
+    >
+      <demand-change
+        :solver="solver"
+        :datapacks="datapacks"
+        class="demand-view"
+      />
     </popup>
   </div>
 </template>

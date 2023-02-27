@@ -3,7 +3,10 @@
     <legend class="mji-title mji-text-brown">
       推荐队列
     </legend>
-    <legend class="mji-title mji-text-orange mji-text-small" v-if="banList.length > 0">
+    <legend
+      v-if="banList.length > 0"
+      class="mji-title mji-text-orange mji-text-small"
+    >
       禁用列表
     </legend>
     <div class="ban-list">
@@ -27,9 +30,9 @@
     </legend>
     <div class="batches">
       <batch-view
-        class="mji-info-box"
         v-for="(val, key) in batches"
         :key="key"
+        class="mji-info-box"
         :solver="solver"
         :batch="val"
         :removeable="true"

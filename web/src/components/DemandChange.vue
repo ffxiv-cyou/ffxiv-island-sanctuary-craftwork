@@ -5,20 +5,42 @@
     </div>
     <div class="demand-header mji-text-small mji-text-orange mji-title">
       <span class="demand-name">产品名</span>
-      <span class="demand-change" v-for="(id) in 7" :key="id">第{{ id }}天</span>
+      <span
+        v-for="(id) in 7"
+        :key="id"
+        class="demand-change"
+      >第{{ id }}天</span>
     </div>
     <div class="demand-items">
-      <div v-for="(item, index) in objects" :key="index" class="demand-item mji-text-brown">
+      <div
+        v-for="(item, index) in objects"
+        :key="index"
+        class="demand-item mji-text-brown"
+      >
         <span class="demand-name">
-          <icon class="item" :class="iconPath(item.Icon)" />
+          <icon
+            class="item"
+            :class="iconPath(item.Icon)"
+          />
           {{ trimName(item.Name) }}
         </span>
-        <span class="demand-change" v-for="(day) in 7" :key="day">
+        <span
+          v-for="(day) in 7"
+          :key="day"
+          class="demand-change"
+        >
           <span class="demand">
-            <icon v-for="(i) in demand(day, item.Id)" :key="i" class="mji mji-box" />
+            <icon
+              v-for="(i) in demand(day, item.Id)"
+              :key="i"
+              class="mji mji-box"
+            />
           </span>
           <span class="change">
-            <icon class="mji" :class="changeClass(day, item.Id)" />
+            <icon
+              class="mji"
+              :class="changeClass(day, item.Id)"
+            />
           </span>
         </span>
       </div>
