@@ -159,7 +159,7 @@ export class Config {
     cfg._withCost = obj._withCost ?? false;
     cfg._styleStepWidth = obj._styleStepWidth ?? false;
     cfg._totalDemand = obj._totalDemand ?? false;
-    cfg._allWorkerValue = obj._allWorkerValue ?? false;
+    cfg._allWorkerValue = obj._allWorkerValue ?? true;
 
     return cfg;
   }

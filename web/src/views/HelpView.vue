@@ -153,14 +153,12 @@
       <a
         href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork"
         target="_blank"
-      >源代码</a> | 
-      ALL FINAL FANTASY XIV CONTENT IS PROPERTY OF SQUARE ENIX CO., LTD
-    </p>
-    <p>
-      若在使用中遇到了问题，请在<a
+      >Github</a> | 
+      <a
         href="https://nga.178.com/read.php?tid=34882091"
         target="_blank"
-      >NGA帖子</a>下留言。
+      >问题反馈</a> | 
+      ALL FINAL FANTASY XIV CONTENT IS PROPERTY OF SQUARE ENIX CO., LTD
     </p>
   </div>
 </template>
