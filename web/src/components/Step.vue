@@ -88,15 +88,15 @@ export default class Step extends Vue {
     return "item-" + this.step.Icon;
   }
   get popularity(): string {
-    if (!this.pop) return "mji-popular-2"
+    if (this.pop === undefined) return "mji-popular-2"
     return "mji-popular-" + this.pop.toString()
   }
   get demandBox(): number {
-    if (!this.demand) return 2;
+    if (this.demand === undefined) return 2;
     return DemandUtils.GetDemand(this.demand);
   }
   get patternName(): string {
-    if (!this.pattern) return PatternNames[0];
+    if (this.pattern === undefined) return PatternNames[0];
     return PatternNames[this.pattern];
   }
   onClose() {
