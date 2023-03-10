@@ -14,6 +14,7 @@ export class Config {
   _styleStepWidth: boolean = false;
   _totalDemand: boolean = false;
   _allWorkerValue: boolean = true;
+  _hideIngredients: boolean = false;
 
   /**
    * 需求变化规律表
@@ -132,6 +133,18 @@ export class Config {
     this.save();
   }
 
+  /**
+   * 是否不显示原材料
+   */
+  public get hideIngredients() {
+    return this._hideIngredients;
+  }
+
+  public set hideIngredients(val: boolean) {
+    this._hideIngredients = val;
+    this.save();
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -160,7 +173,7 @@ export class Config {
     cfg._styleStepWidth = obj._styleStepWidth ?? false;
     cfg._totalDemand = obj._totalDemand ?? false;
     cfg._allWorkerValue = obj._allWorkerValue ?? true;
-
+    cfg._hideIngredients = obj._hideIngredients ?? false;
     return cfg;
   }
 }

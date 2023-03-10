@@ -60,7 +60,8 @@
         </div>
       </div>
       <ingrid-comp
-        class="plan-ingridients mji-info-box"
+        class="plan-ingredients mji-info-box"
+        v-if="!solver.config.hideIngredients"
         :solver="solver"
         :steps="flatSteps"
         :workers="workers"
@@ -73,12 +74,12 @@ import { ToShareCode } from "@/model/share";
 import type { SolverProxy, BatchValues } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Close from "./Close.vue";
-import Ingridients from "./Ingridients.vue";
+import ingredients from "./Ingredients.vue";
 import Steps from "./Steps.vue";
 @Component({
   components: {
     StepsComp: Steps,
-    IngridComp: Ingridients,
+    IngridComp: ingredients,
     Close: Close
   },
   emits: ["addSteps", "delSteps", "remove"]
@@ -220,7 +221,7 @@ export default class PlanView extends Vue {
 .plan-batches {
   flex: 1;
 }
-.plan-ingridients {
+.plan-ingredients {
   flex: 150px 0 0;
   overflow-y: auto;
   max-height: 330px;

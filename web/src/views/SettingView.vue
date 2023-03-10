@@ -116,6 +116,17 @@
           </label>
           <span class="pure-form-message-inline">在排班表中显示对应工坊数量的总收益，而不是显示单间工坊的收益。</span>
         </div>
+        <div class="pure-control-group">
+          <label for="hide-ingredients">
+            <input
+              id="hide-ingredients"
+              v-model="config.hideIngredients"
+              type="checkbox"
+            >
+            隐藏原料用量
+          </label>
+          <span class="pure-form-message-inline">在排班表中不显示当前排班表原材料的使用量。</span>
+        </div>
       </fieldset>
     </div>
   </div>

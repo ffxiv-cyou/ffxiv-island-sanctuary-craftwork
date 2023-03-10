@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      v-for="(value, key) in ingridients"
+      v-for="(value, key) in ingredients"
       :key="key"
       class="ingridient"
       :class="getCategory(value[0])"
@@ -17,7 +17,7 @@ import type { SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop } from "vue-facing-decorator";
 
 @Component({})
-export default class Ingridients extends Vue {
+export default class ingredients extends Vue {
   @Prop()
   solver!: SolverProxy;
 
@@ -31,7 +31,7 @@ export default class Ingridients extends Vue {
     return this.workers ?? 1;
   }
 
-  get ingridients() {
+  get ingredients() {
     let stMap = new Map<number, number>();
     for (let i = 0; i < this.steps.length; i++) {
       let id = this.steps[i];
