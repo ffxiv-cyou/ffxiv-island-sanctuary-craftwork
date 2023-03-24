@@ -15,6 +15,7 @@ export class Config {
   _totalDemand: boolean = false;
   _allWorkerValue: boolean = true;
   _hideIngredients: boolean = false;
+  _showNetValue: boolean = false;
 
   /**
    * 需求变化规律表
@@ -145,6 +146,18 @@ export class Config {
     this.save();
   }
 
+  /**
+   * 是否显示净收益
+   */
+  public get showNetValue() {
+    return this._showNetValue;
+  }
+
+  public set showNetValue(val: boolean) {
+    this._showNetValue = val;
+    this.save();
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -174,6 +187,7 @@ export class Config {
     cfg._totalDemand = obj._totalDemand ?? false;
     cfg._allWorkerValue = obj._allWorkerValue ?? true;
     cfg._hideIngredients = obj._hideIngredients ?? false;
+    cfg._showNetValue = obj._showNetValue ?? false;
     return cfg;
   }
 }

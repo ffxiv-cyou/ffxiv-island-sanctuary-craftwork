@@ -1,7 +1,11 @@
 <template>
   <div class="plan mji-wooden-plate">
     <div class="plan-info mji-info-box">
-      <span class="total-value">收益: <icon class="blue-coin" />{{ sumVal * factor }} (<icon class="blue-coin" />{{ -sumCost * factor }})</span>
+      <span class="total-value">
+        收益: <icon class="blue-coin" />{{ sumVal * factor }} 
+        (<icon class="blue-coin" />{{ -sumCost * factor }})
+        <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal * factor }}</span>
+      </span>
       <span class="share-link"><a
         :href="shareLink"
         target="_blank"
@@ -118,6 +122,10 @@ export default class PlanView extends Vue {
       sum += this.batchValues[i].cost;
     }
     return sum;
+  }
+
+  get netVal() {
+    return this.sumVal - this.sumCost;
   }
 
   get flatSteps() {

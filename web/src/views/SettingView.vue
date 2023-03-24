@@ -117,6 +117,17 @@
           <span class="pure-form-message-inline">在排班表中显示对应工坊数量的总收益，而不是显示单间工坊的收益。</span>
         </div>
         <div class="pure-control-group">
+          <label for="show-net-value">
+            <input
+              id="show-net-value"
+              v-model="config.showNetValue"
+              type="checkbox"
+            >
+            显示净收益
+          </label>
+          <span class="pure-form-message-inline">在排班表中显示去除原料成本的净收益。</span>
+        </div>
+        <div class="pure-control-group">
           <label for="hide-ingredients">
             <input
               id="hide-ingredients"
