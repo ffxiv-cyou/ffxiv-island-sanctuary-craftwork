@@ -91,10 +91,11 @@ pub fn solve_singleday(
     level: u8,
     ban_list: Vec<u16>,
     demands: &[i8],
+    time: u16,
     with_cost: bool,
 ) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
-    let limit = SolveLimit::new(level, &ban_list, with_cost);
+    let limit = SolveLimit::new(level, &ban_list, time, with_cost);
     let batches = solver.solve(&limit, demands);
 
     let mut ret = vec![];

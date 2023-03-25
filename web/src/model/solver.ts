@@ -38,6 +38,11 @@ export class SolverProxy {
     inited = false;
 
     /**
+     * 求解后最长时间
+     */
+    public maxTime: number = 24;
+
+    /**
      * 需求列表
      */
     public demands: number[] = [];
@@ -262,7 +267,7 @@ export class SolverProxy {
         const demandArr = new Int8Array(demands);
 
         const info = this.infoWithTension(tension);
-        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr, this.config.withCost);
+        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr, this.maxTime, this.config.withCost);
 
         return BatchValues.fromSimulateArray(arr);
     }

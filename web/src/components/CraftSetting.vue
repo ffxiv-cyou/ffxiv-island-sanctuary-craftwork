@@ -2,7 +2,7 @@
   <div>
     <form class="pure-form">
       <legend>设置</legend>
-      <div class="pure-control-group">
+      <div class="solve-sitting pure-control-group">
         <label for="tension">当前干劲</label>
         <input
           id="tension"
@@ -10,6 +10,15 @@
           type="number"
           min="0"
           max="35"
+          placeholder=""
+        >
+        <label for="maxTime">工序时间</label>
+        <input
+          id="maxTime"
+          v-model="maxTime"
+          type="number"
+          min="4"
+          max="24"
           placeholder=""
         >
       </div>
@@ -93,6 +102,13 @@ export default class CraftSetting extends Vue {
   }
   set tension(val: number) {
     this.solver.tension = val;
+  }
+
+  get maxTime() {
+    return this.solver.maxTime;
+  }
+  set maxTime(val: number) {
+    this.solver.maxTime = val;
   }
 
   get pop_pattern() {
@@ -195,7 +211,7 @@ input.item-demand {
 .item-disable input {
   width: 100%;
 }
-input#tension {
+.solve-sitting input {
   width: 5em;
 }
 

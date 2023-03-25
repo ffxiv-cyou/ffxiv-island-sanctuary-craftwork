@@ -62,7 +62,7 @@ where
         let last = current.last();
         let first_batch = last == 0;
         let last = self.data.recipe(last as usize);
-        let remain = 24 - current.get_time();
+        let remain = limit.time - current.get_time();
 
         // 连击开始后即增加干劲
         if !first_batch {
@@ -91,7 +91,7 @@ where
             let val = simulate(&info, &s, demand_sub);
             let current = current.push(r.id, val, r.cost, r.craft_time as u16);
 
-            if current.get_time() > 20 {
+            if current.get_time() > limit.time - 4 {
                 // 当前工序结束
                 vec.push(current)
             } else {

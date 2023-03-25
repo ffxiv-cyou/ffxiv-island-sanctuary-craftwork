@@ -76,7 +76,8 @@ fn init_test() {
         10,
         vec![],
         &demands,
-        false,
+        24,
+        false
     );
 }
 
@@ -86,7 +87,7 @@ fn predict() {
     let demands = load_test_demand();
     let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
     let empty = vec![];
-    let limit = SolveLimit::new(10, &empty, false);
+    let limit = SolveLimit::new(10, &empty, 24, false);
     let result = solver.solve(&limit, &demands);
     println!("length: {}", result.len());
     assert_eq!(result.len(), limit.max_result);
