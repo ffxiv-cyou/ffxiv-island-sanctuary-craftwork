@@ -1,28 +1,28 @@
 <template>
   <div class="about">
-    <h1>帮助</h1>
+    <h1>快速开始</h1>
+    <p>欢迎使用无人岛工房求解器。</p>
     <p>
-      欢迎使用无人岛工房求解器。在开始前，请先阅读<a
-        href="https://nga.178.com/read.php?tid=33443333"
-        target="_blank"
-      >什锦笔筒的《浅析无人岛工坊售价影响因素与冲分路线安排》</a>，了解具体的求解原理。
+      在开始使用本工具前，你需要了解如何得到物品的“欢迎度”、“需求值”、“需求趋势”，并知道如何根据这些参数计算最终收益。
     </p>
-    <p>接下来将按照重要性介绍各页面的用途。</p>
+    <p>
+      若您对上述概念尚有疑问，请先阅读<a href="https://nga.178.com/read.php?tid=33443333"
+        target="_blank">什锦笔筒的《浅析无人岛工坊售价影响因素与冲分路线安排》</a>，了解具体的求解原理。
+    </p>
+    <h2>配置基础参数</h2>
+    <p>求解器默认配置为国服，且开拓等级和工坊为满级。若您的无人岛状态与此配置不一致，请访问设置页面修改为正确的值。</p>
+    <p>开拓等级设置错误会导致推荐无法制作的配方，工坊等级设置错误会影响计算收益。</p>
+    <h2>设置本周趋势</h2>
+    <p>在正式求解前，需要在需求与趋势页面设定欢迎度模式和各个物品的需求趋势。求解器需要知道正确的物品需求趋势，才能计算物品在指定日期的真实需求值。</p>
+    <p>这一参数可以从他人手中<del>白嫖</del>获取，也可以根据上面的教程手动分析。</p>
+    <p>使用下文提到的ACT插件可以方便地从游戏中抓取当天的欢迎度和需求状态。配合页面左边的需求趋势预测功能，可以快速计算得到物品的需求趋势。</p>
+    <h2>求解排班</h2>
+    <p>访问排班表页面，点击新建排班表开始排班。点击日期旁的加号按钮，求解器会自动推荐当日最优方案。</p>
+    <p>注意，当日最优方案不一定代表是全局最优方案。你需要根据物品的状态，自行选择合适的方案。</p>
+    <p>排班表会自动根据之前生产的物品和当前日期计算需求值。若需要使用指定需求值求解，你可以前往求解器页面手动求解。</p>
+    <h1>详细说明</h1>
     <h2>设置页面</h2>
-    <p>本页面设定较为重要的参数，请根据自身无人岛的发展情况设置对应参数。</p>
-    <ul>
-      <li>国际服：控制配方版本，勾选后会使用国际服配方和名字。注意当前需求真实值尚未更新到国际服的需求值，排班表计算可能会出错。</li>
-      <li>开拓等级：当前开拓等级（1-12），用于过滤配方。</li>
-      <li>工坊等级：当前工房的等级（1-3），影响产品价格的计算。</li>
-      <li>干劲上限：当前工房的干劲上限，影响产品价格的计算。</li>
-      <li>工坊数量：同时工作的工坊数量，影响需求变动与干劲叠加的计算。</li>
-      <li>按净收益排序: 勾上此选项后，计算推荐队列时会将材料单独卖出的收益从工坊收益中减去，按照净收益排序。</li>
-      <li>
-        按全表计算需求：在推荐时使用全部已选择方案计算叠箱，而不是仅使用当天之前的方案计算叠箱。
-        此功能在非顺序选择推荐方案的情况下可能得到更优的方案。启用后，推荐队列的预计收益会与排班表计算不一致。
-      </li>
-      <li>步骤等宽：勾选后，将不再根据配方耗时设置配方显示长度。</li>
-    </ul>
+    <p>可以设定无人岛的基础参数，或是调整求解器的选项。</p>
     <h2>需求与趋势</h2>
     <p>分为需求趋势设定与趋势预测两个部分。在求解前务必正确设置本周的需求和趋势，否则会得出错误的结果。</p>
     <h3>需求趋势设定</h3>
@@ -68,7 +68,9 @@
       <li>总收益：本周预计总收益</li>
       <li>分享链接：将本排班表分享给他人的链接。注意排班表分享链接不带有需求趋势设定，若要使他人复现结果，请在分享时一并分享趋势设定。</li>
       <li>导入此排班表：将他人分享的排班表导入本地。</li>
-      <li>第x天，<icon class="blue-coin" />1234: 表示当前排班方案的日期与单间工坊的预计收益。</li>
+      <li>第x天，
+        <icon class="blue-coin" />1234: 表示当前排班方案的日期与单间工坊的预计收益。
+      </li>
       <li>
         <button class="sched sched-red">
           -
@@ -80,10 +82,7 @@
         </button>: 为当前日期添加排班方案。点击后会弹出推荐队列选择。
       </li>
       <li>
-        <step
-          :value="52"
-          :step="demoStep"
-        />: 
+        <step :value="52" :step="demoStep" />:
         <span>表示每一步的产品、耗时和预测收入。</span>
       </li>
     </ul>
@@ -95,22 +94,23 @@
           +
         </button>: 将此队列设置为当日的排班方案。
       </li>
-      <li><icon class="blue-coin" />1234: 根据当日排班方案计算得出的当日每间工坊的收益。</li>
+      <li>
+        <icon class="blue-coin" />1234: 根据当日排班方案计算得出的当日每间工坊的收益。
+      </li>
       <li>(-123): 当排班方案材料成本的（即单独卖出材料的收益）。</li>
       <li>
-        <step
-          :value="52"
-          :step="demoStep"
-          :pop="2"
-          :demand="10"
-          :pattern="1"
-          :removeable="true"
-        />
+        <step :value="52" :step="demoStep" :pop="2" :demand="10" :pattern="1" :removeable="true" />
         <ul>
-          <li><icon class="mji mji-popular-2" />: 物品的欢迎度。</li>
-          <li><icon class="mji mji-box" />: 物品结算时的需求。</li>
+          <li>
+            <icon class="mji mji-popular-2" />: 物品的欢迎度。
+          </li>
+          <li>
+            <icon class="mji mji-box" />: 物品结算时的需求。
+          </li>
           <li>2强: 物品的需求趋势。</li>
-          <li><close />: 禁用该物品，禁用后该物品不参与推荐计算。</li>
+          <li>
+            <close />: 禁用该物品，禁用后该物品不参与推荐计算。
+          </li>
         </ul>
       </li>
     </ul>
@@ -127,37 +127,19 @@
     <p>ACT插件搭配悬浮窗可以自动填入每日的参数数据。</p>
     <ol>
       <li>
-        访问<a
-          href="https://github.com/ffxiv-cyou/island-craftwork-act-plugin/releases/latest/"
-          target="_blank"
-        >Github</a>下载ACT插件；
+        访问<a href="https://github.com/ffxiv-cyou/island-craftwork-act-plugin/releases/latest/"
+          target="_blank">Github</a>下载ACT插件；
       </li>
       <li>使用ACT载入插件，然后重新加载悬浮窗（OverlayPlugin或NGLD）插件；</li>
       <li>在悬浮窗插件设置中，点击左下角的新建按钮，预设选择无人岛工坊助手，点击确定按钮添加悬浮窗；</li>
       <li>进入无人岛，在工坊页面点击调查需求。然后点击悬浮窗的“解析”字样即可打开解析页面。</li>
     </ol>
-    <h1>使用方法</h1>
-    <ol>
-      <li>在设置页面正确设定参数。</li>
-      <li>在需求与趋势页面手动修改当周的趋势和流行模式，或使用上面的插件自动解析，或从他人手中<del>白嫖</del>获取。</li>
-      <li>在求解器页面，设定所需求解日期及该日的初始干劲后，点击解最优按钮即可计算得出该日高收益方案。</li>
-      <li>在排班表页面，点击加号按钮，选择该日执行的排班方案。系统会根据所选方案自动计算本周总收益。</li>
-    </ol>
     <h1>关于</h1>
     <p>
       &copy; 2022-{{ year }}
-      <a
-        href="https://ffxiv.cyou"
-        target="_blank"
-      >狒狒西柚</a> | 
-      <a
-        href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork"
-        target="_blank"
-      >Github</a> | 
-      <a
-        href="https://nga.178.com/read.php?tid=34882091"
-        target="_blank"
-      >问题反馈</a> | 
+      <a href="https://ffxiv.cyou" target="_blank">狒狒西柚</a> |
+      <a href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork" target="_blank">Github</a> |
+      <a href="https://nga.178.com/read.php?tid=34882091" target="_blank">问题反馈</a> |
       ALL FINAL FANTASY XIV CONTENT IS PROPERTY OF SQUARE ENIX CO., LTD
     </p>
   </div>
@@ -194,7 +176,10 @@ export default class TemplateView extends Vue {
 .about {
   max-width: 1000px;
   line-height: 1.5;
-  p, ul, ol {
+
+  p,
+  ul,
+  ol {
     margin: 0.4em 0;
   }
 }

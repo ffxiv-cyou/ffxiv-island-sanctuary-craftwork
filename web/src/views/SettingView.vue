@@ -13,7 +13,7 @@
             >
             国际服
           </label>
-          <span class="pure-form-message-inline">勾选后使用国际服配方，注意需求真值表不会改变。</span>
+          <span class="pure-form-message-inline">勾选后使用国际服配方和名字。注意需求变动表尚未更新，趋势预测会出错。</span>
         </div>
       </fieldset>
       <fieldset>
@@ -28,7 +28,7 @@
             max="12"
             placeholder="1-12"
           >
-          <span class="pure-form-message-inline">当前开拓等级，大于此等级的配方不会被求解</span>
+          <span class="pure-form-message-inline">当前开拓等级（1-12），大于此等级的配方不会被求解。</span>
         </div>
         <div class="pure-control-group">
           <label for="craft-level">工坊等级</label>
@@ -40,7 +40,7 @@
             max="3"
             placeholder="1-3"
           >
-          <span class="pure-form-message-inline">当前工坊等级，影响产品价格</span>
+          <span class="pure-form-message-inline">当前工坊等级（1-3），影响产品价格。</span>
         </div>
         <div class="pure-control-group">
           <label for="max-tension">干劲上限</label>
@@ -52,7 +52,7 @@
             max="35"
             placeholder="0-35"
           >
-          <span class="pure-form-message-inline">工坊的干劲上限，影响产品价格</span>
+          <span class="pure-form-message-inline">工坊的干劲上限，影响产品价格。通常不需要修改。</span>
         </div>
         <div class="pure-control-group">
           <label for="workers">工坊数量</label>
@@ -64,7 +64,7 @@
             max="3"
             placeholder="1-3"
           >
-          <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算</span>
+          <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算。</span>
         </div>
       </fieldset>
       <fieldset>
@@ -78,7 +78,7 @@
             >
             按净收益排序
           </label>
-          <span class="pure-form-message-inline">求解时按净收益排序。净收益 = 工坊收益 - 将材料单独卖出的收益。</span>
+          <span class="pure-form-message-inline">求解时按净收益而不是工坊收益排序。净收益 = 工坊收益 - 将材料单独卖出的收益。</span>
         </div>
         <div class="pure-control-group">
           <label for="total-demand">
@@ -89,7 +89,7 @@
             >
             按全表计算需求
           </label>
-          <span class="pure-form-message-inline">使用整周的产量计算需求变动，而不是使用当天之前的产量计算。<br>启用后会导致排班表和推荐队列中的显示的需求与收益不一致。</span>
+          <span class="pure-form-message-inline">使用整周的产量计算需求变动，而不是使用当天之前的产量计算。<br>启用后会导致排班表和推荐队列中的显示的需求与收益不一致。<br>此功能在不按日期顺序选择推荐方案的情况下可能得到更优的方案。</span>
         </div>
       </fieldset>
       <fieldset>
