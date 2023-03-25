@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue';
+import AdvancedSolver from '../views/AdvancedSolver.vue';
 import HelpView from '../views/HelpView.vue';
 import PredView from '../views/DemandPredition.vue';
 import Setting from '../views/SettingView.vue';
@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: AdvancedSolver
     },
     {
       path: '/help',

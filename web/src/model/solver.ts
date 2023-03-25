@@ -25,27 +25,7 @@ export class SolverProxy {
      */
     public config!: Config;
 
-    /**
-     * 配方禁用列表
-     */
-    public banList: boolean[] = [];
-
-    /**
-     * 当前干劲
-     */
-    public tension: number = 0;
-
     inited = false;
-
-    /**
-     * 求解后最长时间
-     */
-    public maxTime: number = 24;
-
-    /**
-     * 需求列表
-     */
-    public demands: number[] = [];
 
     /**
      * 缓存的预测需求列表
@@ -69,9 +49,6 @@ export class SolverProxy {
     constructor() {
         this.data = new CraftworkData(Region.Global);
         this.config = Config.load(this.Recipes.length);
-        for (let i = 0; i < this.Recipes.length; i++) {
-            this.banList.push(false);
-        }
         this.data.SetRegion(this.config.region);
 
         init().catch((e) => {
@@ -158,19 +135,13 @@ export class SolverProxy {
             }
         }
     }
-
     /**
-     * 根据配置的需求变化表设置指定日期的需求
+     * 根据预测值获取指定日期的需求
      * @param day 
+     * @returns 
      */
-    setPredictDemands(day: number) {
-        for (let j = 0; j < this.predictDemands[day].length; j++) {
-            this.demands[j] = this.predictDemands[day][j];
-        }
-    }
-
-    get info() {
-        return this.infoWithTension(this.tension);
+    getPredictDemands(day: number): number[] {
+        return this.predictDemands[day];
     }
 
     /**
@@ -184,16 +155,14 @@ export class SolverProxy {
 
     /**
      * 模拟求解。注意只考虑连击
-     * @param array 配方
-     * @returns 配方收益
+     * @param steps 配方
+     * @param demands 当前需求值
+     * @param tension 当前干劲
+     * @returns 
      */
-    simulate(array: number[]): BatchValues {
-        const steps = new Uint8Array(array.length);
-        for (let i = 0; i < steps.length; i++) {
-            steps[i] = array[i];
-        }
-        const arr = simulate(this.repo, this.info, steps, new Int8Array(this.demands));
-        return BatchValues.fromSteps(array, arr);
+    simulateDetail(steps: number[], demands: number[], tension: number) {
+        const arr = simulate(this.repo, this.infoWithTension(tension), new Uint8Array(steps), new Int8Array(demands));
+        return BatchValues.fromSteps(steps, arr);
     }
 
     /**
@@ -242,32 +211,18 @@ export class SolverProxy {
     }
 
     /**
-     * 根据当前人气和供给求解当天的最优值
-     * @returns 
-     */
-    solveDay(): BatchValues[] {
-        const banArr = [];
-        for (let i = 0; i < this.banList.length; i++) {
-            if (this.banList[i]) {
-                banArr.push(i);
-            }
-        }
-        return this.solveDayDetail(this.demands, banArr, this.tension)
-    }
-
-    /**
      * 使用指定的需求值求解当天的最优值
      * @param demands 
      * @param banList 
      * @param tension 
      * @returns 
      */
-    solveDayDetail(demands: number[], banList: number[], tension: number) {
+    solveDayDetail(demands: number[], banList: number[], tension: number, maxTime: number = 24) {
         const banArr = new Uint16Array(banList);
         const demandArr = new Int8Array(demands);
 
         const info = this.infoWithTension(tension);
-        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr, this.maxTime, this.config.withCost);
+        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr, maxTime, this.config.withCost);
 
         return BatchValues.fromSimulateArray(arr);
     }
