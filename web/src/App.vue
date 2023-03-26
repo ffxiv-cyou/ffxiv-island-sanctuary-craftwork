@@ -29,17 +29,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-facing-decorator";
-import HomePage from "@/views/HomeView.vue";
 import { SolverProxy } from "./model/solver";
 import "purecss";
 import "@/assets/icons.css";
 import "@/assets/mji.css";
 
-@Component({
-  components: {
-    HomePage: HomePage,
-  },
-})
+@Component
 export default class App extends Vue {
   solver: SolverProxy = new SolverProxy();
 
