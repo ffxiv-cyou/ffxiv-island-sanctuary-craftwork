@@ -5,9 +5,23 @@
         <legend>设置</legend>
         <div class="solve-sitting pure-control-group">
           <label for="tension">当前干劲</label>
-          <input id="tension" v-model="tension" type="number" min="0" max="35" placeholder="">
+          <input
+            id="tension"
+            v-model="tension"
+            type="number"
+            min="0"
+            max="35"
+            placeholder=""
+          >
           <label for="maxTime">工序时间</label>
-          <input id="maxTime" v-model="maxTime" type="number" min="4" max="24" placeholder="">
+          <input
+            id="maxTime"
+            v-model="maxTime"
+            type="number"
+            min="4"
+            max="24"
+            placeholder=""
+          >
         </div>
       </form>
       <div class="pure-form pure-form-stacked pure-g">
@@ -21,19 +35,41 @@
           <span class="item-demand pure-u-9-24">需求</span>
           <span class="item-demand pure-u-3-24">禁用</span>
         </div>
-        <div v-for="(item, index) in objects" :key="index" class="object-item pure-form pure-g">
+        <div
+          v-for="(item, index) in objects"
+          :key="index"
+          class="object-item pure-form pure-g"
+        >
           <span class="item-name pure-u-9-24">{{ trimName(item.Name) }}</span>
           <span class="item-pop pure-u-2-24">
-            <icon class="mji" :class="popularity(item.Id)" />
+            <icon
+              class="mji"
+              :class="popularity(item.Id)"
+            />
           </span>
-          <span class="item-demand-box pure-u-6-24" :class="{ 'pure-u-6-24': customDemand, 'pure-u-10-24': !customDemand }"
-            @click="changeDemandBox(item.Id)">
-            <icon v-for="(i) in getDemandBox(demands[item.Id])" :key="i" class="mji mji-box" />
+          <span
+            class="item-demand-box pure-u-6-24"
+            :class="{ 'pure-u-6-24': customDemand, 'pure-u-10-24': !customDemand }"
+            @click="changeDemandBox(item.Id)"
+          >
+            <icon
+              v-for="(i) in getDemandBox(demands[item.Id])"
+              :key="i"
+              class="mji mji-box"
+            />
           </span>
-          <input v-if="customDemand" v-model.number="demands[item.Id]" class="item-demand pure-u-4-24" type="number"
-            placeholder="需求">
+          <input
+            v-if="customDemand"
+            v-model.number="demands[item.Id]"
+            class="item-demand pure-u-4-24"
+            type="number"
+            placeholder="需求"
+          >
           <span class="item-disable pure-u-3-24">
-            <input v-model="banList[item.Id]" type="checkbox">
+            <input
+              v-model="banList[item.Id]"
+              type="checkbox"
+            >
           </span>
         </div>
       </div>
@@ -43,11 +79,20 @@
       <p v-if="batches.length == 0">
         首次使用？请先查看帮助页面了解详细使用说明。
       </p>
-      <button class="pure-button" @click="load">
+      <button
+        class="pure-button"
+        @click="load"
+      >
         解最优
       </button>
       <div>
-        <batch-view v-for="(val, key) in batches" :key="key" class="mji-info-box" :solver="solver" :batch="val" />
+        <batch-view
+          v-for="(val, key) in batches"
+          :key="key"
+          class="mji-info-box"
+          :solver="solver"
+          :batch="val"
+        />
       </div>
     </div>
   </div>
