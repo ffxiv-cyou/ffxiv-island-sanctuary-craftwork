@@ -129,13 +129,13 @@ export default class DemandChange extends Vue {
 
   get popPattern() {
     var d = this.firstValidData;
-    if (!d || d.length === 0) return 0;
+    if (!d || d.length < 2) return 0;
     return d[0] + 1;
   }
 
   get popPatternNext() {
     var d = this.firstValidData;
-    if (!d || d.length === 0) return 0;
+    if (!d || d.length < 2) return 0;
     return d[1] + 1;
   }
 
