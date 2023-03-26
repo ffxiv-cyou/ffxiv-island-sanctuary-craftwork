@@ -1,31 +1,42 @@
 <template>
   <div class="container">
-    <predition
-      class="container-left predition-col hide-lg"
-      :solver="solver"
-      :input-data="packetData"
-    />
     <Pattern
       class="container-right demand-pattern"
       :solver="solver"
       :input-share-code="shareCode"
+      @view-predict="changeVisible = true"
     />
+    <popup
+      v-if="changeVisible"
+      @close="changeVisible = false"
+    >
+      <demand-change
+        :solver="solver"
+        :input-data="packetData"
+        class="demand-view"
+        @on-apply="onApply"
+      />
+    </popup>
   </div>
 </template>
 <script lang="ts">
+import DemandChange from "@/components/DemandChange.vue";
 import DemandPattern from "@/components/DemandPattern.vue";
-import PreditionComponent from "@/components/DPredition.vue";
+import Dialog from "@/components/Dialog.vue";
 import type { SolverProxy } from "@/model/solver";
-import { Component, Vue, Prop } from "vue-facing-decorator";
+import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 @Component({
   components: {
-    Predition: PreditionComponent,
+    DemandChange: DemandChange,
+    Popup: Dialog,
     Pattern: DemandPattern
   }
 })
 export default class PreditionView extends Vue {
   @Prop()
   solver!: SolverProxy;
+
+  changeVisible = false;
 
   get shareCode() {
     return this.$route.params['share'];
@@ -34,11 +45,25 @@ export default class PreditionView extends Vue {
   get packetData() {
     return this.$route.params['data'];
   }
+
+  @Watch("packetData")
+  onPacketDataChange(val: string) {
+    if (val) this.changeVisible = true;
+  }
+
+  onApply() {
+    this.changeVisible = false;
+  }
 }
 </script>
 <style>
-.predition-col {
-  width: 260px;
+.demand-pattern {
+  max-width: 1200px;
+  margin: 0 auto;
 }
-
+.demand-view {
+  height: calc(100vh - 120px);
+  max-width: 1000px;
+  margin: 30px auto;
+}
 </style>

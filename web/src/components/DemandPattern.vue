@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="pure-form">
+    <div class="control-form pure-form">
       <fieldset class="pure-g">
         <label for="pop-pattern">欢迎度模式</label>
         <input
@@ -31,6 +31,14 @@
         >
           导入当前设置
         </button>
+        <button
+          class="sched sched-delete"
+          @click="reset"
+        />
+        <button
+          class="sched sched-demand"
+          @click="$emit('view-predict')"
+        />
       </fieldset>
     </div>
     <div class="recipes">
@@ -72,7 +80,8 @@
             :active="sortMethod === id + 4"
             :active-up="sortDir"
             @click="sort(id + 4, $event)"
-          >第{{ id }}天</sort-label>
+          >第{{ id
+          }}天</sort-label>
         </span>
       </div>
       <div
@@ -120,13 +129,13 @@
 import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import { DemandUtils, PatternNames } from "@/model/data";
-import { CraftworkData, CraftworkObject} from "@/data/data";
+import { CraftworkData, CraftworkObject } from "@/data/data";
 import { FromShareCode, ToShareCode } from "@/model/share";
 import SortLabel from "./SortLabel.vue";
 
 @Component({
   emits: [
-    "close"
+    "view-predict"
   ],
   components: {
     SortLabel: SortLabel
@@ -270,7 +279,7 @@ export default class DemandPattern extends Vue {
   getBasicPriceNum(item: CraftworkObject) {
     let pop = this.solver.Popularity[this.popPattern][item.Id];
     let rate = 1;
-    switch(pop) {
+    switch (pop) {
       case 0:
         rate = 0;
         break;
@@ -336,6 +345,14 @@ export default class DemandPattern extends Vue {
     this.$router.push('/pred');
   }
 
+  reset() {
+    for (let i = 0; i < this.config.demandPatterns.length; i++) {
+      this.config.demandPatterns[i] = 0;
+    }
+    this.solver.updatePredictDemands();
+    this.config.save();
+  }
+
   mounted() {
     this.parseShareCode();
     try {
@@ -346,19 +363,16 @@ export default class DemandPattern extends Vue {
           this.config.demandPatterns.push(0);
       });
     }
-    catch{}
+    catch { }
   }
 }
 </script>
 <style lang="scss" scoped>
-.close-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  box-shadow: none;
-  border: none;
-  fill: #666;
-  cursor: pointer;
+.control-form {
+  button.sched {
+    flex: 38.4px 0 0;
+    --scale: 0.4 !important;
+  }
 }
 
 .recipes {
@@ -368,24 +382,31 @@ export default class DemandPattern extends Vue {
   margin-right: -10px;
   margin-bottom: -10px;
 }
+
 .recipe-item,
 .recipe-header {
   display: flex;
+
   * {
     white-space: nowrap;
   }
+
   .recipe-name {
     flex: 4em;
   }
+
   .recipe-pop {
     flex: 1em;
   }
+
   .recipe-value {
     flex: 1em;
   }
+
   .recipe-pattern {
     flex: 2em;
   }
+
   .recipe-demand {
     flex: 1em;
   }
@@ -421,15 +442,18 @@ export default class DemandPattern extends Vue {
   margin: -4px -8px 0 -8px;
 }
 
-label + input {
+label+input {
   margin-left: 0.5em;
 }
-input + label {
+
+input+label {
   margin-left: 1em;
 }
+
 #pop-pattern {
   width: 5em;
 }
+
 #share-link {
   flex: 1;
 }
