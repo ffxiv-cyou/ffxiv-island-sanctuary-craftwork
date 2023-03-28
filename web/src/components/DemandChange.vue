@@ -236,6 +236,7 @@ export default class DemandChange extends Vue {
 
   mounted() {
     this.loadData();
+    this.fromInputData();
     this.reload();
   }
 
