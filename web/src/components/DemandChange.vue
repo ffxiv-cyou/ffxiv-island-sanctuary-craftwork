@@ -2,87 +2,43 @@
   <div class="demands mji-wooden-plate">
     <div class="mji-text-brown mji-title">
       <span>需求变动与趋势预测</span>
-      <span class="demand-control mji-text-small">
-        <label
-          for="update-unknown-only"
-          class="pure-checkbox"
-        >
-          <input
-            id="update-unknown-only"
-            v-model="updateUnknownOnly"
-            type="checkbox"
-          > 不覆盖先前已知的趋势
-        </label>
-        <button
-          class="mji-text-brown"
-          @click="applyPredict"
-        >应用预测</button>
+      <span class="demand-control">
+        <span class="mji-text-small">
+          <span class="mji-text-orange">欢迎度模式 </span>
+          <span class="mji-text-brown">
+            <span class="hide-xs">本周 </span>{{ popPattern }} /
+            <span class="hide-xs">下周 </span>{{ popPatternNext }}</span>
+        </span>
+        <button class="mji-text-brown" @click="applyPredict(false)">更新趋势</button>
+        <button class="mji-text-brown" @click="applyPredict(true)">覆盖趋势</button>
       </span>
     </div>
     <div class="demand-packet mji-text-small mji-title">
       <span class="demand-packet-title mji-text-orange">抓包数据</span>
-      <input
-        v-for="(i) in 7"
-        :key="i"
-        v-model="datapacks[i - 1]"
-        type="text"
-        :placeholder="'第' + i + '天'"
-        :required="datapacks[i] !== undefined && datapacks[i].length > 0"
-        pattern="[0-9a-fA-F]+"
-        class="mji-text-brown"
-      >
-
-      <span class="demand-packet-pop">
-        <span class="mji-text-orange">欢迎度模式 </span>
-        <span class="mji-text-brown">{{ popPattern }} &rightarrow; {{ popPatternNext }}</span>
-      </span>
+      <input v-for="(i) in 7" :key="i" v-model="datapacks[i - 1]" type="text" :placeholder="'第' + i + '天'"
+        :required="datapacks[i] !== undefined && datapacks[i].length > 0" pattern="[0-9a-fA-F]+" class="mji-text-brown">
     </div>
     <div class="demand-header mji-text-small mji-text-orange mji-title">
       <span class="demand-name">产品名</span>
       <span class="demand-pop">欢迎度</span>
-      <span
-        v-for="(id) in 7"
-        :key="id"
-        class="demand-change"
-      >第{{ id }}天</span>
+      <span v-for="(id) in 7" :key="id" class="demand-change">第{{ id }}天</span>
       <span class="demand-pat">预测趋势</span>
     </div>
     <div class="demand-items">
-      <div
-        v-for="(item, index) in objects"
-        :key="index"
-        class="demand-item mji-text-brown"
-      >
+      <div v-for="(item, index) in objects" :key="index" class="demand-item mji-text-brown">
         <span class="demand-name">
-          <icon
-            class="item"
-            :class="iconPath(item.Icon)"
-          />
+          <icon class="item" :class="iconPath(item.Icon)" />
           {{ trimName(item.Name) }}
         </span>
         <span class="demand-pop">
-          <icon
-            class="mji"
-            :class="popularityClass(item.Id)"
-          />
+          <icon class="mji" :class="popularityClass(item.Id)" />
         </span>
-        <span
-          v-for="(day) in 7"
-          :key="day"
-          class="demand-change"
-        >
+        <span v-for="(day) in 7" :key="day" class="demand-change">
           <span class="demand">
-            <icon
-              v-for="(i) in demand(day, item.Id)"
-              :key="i"
-              class="mji mji-box"
-            />
+            <icon v-for="(i) in demand(day, item.Id)" :key="i" class="mji mji-box" />
           </span>
           <span class="change">
-            <icon
-              class="mji"
-              :class="changeClass(day, item.Id)"
-            />
+            <icon class="mji" :class="changeClass(day, item.Id)" />
           </span>
         </span>
         <span class="demand-pat">
@@ -116,8 +72,6 @@ export default class DemandChange extends Vue {
   data: Uint8Array[] = [];
 
   patterns: DemandPattern[] = [];
-
-  updateUnknownOnly: boolean = false;
 
   get firstValidData() {
     for (let i = 0; i < this.data.length; i++) {
@@ -255,9 +209,9 @@ export default class DemandChange extends Vue {
     localStorage.setItem("MJICraftworkPatPred", str);
   }
 
-  applyPredict() {
+  applyPredict(updateAll: boolean) {
     for (let i = 0; i < this.config.demandPatterns.length && i < this.patterns.length; i++) {
-      if (this.config.demandPatterns[i] != 0 && this.updateUnknownOnly)
+      if (!updateAll && this.config.demandPatterns[i] != 0)
         continue;
       this.config.demandPatterns[i] = this.patterns[i];
     }
@@ -287,11 +241,6 @@ export default class DemandChange extends Vue {
     flex: 4.5em 0 0;
   }
 
-  .demand-packet-pop {
-    flex: 9.5em 0 0;
-    text-align: right;
-  }
-
   input[type=text] {
     height: 16px;
     background: transparent;
@@ -310,6 +259,10 @@ export default class DemandChange extends Vue {
   float: right;
   text-align: right;
 
+  &>*+* {
+    margin-left: 3px;
+  }
+
   button {
     background: rgb(214, 210, 205);
     border: 1px solid rgba(58, 45, 33, 0.5);
@@ -317,6 +270,7 @@ export default class DemandChange extends Vue {
     padding: 2px 5px;
     cursor: pointer;
   }
+
   button:hover {
     filter: brightness(0.95);
   }
@@ -375,6 +329,7 @@ export default class DemandChange extends Vue {
 }
 
 .demand-change {
+
   .demand,
   .change {
     display: inline-block;
