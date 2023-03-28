@@ -48,11 +48,16 @@ export default class PreditionView extends Vue {
 
   @Watch("packetData")
   onPacketDataChange(val: string) {
-    if (val) this.changeVisible = true;
+    if (val)
+      this.changeVisible = true;
   }
 
   onApply() {
     this.changeVisible = false;
+  }
+
+  mounted() {
+    this.onPacketDataChange(this.packetData as string);
   }
 }
 </script>
