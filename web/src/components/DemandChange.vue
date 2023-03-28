@@ -123,6 +123,7 @@ export default class DemandChange extends Vue {
       case 2: return "mji-change-0";
       case 3: return "mji-change-1-down";
       case 4: return "mji-change-2-down";
+      default: return "mji-change-0";
     }
   }
 
