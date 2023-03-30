@@ -68,7 +68,7 @@ export default class DemandChange extends Vue {
     return this.solver.config;
   }
 
-  datapacks: string[] = [];
+  datapacks: string[] = ["","","","","","",""];
   data: Uint8Array[] = [];
 
   patterns: DemandPattern[] = [];
