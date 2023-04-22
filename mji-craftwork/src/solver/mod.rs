@@ -1,5 +1,7 @@
 mod bruce_force;
 
+use std::collections::BinaryHeap;
+
 use super::simulator::Batch;
 pub use bruce_force::BFSolver;
 
@@ -7,7 +9,41 @@ use crate::data::{CraftworkInfo, Recipe};
 
 pub trait Solver {
     /// 解最优
-    fn solve(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch>;
+    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch>;
+
+    /// 解最优后对结果排序
+    fn solve(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch> {
+        let ret = self.solve_unordered(limit, demands);
+        // 结果排序
+        let mut heap = BinaryHeap::new();
+        for mut item in ret {
+            item.set_cmp_value(limit.with_cost);
+            if heap.len() >= limit.max_result {
+                heap.pop();
+            }
+            heap.push(item)
+        }
+        heap.into_sorted_vec()
+    }
+
+    /// 解唯一最优
+    fn solve_best(&self, limit: &SolveLimit, demands: &[i8]) -> Batch {
+        let ret = self.solve_unordered(limit, demands);
+        let mut max_val = 0;
+        let mut max_batch = Batch::new();
+        for item in ret {
+            let val = match limit.with_cost {
+                true => item.value - item.cost,
+                false => item.value,
+            };
+            if max_val < val {
+                max_val = val;
+                max_batch = item;
+            }
+        }
+        max_batch
+    }
+
     fn update_info(&mut self, info: CraftworkInfo);
 }
 
@@ -32,7 +68,7 @@ impl<'a> SolveLimit<'a> {
             ban_list,
             max_result: 100,
             with_cost,
-            time
+            time,
         }
     }
 

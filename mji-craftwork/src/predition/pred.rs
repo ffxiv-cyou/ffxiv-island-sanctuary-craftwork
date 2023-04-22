@@ -19,6 +19,8 @@ const REAL_DEMAND_TABLE: [[i8; 7]; 12] = [
 ];
 
 /// 根据指定的pattern获取需求
+/// 
+/// day 从0开始
 pub fn get_demand(pattern: DemandPattern, day: u8, _offset: u8) -> i8 {
     if day >= 7 || pattern == DemandPattern::Unknown {
         return 9;

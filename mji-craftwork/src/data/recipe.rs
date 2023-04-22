@@ -48,11 +48,17 @@ impl Recipe {
 /// 配方状态
 #[derive(Debug)]
 pub struct RecipeState {
+    /// 配方ID
     id: u16,
+    /// 产品收益
     value: u16,
+    /// 原料成本
     cost: u16,
+    /// 工作时间
     time: u8,
+    /// 需求值
     demand: i8,
+    /// 欢迎度
     popularity: Popularity,
 }
 
@@ -67,6 +73,9 @@ impl RecipeState {
             popularity,
         }
     }
+    /// 配方系数
+    /// 
+    /// 系数 = 欢迎度系数 * 需求系数
     pub fn factor(&self, demand_sub: i16) -> f32 {
         (Demand::from_val(self.demand as i16 - demand_sub).factor() as u16
             * self.popularity.factor() as u16) as f32

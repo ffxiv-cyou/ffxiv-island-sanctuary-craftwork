@@ -63,6 +63,17 @@ fn predict() {
 }
 
 #[test]
+fn predict_best() {
+    let repo = new_repo(1);
+    let demands = vec![9; 62];
+    let solver = BFSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
+    let empty = vec![];
+    let limit = SolveLimit::new(10, &empty, 24, false);
+    let result = solver.solve_best(&limit, &demands);
+    println!("{:?}", result);
+}
+
+#[test]
 fn simulator() {
     let repo = new_repo(1);
     let demands = vec![9; 62];
