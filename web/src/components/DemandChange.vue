@@ -9,36 +9,75 @@
             <span class="hide-xs">本周 </span>{{ popPattern }} /
             <span class="hide-xs">下周 </span>{{ popPatternNext }}</span>
         </span>
-        <button class="mji-text-brown" @click="applyPredict(false)">更新趋势</button>
-        <button class="mji-text-brown" @click="applyPredict(true)">覆盖趋势</button>
+        <button
+          class="mji-text-brown"
+          @click="applyPredict(false)"
+        >更新趋势</button>
+        <button
+          class="mji-text-brown"
+          @click="applyPredict(true)"
+        >覆盖趋势</button>
       </span>
     </div>
     <div class="demand-packet mji-text-small mji-title">
       <span class="demand-packet-title mji-text-orange">抓包数据</span>
-      <input v-for="(i) in 7" :key="i" v-model="datapacks[i - 1]" type="text" :placeholder="'第' + i + '天'"
-        :required="datapacks[i] !== undefined && datapacks[i].length > 0" pattern="[0-9a-fA-F]+" class="mji-text-brown">
+      <input
+        v-for="(i) in 7"
+        :key="i"
+        v-model="datapacks[i - 1]"
+        type="text"
+        :placeholder="'第' + i + '天'"
+        :required="datapacks[i] !== undefined && datapacks[i].length > 0"
+        pattern="[0-9a-fA-F]+"
+        class="mji-text-brown"
+      >
     </div>
     <div class="demand-header mji-text-small mji-text-orange mji-title">
       <span class="demand-name">产品名</span>
       <span class="demand-pop">欢迎度</span>
-      <span v-for="(id) in 7" :key="id" class="demand-change">第{{ id }}天</span>
+      <span
+        v-for="(id) in 7"
+        :key="id"
+        class="demand-change"
+      >第{{ id }}天</span>
       <span class="demand-pat">预测趋势</span>
     </div>
     <div class="demand-items">
-      <div v-for="(item, index) in objects" :key="index" class="demand-item mji-text-brown">
+      <div
+        v-for="(item, index) in objects"
+        :key="index"
+        class="demand-item mji-text-brown"
+      >
         <span class="demand-name">
-          <icon class="item" :class="iconPath(item.Icon)" />
+          <icon
+            class="item"
+            :class="iconPath(item.Icon)"
+          />
           {{ trimName(item.Name) }}
         </span>
         <span class="demand-pop">
-          <icon class="mji" :class="popularityClass(item.Id)" />
+          <icon
+            class="mji"
+            :class="popularityClass(item.Id)"
+          />
         </span>
-        <span v-for="(day) in 7" :key="day" class="demand-change">
+        <span
+          v-for="(day) in 7"
+          :key="day"
+          class="demand-change"
+        >
           <span class="demand">
-            <icon v-for="(i) in demand(day, item.Id)" :key="i" class="mji mji-box" />
+            <icon
+              v-for="(i) in demand(day, item.Id)"
+              :key="i"
+              class="mji mji-box"
+            />
           </span>
           <span class="change">
-            <icon class="mji" :class="changeClass(day, item.Id)" />
+            <icon
+              class="mji"
+              :class="changeClass(day, item.Id)"
+            />
           </span>
         </span>
         <span class="demand-pat">
@@ -52,7 +91,6 @@
 import { CraftworkData, type CraftworkObject } from "@/data/data";
 import { Utils, PatternNames } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
-import type { DemandPattern } from "mji-craftwork";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 @Component({
   emits: ["on-apply"]
@@ -71,7 +109,7 @@ export default class DemandChange extends Vue {
   datapacks: string[] = ["","","","","","",""];
   data: Uint8Array[] = [];
 
-  patterns: DemandPattern[] = [];
+  patterns: number[] = [];
 
   get firstValidData() {
     for (let i = 0; i < this.data.length; i++) {
@@ -175,7 +213,7 @@ export default class DemandChange extends Vue {
     this.predict();
   }
 
-  predict() {
+  async predict() {
     let dataArray = [];
     for (let i = 0; i < this.data.length; i++) {
       if (this.data[i].length > 0) {
@@ -186,7 +224,7 @@ export default class DemandChange extends Vue {
     console.log(dataArray);
     if (dataArray.length == 0)
       return;
-    this.patterns = this.solver.predictFromPackets(dataArray);
+    this.patterns = await this.solver.predictFromPackets(dataArray);
   }
 
   mounted() {

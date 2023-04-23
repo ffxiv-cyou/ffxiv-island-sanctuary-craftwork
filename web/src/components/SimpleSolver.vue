@@ -107,7 +107,7 @@ export default class SimpleSolver extends Vue {
   async solve() {
     if (this.cachedDemands === undefined || this.cachedtension === undefined)
       return;
-    let batches = this.solver.solveDayDetail(this.cachedDemands, this.banList, this.cachedtension);
+    let batches = await this.solver.solveDayDetail(this.cachedDemands, this.banList, this.cachedtension);
     this.batches = batches.slice(0, 100);
 
     this.stepDemands = [];

@@ -129,13 +129,15 @@ export default class PlanView extends Vue {
   }
 
   get flatSteps() {
-    return [].concat(...this.steps);
+    let arr: number[] = [];
+    arr.concat(...this.steps);
+    return arr;
   }
   
   @Watch("steps", { deep: true })
   async recalculateValue() {
     await this.solver.init();
-    this.batchValues = this.solver.simulateWeek(this.steps);
+    this.batchValues = await this.solver.simulateWeek(this.steps);
   }
 
   mounted() {

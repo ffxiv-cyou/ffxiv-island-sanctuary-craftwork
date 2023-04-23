@@ -303,7 +303,9 @@ export default class DemandPattern extends Vue {
     return this.getBasicPriceNum(item).toFixed(1);
   }
 
-  cachedDemands: number[][] = [];
+  get cachedDemands() {
+    return this.solver.predictDemands;
+  }
   getDemand(id: number, day: number) {
     if (this.cachedDemands.length < day) {
       return 9;
@@ -322,15 +324,7 @@ export default class DemandPattern extends Vue {
   }
 
   @Watch("config.demandPatterns", { deep: true })
-  reloadDemand() {
-    for (let i = 0; i < 7; i++) {
-      let result = this.solver.demandsFromPredict(this.demandPattern, i);
-      if (this.cachedDemands.length <= i) {
-        this.cachedDemands.push(result);
-      } else {
-        this.cachedDemands[i] = result;
-      }
-    }
+  async onDemandChange() {
     this.config.save();
     this.solver.updatePredictDemands();
   }
@@ -356,8 +350,8 @@ export default class DemandPattern extends Vue {
   mounted() {
     this.parseShareCode();
     try {
-      this.solver.init().then(() => {
-        this.reloadDemand();
+      this.solver.init().then(async() => {
+        await this.solver.updatePredictDemands();
         // fix length
         while (this.config.demandPatterns.length < this.solver.data.Recipes.length)
           this.config.demandPatterns.push(0);

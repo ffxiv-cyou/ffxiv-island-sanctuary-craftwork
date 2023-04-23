@@ -22,8 +22,9 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 /// 初始化数据
 ///
 /// 传入数据格式如下：
-/// recipes: id theme1 theme2 level time value cost
-///
+/// - recipes: 配方，以 id theme1 theme2 level time value cost 格式排列
+/// - pop_pattern: 欢迎度模式，一维数组形式的二维数组
+/// - pop_pattern_row: 欢迎度模式单行长度
 #[wasm_bindgen]
 pub fn init_repo(recipes: Vec<u16>, pop_pattern: Vec<u8>, pop_pattern_row: usize) -> GameDataRepo {
     console_error_panic_hook::set_once();

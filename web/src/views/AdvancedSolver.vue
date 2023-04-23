@@ -133,7 +133,7 @@ export default class AdvancedSolver extends Vue {
   }
 
   async load() {
-    let batches = this.solver.solveDayDetail(this.demands, this.banArr, this.tension, this.maxTime);
+    let batches = await this.solver.solveDayDetail(this.demands, this.banArr, this.tension, this.maxTime);
     this.batches = batches.slice(0, 100);
   }
 

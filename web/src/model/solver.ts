@@ -1,19 +1,9 @@
 import { CraftworkData, Region } from "@/data/data";
-import init, {
-    init_repo,
-    set_pattern,
-    solve_singleday,
-    GameDataRepo,
-    CraftworkInfo,
-    simulate,
-    pattern_predict,
-    pattern_demand,
-    DemandPattern,
-} from "mji-craftwork";
 import { Config } from "./config";
+import { SolverBG, WorkerInfo } from "./solver_bg";
 
 export class SolverProxy {
-    repo!: GameDataRepo;
+    solver: SolverBG = new SolverBG();
 
     /**
      * 数据Repo
@@ -50,24 +40,20 @@ export class SolverProxy {
         this.data = new CraftworkData(Region.Global);
         this.config = Config.load(this.Recipes.length);
         this.data.SetRegion(this.config.region);
-
-        init().catch((e) => {
-            throw e;
-        });
     }
 
     async init() {
         if (this.inited)
             return;
 
-        await init();
-        this.loadData();
+        await this.solver.init();
+        await this.loadData();
     }
 
     /**
      * 载入数据
      */
-    loadData() {
+    async loadData() {
         const recipe = new Uint16Array(7 * this.Recipes.length);
         for (let i = 0; i < this.Recipes.length; i++) {
             const r = this.Recipes[i];
@@ -89,12 +75,12 @@ export class SolverProxy {
             }
         }
 
-        this.repo = init_repo(recipe, pops, cols);
+        await this.solver.init_repo(recipe, pops, cols);
         this.inited = true;
 
         // 更新缓存
-        this.updatePredictDemands();
-        set_pattern(this.repo, this.popPattern);
+        await this.updatePredictDemands();
+        await this.solver.set_pattern(this.popPattern);
     }
 
     /**
@@ -106,7 +92,7 @@ export class SolverProxy {
 
     set popPattern(val: number) {
         this.config.popPattern = val;
-        set_pattern(this.repo, val);
+        this.solver.set_pattern(val);
     }
 
     /**
@@ -125,9 +111,9 @@ export class SolverProxy {
     /**
      * 从配置中的demandPatterns更新缓存的需求
      */
-    updatePredictDemands() {
+    async updatePredictDemands() {
         for (let i = 0; i < 7; i++) {
-            const result = this.demandsFromPredict(this.config.demandPatterns, i);
+            const result = await this.demandsFromPredict(this.config.demandPatterns, i);
             if (this.predictDemands.length <= i) {
                 this.predictDemands.push(result);
             } else {
@@ -149,8 +135,8 @@ export class SolverProxy {
      * @param tension 干劲
      * @returns Info
      */
-    infoWithTension(tension: number): CraftworkInfo {
-        return new CraftworkInfo(tension, this.config.maxTension, this.config.craftLevel, this.config.workers);
+    infoWithTension(tension: number): WorkerInfo {
+        return new WorkerInfo(tension, this.config.maxTension, this.config.craftLevel, this.config.workers);
     }
 
     /**
@@ -160,8 +146,8 @@ export class SolverProxy {
      * @param tension 当前干劲
      * @returns 
      */
-    simulateDetail(steps: number[], demands: number[], tension: number) {
-        const arr = simulate(this.repo, this.infoWithTension(tension), new Uint8Array(steps), new Int8Array(demands));
+    async simulateDetail(steps: number[], demands: number[], tension: number) {
+        const arr = await this.solver.simulate(this.infoWithTension(tension), new Uint8Array(steps), new Int8Array(demands));
         return BatchValues.fromSteps(steps, arr);
     }
 
@@ -170,7 +156,7 @@ export class SolverProxy {
      * @param weekSteps 每一天的配方
      * @returns 
      */
-    simulateWeek(weekSteps: number[][]): BatchValues[] {
+    async simulateWeek(weekSteps: number[][]) {
         const batchValues = [];
 
         const demandChanges = []; // 各个配方的需求变动值
@@ -190,7 +176,7 @@ export class SolverProxy {
             for (let i = 0; i < daySteps.length; i++) {
                 stepArray[i] = daySteps[i];
             }
-            const arr = simulate(this.repo, this.infoWithTension(tensionAdd), stepArray, demands);
+            const arr = await this.solver.simulate(this.infoWithTension(tensionAdd), stepArray, demands);
             const values = BatchValues.fromSteps(daySteps, arr);
             batchValues.push(values);
 
@@ -217,13 +203,28 @@ export class SolverProxy {
      * @param tension 
      * @returns 
      */
-    solveDayDetail(demands: number[], banList: number[], tension: number, maxTime: number = 24) {
+    async solveDayDetail(demands: number[], banList: number[], tension: number, maxTime: number = 24) {
         const banArr = new Uint16Array(banList);
         const demandArr = new Int8Array(demands);
 
         const info = this.infoWithTension(tension);
-        const arr = solve_singleday(this.repo, info, this.config.level, banArr, demandArr, maxTime, this.config.withCost);
+        const arr = await this.solver.solve_day(info, this.config.level, banArr, demandArr, maxTime, this.config.withCost);
 
+        return BatchValues.fromSimulateArray(arr);
+    }
+
+    /**
+     * 使用指定的需求模式尝试求解本周最优
+     * @param banList 禁用列表
+     * @returns 
+     */
+    async solveWeek(banList: number[]): Promise<BatchValues[]> 
+    {
+        const info = this.infoWithTension(0);
+        const banArr = new Uint16Array(banList);
+        const patternArr = new Uint8Array(this.config.demandPatterns);
+
+        const arr = await this.solver.solve_week(info, this.config.level, banArr, 24, this.config.withCost, patternArr);
         return BatchValues.fromSimulateArray(arr);
     }
 
@@ -232,7 +233,7 @@ export class SolverProxy {
      * @param packets 数据包
      * @returns 变化模式
      */
-    predictFromPackets(packets: Uint8Array[]): DemandPattern[] {
+    async predictFromPackets(packets: Uint8Array[]) {
         const days = packets.length;
         const objs = packets[0].length - 2;
         const array = new Uint8Array(days * objs);
@@ -243,10 +244,10 @@ export class SolverProxy {
             }
         }
 
-        const result = pattern_predict(array, packets.length);
+        const result = await this.solver.pattern_predict(array, packets.length);
         const arr = [];
         for (let i = 0; i < result.length; i++) {
-            arr.push(result[i] as DemandPattern);
+            arr.push(result[i]);
         }
         return arr;
     }
@@ -257,12 +258,9 @@ export class SolverProxy {
      * @param day 日期
      * @returns 需求
      */
-    demandsFromPredict(pattern: DemandPattern[], day: number): number[] {
-        const array = new Uint8Array(pattern.length);
-        for (let i = 0; i < pattern.length; i++) {
-            array[i] = pattern[i];
-        }
-        const result = pattern_demand(array, day);
+    async demandsFromPredict(pattern: number[], day: number) {
+        const array = new Uint8Array(pattern);
+        const result = await this.solver.pattern_demand(array, day);
         const arr = [];
         for (let i = 0; i < result.length; i++) {
             arr.push(result[i]);

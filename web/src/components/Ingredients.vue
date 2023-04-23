@@ -35,15 +35,10 @@ export default class ingredients extends Vue {
     let stMap = new Map<number, number>();
     for (let i = 0; i < this.steps.length; i++) {
       let id = this.steps[i];
-      if (stMap.has(id)) {
-        stMap.set(id, stMap.get(id) + 1);
-      } else {
-        stMap.set(id, 1);
-      }
+      stMap.set(id, (stMap.get(id) ?? 0) + 1);
     }
 
-    let resMap = new Map<number, number>();
-    
+    let resMap = new Map<number, number>();    
     stMap.forEach((value, key) => {
       let recipe = this.solver.Recipes[key];
       recipe.Ingredients.forEach(ing => {
@@ -52,11 +47,7 @@ export default class ingredients extends Vue {
 
         let id = ing.Id;
         let cnt = ing.Count * value;
-        if (resMap.has(id)) {
-          resMap.set(id, resMap.get(id) + cnt);
-        } else {
-          resMap.set(id, cnt);
-        }
+        resMap.set(id, (resMap.get(id) ?? 0) + cnt);
       });
     });
     

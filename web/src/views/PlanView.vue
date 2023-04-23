@@ -41,13 +41,22 @@
         @add-steps="addStep(key, $event)"
         @del-steps="delStep(key, $event)"
       />
-      <button
-        class="pure-button add-plan-button"
-        style="width: 100%"
-        @click="createPlan"
-      >
-        新建排班表
-      </button>
+      <div class="control-buttons">
+        <button
+          class="pure-button"
+          style="width: 70%"
+          @click="createPlan"
+        >
+          新建排班表
+        </button>
+        <button
+          class="pure-button"
+          style="width: 29%"
+          @click="createPlanFromSolve"
+        >
+          手气不错
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -244,13 +253,27 @@ export default class PlanView extends Vue {
     }
   }
 
+  /**
+   * 新建一个排班表
+   */
+  async createPlanFromSolve() {
+    let batches = await this.solver.solveWeek([]);
+    let arr = [];
+    arr.push([]);
+    for (let i = 0; i < batches.length; i++) {
+      arr.push(batches[i].steps);
+    }
+    this.plans.push(arr);
+    this.onStepChange();
+  }
+
   mounted() {
     this.load();
     this.onShareCodeChange();
   }
 }
 </script>
-<style>
+<style lang="scss">
 .plan-view {
   max-width: 1200px;
 }
@@ -261,7 +284,10 @@ export default class PlanView extends Vue {
   margin: 30px auto;
 }
 
-.add-plan-button {
+.control-buttons {
   margin-top: 10px;
+  .pure-button + .pure-button {
+    margin-left: 5px;
+  }
 }
 </style>
