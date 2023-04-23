@@ -49,6 +49,12 @@
         </button>
       </batch-view>
     </div>
+    <div
+      v-if="loading"
+      class="loading"
+    >
+      <Loading />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -57,10 +63,12 @@ import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import BatchView from "@/components/BatchView.vue";
 import Close from "@/components/Close.vue";
 import { CraftworkData } from "@/data/data";
+import Loading from "./Loading.vue";
 @Component({
   components: {
     BatchView: BatchView,
-    Close: Close
+    Close: Close,
+    Loading: Loading,
   },
   emits: [ "apply" ]
 })
@@ -74,6 +82,8 @@ export default class SimpleSolver extends Vue {
   banList: number[] = [];
 
   batches: BatchValues[] = [];
+
+  loading = true;
 
   removeBan(index: number) {
     this.banList.splice(index, 1);
@@ -107,11 +117,16 @@ export default class SimpleSolver extends Vue {
   async solve() {
     if (this.cachedDemands === undefined || this.cachedtension === undefined)
       return;
-    let batches = await this.solver.solveDayDetail(this.cachedDemands, this.banList, this.cachedtension);
-    this.batches = batches.slice(0, 100);
 
+    this.loading = true;
     this.stepDemands = [];
     this.stepPops = [];
+    this.batches = [];
+
+    let batches = await this.solver.solveDayDetail(this.cachedDemands, this.banList, this.cachedtension);
+    
+    this.loading = false;
+    this.batches = batches.slice(0, 100);
 
     for (let b = 0; b < this.batches.length; b++) {
       let steps = this.batches[b].steps;
@@ -194,6 +209,12 @@ export default class SimpleSolver extends Vue {
   --scale: 0.65 !important;
 }
 .batches {
-  overflow-y: scroll;
+  overflow-y: auto;
+}
+.loading {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
