@@ -1,11 +1,13 @@
 pub mod data;
+pub mod gsolver;
 pub mod predition;
 pub mod simulator;
 pub mod solver;
 pub mod utils;
 
 use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
-use predition::{get_demands, predict_all};
+use gsolver::{MildSolver, GSolver};
+use predition::{get_demands, predict_all, DemandPattern};
 use solver::{BFSolver, SolveLimit, Solver};
 use wasm_bindgen::prelude::*;
 
@@ -55,7 +57,10 @@ pub fn set_pattern(repo: &mut GameDataRepo, pattern: usize) {
 
 /// 模拟排班表
 ///
-/// 传入排班序列后，传出的是各阶段的收入
+/// 传入排班序列后，传出的是各阶段的收入。
+///
+/// 传出的数据结构如下：
+/// cost value[6]
 #[wasm_bindgen]
 pub fn simulate(
     repo: &GameDataRepo,
@@ -154,4 +159,45 @@ pub fn pattern_demand(array: &[u8], day: u8) -> Vec<i8> {
         result.push(i.into());
     }
     result
+}
+
+/// 尝试自动解整周的数据
+///
+/// 传入的是需求趋势模式数组
+#[wasm_bindgen]
+pub fn solve_week(
+    repo: &GameDataRepo,
+    state: &CraftworkInfo,
+    level: u8,
+    ban_list: Vec<u16>,
+    time: u16,
+    with_cost: bool,
+    pattern: &[u8],
+) -> Vec<u16> {
+    let limit = SolveLimit::new(level, &ban_list, time, with_cost);
+    let solver = MildSolver::new(repo, state.clone());
+    
+    let vec = DemandPattern::from_u8(pattern);
+    let batches = solver.solve(&limit, &vec);
+
+    let mut ret = vec![];
+    for b in batches {
+        match b {
+            None => {
+                ret.push(0); // val
+                ret.push(0); // cost
+                ret.push(0); // seq
+                ret.extend_from_slice(&[0,0,0,0,0,0]); // steps
+                ret.extend_from_slice(&[0,0,0,0,0,0]); // values
+            },
+            Some(batch) => {
+                ret.push(batch.get_val());
+                ret.push(batch.get_cost());
+                ret.push(batch.seq as u16);
+                ret.extend_from_slice(batch.get_steps());
+                ret.extend_from_slice(batch.get_values());
+            },
+        }
+    }
+    ret
 }

@@ -1,9 +1,11 @@
 mod bruce_force;
+mod simplify;
 
 use std::collections::BinaryHeap;
 
 use super::simulator::Batch;
 pub use bruce_force::BFSolver;
+pub use simplify::SimplifySolver;
 
 use crate::data::{CraftworkInfo, Recipe};
 

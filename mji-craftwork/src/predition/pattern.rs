@@ -59,3 +59,13 @@ impl From<DemandPattern> for u8 {
         }
     }
 }
+
+impl DemandPattern {
+    pub fn from_u8(data: &[u8]) -> Vec<DemandPattern> {
+        let mut result = vec![];
+        for d in data {
+            result.push(DemandPattern::from(*d))
+        }
+        result
+    }
+}

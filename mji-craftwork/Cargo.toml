@@ -33,11 +33,15 @@ wee_alloc = { version = "0.4.5", optional = true }
 wasm-bindgen-test = "0.3.13"
 pprof = { version = "0.11", features = ["flamegraph"] }
 criterion = "0.3"
+rand = "0.8"
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
 lto = true
+
+[profile.test]
+opt-level = 3
 
 [[bench]]
 name = "my_benchmark"
