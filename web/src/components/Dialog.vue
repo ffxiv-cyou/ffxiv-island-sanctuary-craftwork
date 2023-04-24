@@ -5,6 +5,7 @@
       @click="close"
     />
     <close
+      v-if="!noClose"
       class="dialog-close"
       @close="close"
     />
@@ -14,7 +15,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-facing-decorator";
+import { Component, Prop, Vue } from "vue-facing-decorator";
 import Close from "@/components/Close.vue";
 @Component({
   components: {
@@ -26,6 +27,9 @@ export default class Dialog extends Vue {
   close() {
     this.$emit("close");
   }
+
+  @Prop()
+  noClose?: boolean;
 }
 </script>
 <style>

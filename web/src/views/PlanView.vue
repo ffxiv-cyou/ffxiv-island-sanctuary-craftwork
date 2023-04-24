@@ -12,6 +12,12 @@
         @apply="apply"
       />
     </popup>
+    <popup
+      v-show="isLoading"
+      :no-close="true"
+    >
+      <Loading />
+    </popup>
     <div v-if="shareCode">
       <div>
         <div>排班表可能由于需求和欢迎度设置的不同造成计算结果差异，若有需要请检查需求和欢迎度设置。</div>
@@ -68,12 +74,14 @@ import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Plan from "../components/Plan.vue"
 import Dialog from "@/components/Dialog.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 @Component({
   components: {
     Plan: Plan,
     SimpleSolver: SimpleSolver,
     Close: Close,
-    Popup: Dialog
+    Popup: Dialog,
+    Loading: LoadingSpinner,
   }
 })
 export default class PlanView extends Vue {
@@ -108,6 +116,11 @@ export default class PlanView extends Vue {
    * 求解器窗口状态
    */
   solverDialog = false;
+
+  /**
+   * 求解整周的状态
+   */
+  isLoading = false;
 
   /**
    * 为排班添加某天的内容
@@ -257,6 +270,7 @@ export default class PlanView extends Vue {
    * 新建一个排班表
    */
   async createPlanFromSolve() {
+    this.isLoading = true;
     let batches = await this.solver.solveWeek([]);
     let arr = [];
     arr.push([]);
@@ -265,6 +279,8 @@ export default class PlanView extends Vue {
     }
     this.plans.push(arr);
     this.onStepChange();
+
+    this.isLoading = false;
   }
 
   mounted() {
@@ -282,6 +298,13 @@ export default class PlanView extends Vue {
   max-width: 1200px;
   height: calc(100vh - 120px);
   margin: 30px auto;
+}
+
+.dialog-content>.lds-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .control-buttons {
