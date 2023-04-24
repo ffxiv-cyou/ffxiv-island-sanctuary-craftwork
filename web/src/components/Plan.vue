@@ -130,7 +130,9 @@ export default class PlanView extends Vue {
 
   get flatSteps() {
     let arr: number[] = [];
-    arr.concat(...this.steps);
+    for (let i = 0; i < this.steps.length; i++) {
+      arr.push(...this.steps[i]);
+    }
     return arr;
   }
   
