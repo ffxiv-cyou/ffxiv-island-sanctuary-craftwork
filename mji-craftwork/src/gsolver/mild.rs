@@ -28,7 +28,8 @@ where
         let mut max = [None; 6];
         let mut max_val = 0;
         let mut demand = vec![0; pat.len()];
-        self.dfs(limit, pat, &mut demand, &mut current, 0, &mut max, &mut max_val);
+        let mut seq = [0; 6];
+        self.dfs(limit, pat, &mut demand, &mut current, 0, &mut seq, &mut max, &mut max_val);
         
         max
     }
@@ -49,6 +50,7 @@ where
         demand_sub: &mut [i8],
         current: &mut [Option<Batch>; 6],
         depth: u8,
+        seq: &mut [u8],
         max: &mut [Option<Batch>; 6],
         max_val: &mut u16,
     ) {
@@ -67,6 +69,18 @@ where
                     }
                 }
             }
+            
+            // 计算当前干劲可能为后续带来的收益增加量
+            let mut tension_delta = [0; 6];
+            if tension < self.info.max_tension {
+                for j in 0..tension_delta.len() {
+                    let tension = tension + (1 + j as u8) * self.info.workers;
+                    let tension = tension.min(self.info.max_tension);
+
+                    let (_, value, _) = self.calc_value(pat, current, i + 1, tension);
+                    tension_delta[j] = value;
+                }
+            }
 
             // 计算需求值
             let mut info = self.info;
@@ -79,16 +93,18 @@ where
             }
 
             // 计算最佳
-            let batch = solver.solve_best(limit, &demand);
+            let batch = solver.solve_best_fn(limit, &demand, |v, b| {
+                return v + tension_delta[b.seq - 1];
+            });
             current[i] = Some(batch);
 
             // if depth == 1 {
             //     println!("{} {} {:?}", depth, max_val, max);
             // }
-
+            seq[depth as usize] = i as u8 + 2;
             if depth >= 4 {
                 // 当前所有都求解完毕了
-                let (real_batch, val, cost) = self.calc_value(pat, current);
+                let (real_batch, val, cost) = self.calc_value(pat, current, 0, 0);
                 let val_cmp = match limit.with_cost {
                     true => val - cost,
                     false => val,
@@ -97,6 +113,7 @@ where
                 if val_cmp > *max_val {
                     *max_val = val_cmp;
                     *max = real_batch;
+                    // println!("{}: {:?}", val_cmp, seq);
                 }
             } else {
                 // 计算需求变动值
@@ -111,7 +128,7 @@ where
                     } * self.info.workers as i8;
                 }
 
-                self.dfs(limit, pat, demand_sub, current, depth + 1, max, max_val);
+                self.dfs(limit, pat, demand_sub, current, depth + 1, seq, max, max_val);
             
                 // 还原需求变动值
                 for i in 0..batch.steps.len() {
@@ -125,6 +142,7 @@ where
                     } * self.info.workers as i8;
                 }
             }
+            seq[depth as usize] = 0;
             current[i] = None;
         }
     }
@@ -134,10 +152,13 @@ where
         &self,
         pat: &[crate::predition::DemandPattern],
         current: &[Option<Batch>; 6],
+        begin: usize,
+        tension: u8,
     ) -> ([Option<Batch>; 6], u16, u16) {
         let mut result = [None; 6];
 
         let mut info = self.info.clone();
+        info.tension = tension;
         let (mut val, mut cost) = (0, 0);
 
         let mut demand_sub = vec![];
@@ -148,7 +169,7 @@ where
             demand_sub.push(0);
         }
 
-        for i in 0..6 {
+        for i in begin..6 {
             match &current[i] {
                 None => result[i] = None,
                 Some(batch) => {

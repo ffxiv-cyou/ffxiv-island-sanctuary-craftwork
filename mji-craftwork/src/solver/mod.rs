@@ -46,6 +46,24 @@ pub trait Solver {
         max_batch
     }
 
+    fn solve_best_fn(&self, limit: &SolveLimit, demands: &[i8], sort_val: impl Fn(u16,&Batch)->u16) ->Batch {
+        let ret = self.solve_unordered(limit, demands);
+        let mut max_val = 0;
+        let mut max_batch = Batch::new();
+        for item in ret {
+            let val = match limit.with_cost {
+                true => item.value - item.cost,
+                false => item.value,
+            };
+            let val = sort_val(val, &item);
+            if max_val < val {
+                max_val = val;
+                max_batch = item;
+            }
+        }
+        max_batch
+    }
+
     fn update_info(&mut self, info: CraftworkInfo);
 }
 
