@@ -140,11 +140,11 @@ export class SolverBG {
     });
   }
 
-  public pattern_predict(array: Uint8Array, days: number) {
+  public pattern_predict(array: Uint8Array, demands: number) {
     return this.postMsg<Uint8Array>({
       type: "pattern_predict",
       array: array,
-      days: days,
+      demands: demands,
     });
   }
 
