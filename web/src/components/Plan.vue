@@ -65,7 +65,7 @@
       </div>
       <ingrid-comp
         v-if="!solver.config.hideIngredients"
-        class="plan-ingredients mji-info-box"
+        class="plan-ingredients mji-info-box hide-xs"
         :solver="solver"
         :steps="flatSteps"
         :workers="workers"

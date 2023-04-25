@@ -57,7 +57,7 @@
         </button>
         <button
           class="pure-button"
-          style="width: 29%"
+          style="width: calc(30% - 5px)"
           @click="createPlanFromSolve"
         >
           手气不错

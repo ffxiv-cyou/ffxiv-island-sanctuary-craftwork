@@ -25,6 +25,21 @@
     class="body"
     :step-style="style"
   />
+  <div
+    v-else
+    class="body-loading"
+  >
+    <Loading />
+    
+    <div v-if="errMessage">
+      <p>求解器加载失败</p>
+      <p>{{ errMessage }}</p>
+    </div>
+    <div v-else>
+      <p>正在加载求解器</p>
+      <p>若长时间加载不成功请刷新页面</p>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -33,15 +48,25 @@ import { SolverProxy } from "./model/solver";
 import "purecss";
 import "@/assets/icons.css";
 import "@/assets/mji.css";
+import LoadingSpinner from "./components/LoadingSpinner.vue";
 
-@Component
+@Component({
+  components: {
+    Loading: LoadingSpinner
+  }
+})
 export default class App extends Vue {
   solver: SolverProxy = new SolverProxy();
 
   inited = false;
-  async mounted() {
-    await this.solver.init();
-    this.inited = true;
+  errMessage = "";
+
+  mounted() {
+    this.solver.init().then(() => {
+      this.inited = true;
+    }).catch((err: ErrorEvent) => {
+      this.errMessage = err.message;
+    });
   }
 
   get style() {
@@ -62,6 +87,18 @@ icon.blue-coin {
 .body {
   margin: auto;
   padding: 40px 20px 20px 20px;
+}
+
+.body-loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  
+  .lds-spinner div::after {
+    background: black;
+  }
 }
 
 header {
