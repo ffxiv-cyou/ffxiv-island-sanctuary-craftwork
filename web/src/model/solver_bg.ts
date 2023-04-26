@@ -67,7 +67,7 @@ export class SolverBG {
   errorHandler(ev: ErrorEvent) {
     if (this.msgQueue.length > 0) {
       const a = this.msgQueue[0];
-      a.reject(ev.error)
+      a.reject(ev)
       this.msgQueue.shift();
     }
   }
