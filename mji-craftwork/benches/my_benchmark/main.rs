@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo, Popularity, Recipe},
-    solver::{BFSolver, SolveLimit, Solver, SimplifySolver}, gsolver::{MildSolver, GSolver}, predition::DemandPattern,
+    solver::{BFSolver, SolveLimit, Solver, SimplifySolver}, gsolver::{MildSolver, GSolver, RadicalSolver}, predition::DemandPattern,
 };
 mod test_data;
 use test_data::{CRAFT_OBJECTS, POPULARITY_LIST};
@@ -73,9 +73,12 @@ fn gsolver_benchmark(c: &mut Criterion) {
     let mut repo = load_data::<51>();
     repo.set_popular_pattern(19);
 
-    let solver = MildSolver::new(&repo, CraftworkInfo::new(0, 35, 1, 1));
+    let info = CraftworkInfo::new(0, 35, 2, 3);
+    let mild_solver = MildSolver::new(&repo, info);
+    let radical_solver = RadicalSolver::new(&repo, info);
     let ban = vec![];
-    let limit = SolveLimit::new(10, &ban, 24, false);
+    let mut limit = SolveLimit::new(10, &ban, 24, false);
+    limit.max_result = 200;
 
     let data = vec![
         0, 11, 12, 3, 3, 4, 1, 11, 12, 5, 2, 4, 7, 7, 12, 2, 1, 9, 1, 6, 2, 6, 11, 6, 8, 4, 9, 4,
@@ -85,8 +88,11 @@ fn gsolver_benchmark(c: &mut Criterion) {
     let pat = DemandPattern::from_u8(&data);
 
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> = c.benchmark_group("gpred");
-    group.bench_function(BenchmarkId::new("MildSolver", 1), |b| {
-        b.iter(|| solver.solve(black_box(&limit), black_box(&pat)))
+    group.bench_function(BenchmarkId::new("Mild_GSolver", 1), |b| {
+        b.iter(|| mild_solver.solve(black_box(&limit), black_box(&pat)))
+    });
+    group.bench_function(BenchmarkId::new("Radical_GSolver", 1), |b| {
+        b.iter(|| radical_solver.solve(black_box(&limit), black_box(&pat)))
     });
     group.finish()
 }
