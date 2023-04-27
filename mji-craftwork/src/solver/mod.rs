@@ -20,10 +20,10 @@ pub trait Solver {
         let mut heap = BinaryHeap::new();
         for mut item in ret {
             item.set_cmp_value(limit.with_cost);
+            heap.push(item);
             if heap.len() >= limit.max_result {
                 heap.pop();
             }
-            heap.push(item)
         }
         heap.into_sorted_vec()
     }
