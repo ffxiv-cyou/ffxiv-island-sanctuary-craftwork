@@ -5,6 +5,9 @@ use crate::{
 
 use super::{Batch, SolveLimit, Solver};
 
+/// Bruce Force 暴力搜索
+/// 
+/// 此方法通过对解空间做暴力遍历，得到所有情况的收益值。故其解一定正确。
 pub struct BFSolver<'a, T>
 where
     T: IDataRepo,

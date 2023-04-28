@@ -7,6 +7,12 @@ use crate::{
 
 use super::GSolver;
 
+/// Radical 全局求解器
+/// 
+/// 首先在不考虑需求变动的情况下，选出每天每小时收益最高的N样物品。同时对当天求解，选出M*N个带有前面物品的可能解。
+/// 对这些可能解做排列组合，最终得到最高的可能解。
+/// 
+/// 此方法较为激进，部分情况下可能不会得到较好的结果。
 pub struct RadicalSolver<'a, T>
 where
     T: IDataRepo,

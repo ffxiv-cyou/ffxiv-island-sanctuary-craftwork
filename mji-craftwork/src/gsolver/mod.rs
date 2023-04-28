@@ -6,7 +6,7 @@ mod radical;
 pub use radical::RadicalSolver;
 
 
-/// Global Solver 解全局最优
+/// Global Solver 整周排班求解器
 pub trait GSolver {
     fn solve(&self, limit: &SolveLimit, pat: &[DemandPattern]) -> [Option<Batch>; 6];
 }

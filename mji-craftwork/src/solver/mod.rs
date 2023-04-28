@@ -9,6 +9,7 @@ pub use simplify::SimplifySolver;
 
 use crate::data::{CraftworkInfo, Recipe};
 
+/// 每天排班求解器
 pub trait Solver {
     /// 解最优
     fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch>;
@@ -46,6 +47,7 @@ pub trait Solver {
         max_batch
     }
 
+    /// 使用指定函数解唯一最优
     fn solve_best_fn(&self, limit: &SolveLimit, demands: &[i8], sort_val: impl Fn(u16,&Batch)->u16) ->Batch {
         let ret = self.solve_unordered(limit, demands);
         let mut max_val = 0;
