@@ -1,5 +1,12 @@
 <template>
-  <div class="demands mji-wooden-plate">
+  <DemandList
+    :solver="solver"
+    :pop-pattern="popPattern"
+    :demand-pats="patterns"
+    :demands="demands"
+    :changes="changes"
+    demand-pat-name="预测趋势"
+  >
     <div class="mji-text-brown mji-title">
       <span>需求变动与趋势预测</span>
       <span class="demand-control">
@@ -32,68 +39,19 @@
         class="mji-text-brown"
       >
     </div>
-    <div class="demand-header mji-text-small mji-text-orange mji-title">
-      <span class="demand-name">产品名</span>
-      <span class="demand-pop">欢迎度</span>
-      <span
-        v-for="(id) in 7"
-        :key="id"
-        class="demand-change"
-      >第{{ id }}天</span>
-      <span class="demand-pat">预测趋势</span>
-    </div>
-    <div class="demand-items">
-      <div
-        v-for="(item, index) in objects"
-        :key="index"
-        class="demand-item mji-text-brown"
-      >
-        <span class="demand-name">
-          <icon
-            class="item"
-            :class="iconPath(item.Icon)"
-          />
-          {{ trimName(item.Name) }}
-        </span>
-        <span class="demand-pop">
-          <icon
-            class="mji"
-            :class="popularityClass(item.Id)"
-          />
-        </span>
-        <span
-          v-for="(day) in 7"
-          :key="day"
-          class="demand-change"
-        >
-          <span class="demand">
-            <icon
-              v-for="(i) in demand(day, item.Id)"
-              :key="i"
-              class="mji mji-box"
-            />
-          </span>
-          <span class="change">
-            <icon
-              class="mji"
-              :class="changeClass(day, item.Id)"
-            />
-          </span>
-        </span>
-        <span class="demand-pat">
-          {{ pattern(item.Id) }}
-        </span>
-      </div>
-    </div>
-  </div>
+  </DemandList>
 </template>
 <script lang="ts">
-import { CraftworkData, type CraftworkObject } from "@/data/data";
-import { Utils, PatternNames } from "@/model/data";
+import { Utils } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
+import DemandList from "./DemandList.vue";
+
 @Component({
-  emits: ["on-apply"]
+  emits: ["on-apply"],
+  components: {
+    DemandList: DemandList
+  }
 })
 export default class DemandChange extends Vue {
   @Prop()
@@ -110,6 +68,8 @@ export default class DemandChange extends Vue {
   data: Uint8Array[] = [];
 
   patterns: number[] = [];
+  demands: number[][] = [];
+  changes: number[][] = [];
 
   get firstValidData() {
     for (let i = 0; i < this.data.length; i++) {
@@ -131,53 +91,6 @@ export default class DemandChange extends Vue {
     return d[1] + 1;
   }
 
-  get objects(): CraftworkObject[] {
-    return this.solver.Recipes.filter((v) => v.Name);
-  }
-
-  demand(day: number, id: number) {
-    var d = this.data[day - 1];
-    if (!d || d.length == 0)
-      return 2;
-    return (d[id + 2] >> 4) & 0x0f;
-  }
-
-  change(day: number, id: number) {
-    var d = this.data[day - 1];
-    if (!d || d.length == 0)
-      return 2;
-    return (d[id + 2] >> 0) & 0x0f;
-  }
-
-  pattern(id: number) {
-    var v = this.patterns[id] ?? 0;
-    return PatternNames[v as number];
-  }
-
-  changeClass(day: number, id: number) {
-    switch (this.change(day, id)) {
-      case 0: return "mji-change-2-up";
-      case 1: return "mji-change-1-up";
-      case 2: return "mji-change-0";
-      case 3: return "mji-change-1-down";
-      case 4: return "mji-change-2-down";
-      default: return "mji-change-0";
-    }
-  }
-
-  iconPath(id: number) {
-    return "item-" + id;
-  }
-
-  popularityClass(id: number): string {
-    if (this.popPattern >= this.solver.Popularity.length || this.popPattern === 0)
-      return "mji-popular-3";
-    return "mji-popular-" + this.solver.Popularity[this.popPattern][id].toString()
-  }
-
-  trimName(name: string) {
-    return CraftworkData.TrimName(name);
-  }
 
   @Watch("inputData")
   fromInputData() {
@@ -210,6 +123,21 @@ export default class DemandChange extends Vue {
     for (let i = 0; i < this.datapacks.length; i++) {
       this.data.push(Utils.Hex2U8Array(this.datapacks[i]));
     }
+
+    this.demands.length = 0;
+    this.changes.length = 0;
+    for (let i = 0; i < this.data.length; i++) {
+      const element = this.data[i];
+      let demandArr = [];
+      let changeArr = [];
+      for (let j = 2; j < element.length; j++) {
+        demandArr.push((element[j] >> 4) & 0x0f)
+        changeArr.push((element[j] >> 0) & 0x0f)
+      }
+      this.demands.push(demandArr);
+      this.changes.push(changeArr);
+    }
+
     this.predict();
   }
 
@@ -263,18 +191,14 @@ export default class DemandChange extends Vue {
 }
 </script>
 <style lang="scss">
-.demands {
-  display: flex;
-  flex-direction: column;
-}
-
-.demand-items {
-  overflow-y: scroll;
-  height: 100%;
-}
-
 .demand-packet {
+  display: flex;
   gap: 0.5em;
+
+  * {
+    white-space: nowrap;
+    overflow: hidden;
+  }
 
   .demand-packet-title {
     flex: 4.5em 0 0;
@@ -302,75 +226,6 @@ export default class DemandChange extends Vue {
 
   &>*+* {
     margin-left: 3px;
-  }
-}
-
-.demand-item,
-.demand-header,
-.demand-packet {
-  display: flex;
-
-  * {
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .demand-name {
-    flex: 150px;
-  }
-
-  .demand-pop,
-  .demand-pat {
-    flex: 70px;
-    text-align: center;
-  }
-
-  .demand-change {
-    flex: 90px;
-    text-align: center;
-  }
-}
-
-.demand-item {
-  height: 1.875em;
-  line-height: 1.875em;
-  user-select: none;
-
-  icon.item {
-    width: 1.75em;
-    height: 1.75em;
-    background-size: 1.75em 1.75em;
-    vertical-align: middle;
-  }
-}
-
-.mji-box+.mji-box {
-  margin-left: -20px !important;
-}
-
-.demand-item icon.mji {
-  transform: scale(.6);
-  margin: -4px -8px 0 -8px;
-}
-
-.demand-item:nth-child(odd) {
-  background: #ffffff33;
-}
-
-.demand-change {
-
-  .demand,
-  .change {
-    display: inline-block;
-  }
-
-  .demand {
-    width: 75%;
-    text-align: right;
-  }
-
-  .change {
-    text-align: left;
   }
 }
 </style>

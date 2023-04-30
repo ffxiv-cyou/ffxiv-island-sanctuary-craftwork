@@ -1,13 +1,16 @@
 <template>
   <div class="plan mji-wooden-plate">
-    <slot></slot>
+    <slot />
     <div class="plan-info mji-info-box">
       <span class="total-value">
         收益: <icon class="blue-coin" />{{ sumVal * factor }} 
         (<icon class="blue-coin" />{{ -sumCost * factor }})
         <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal * factor }}</span>
       </span>
-      <span class="share-link" v-if="!hideShare"><a
+      <span
+        v-if="!hideShare"
+        class="share-link"
+      ><a
         :href="shareLink"
         target="_blank"
       >分享</a><span class="hide-lg">: </span><span class="hide-lg share-link-url">{{ shareLink }}</span></span>
@@ -35,21 +38,23 @@
               class="value"
             ><icon class="blue-coin" />{{ val.value * factor }}</span>
           </div>
-          <button
-            v-if="steps[index].length == 0"
-            class="sched sched-green"
-            :disabled="isMax"
-            @click="add(index)"
-          >
-            +
-          </button>
-          <button
-            v-else
-            class="sched sched-red"
-            @click="del(index)"
-          >
-            -
-          </button>
+          <div v-if="!hideBtn">
+            <button
+              v-if="steps[index].length == 0"
+              class="sched sched-green"
+              :disabled="isMax"
+              @click="add(index)"
+            >
+              +
+            </button>
+            <button
+              v-else
+              class="sched sched-red"
+              @click="del(index)"
+            >
+              -
+            </button>
+          </div>
           <div
             v-if="steps[index].length == 0"
             class="plan-rest"
@@ -101,6 +106,9 @@ export default class PlanView extends Vue {
 
   @Prop()
   hideShare?: boolean;
+
+  @Prop()
+  hideBtn?: boolean;
 
   get workers() {
     return this.solver.config.workers;

@@ -1,5 +1,16 @@
 <template>
   <div>
+    <popup
+      v-if="inputShareCode"
+      :no-close="true"
+    >
+      <DemandShare
+        class="demand-share"
+        :solver="solver"
+        :share-code="inputShareCode"
+        @on-apply="onShareApply"
+      />
+    </popup>
     <div class="control-form pure-form">
       <fieldset class="pure-g">
         <label for="pop-pattern">欢迎度模式</label>
@@ -11,26 +22,17 @@
           max="100"
         >
         <label
-          v-if="!shareMode"
           for="share-link"
         >
           分享链接
         </label>
         <input
-          v-if="!shareMode"
           id="share-link"
           v-model="shareLink"
           onclick="this.select();"
           type="text"
           placeholder="用于分享的趋势代码"
         >
-        <button
-          v-if="shareMode"
-          class="pure-button"
-          @click="applyShare"
-        >
-          导入当前设置
-        </button>
         <button
           class="sched sched-delete"
           @click="reset"
@@ -119,7 +121,7 @@
             :key="i"
             class="mji mji-box"
           />
-          <span>({{ getDemand(item.Id, day) }})</span>
+          <span>[{{ getDemand(item.Id, day) }}]</span>
         </span>
       </div>
     </div>
@@ -130,15 +132,19 @@ import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import { DemandUtils, PatternNames } from "@/model/data";
 import { CraftworkData, CraftworkObject } from "@/data/data";
-import { FromShareCode, ToShareCode } from "@/model/share";
+import { ToShareCode } from "@/model/share";
 import SortLabel from "./SortLabel.vue";
+import Dialog from "./Dialog.vue";
+import DemandShare from "./DemandShare.vue";
 
 @Component({
   emits: [
     "view-predict"
   ],
   components: {
-    SortLabel: SortLabel
+    SortLabel: SortLabel,
+    Popup: Dialog,
+    DemandShare: DemandShare,
   }
 })
 export default class DemandPattern extends Vue {
@@ -151,15 +157,6 @@ export default class DemandPattern extends Vue {
   @Prop()
   inputShareCode?: string;
 
-  /**
-   * 分享代码得到的趋势
-   */
-  inputPatterns: number[] = [];
-  /**
-   * 分享代码得到的流行趋势
-   */
-  inputPopPattern: number = 0;
-
   get config() {
     return this.solver.config;
   }
@@ -169,26 +166,16 @@ export default class DemandPattern extends Vue {
   }
 
   get demandPattern() {
-    if (this.inputShareCode) {
-      return this.inputPatterns;
-    }
     return this.config.demandPatterns;
   }
 
   get popPattern() {
-    if (this.inputShareCode) {
-      return this.inputPopPattern;
-    }
     return this.solver.popPattern;
   }
 
   set popPattern(val: number) {
     if (val <= 0) return;
-    if (this.inputShareCode) {
-      this.inputPopPattern = val;
-    } else {
-      this.solver.popPattern = val;
-    }
+    this.solver.popPattern = val;
   }
 
   get shareLink() {
@@ -208,22 +195,6 @@ export default class DemandPattern extends Vue {
     console.log(result);
     if (result && result.length > 0) {
       this.$router.push("/pat/" + result[1])
-    }
-  }
-
-  get shareMode() {
-    return this.inputShareCode !== undefined;
-  }
-
-  @Watch("inputShareCode")
-  parseShareCode() {
-    if (!this.inputShareCode)
-      return;
-    let binary = FromShareCode(this.inputShareCode);
-    this.inputPopPattern = binary[0];
-    for (let i = 1; i < binary.length; i++) {
-      this.inputPatterns[(i - 1) * 2] = binary[i] & 0x0F;
-      this.inputPatterns[(i - 1) * 2 + 1] = (binary[i] & 0xF0) >> 4;
     }
   }
 
@@ -329,13 +300,7 @@ export default class DemandPattern extends Vue {
     this.solver.updatePredictDemands();
   }
 
-  applyShare() {
-    for (let i = 0; i < this.inputPatterns.length; i++) {
-      this.config.demandPatterns[i] = this.inputPatterns[i];
-    }
-    this.solver.popPattern = this.inputPopPattern;
-    this.config.save();
-    this.solver.updatePredictDemands();
+  onShareApply() {
     this.$router.push('/pred');
   }
 
@@ -348,7 +313,6 @@ export default class DemandPattern extends Vue {
   }
 
   mounted() {
-    this.parseShareCode();
     try {
       this.solver.init().then(async() => {
         await this.solver.updatePredictDemands();
@@ -362,6 +326,11 @@ export default class DemandPattern extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+.demand-share {
+  width: 1000px;
+  height: 85vh;
+}
+
 .control-form {
   button.sched {
     flex: 38.4px 0 0;

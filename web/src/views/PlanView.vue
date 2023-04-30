@@ -18,25 +18,35 @@
     >
       <Loading />
     </popup>
-    <popup v-if="shareCode" @close="closePlan">
+    <popup
+      v-if="shareCode"
+      :no-close="true"
+    >
       <div class="plan-share-view">
         <plan
           v-if="shareCode"
           :solver="solver"
           :steps="shareSteps"
-          :hideShare="true"
+          :hide-share="true"
+          :hide-btn="true"
         >
           <div class="mji-title">
-            <span class="mji-text-brown mji-text-small">收益计算结果会随着当前欢迎度和需求的设置而变动，若有需要请检查需求和欢迎度设置</span>
-            <button
-              class="mji mji-text-brown"
-              @click="importPlan"
-              style="float: right"
-            >
-              导入排班表
-            </button>
+            <span class="mji-text-brown">
+              排班表分享
+            </span>
+            <span class="share-control">
+              <span class="mji-text-brown mji-text-small">
+                收益计算结果会随着当前欢迎度和需求的设置而变动，若有需要请检查需求和欢迎度设置
+              </span>
+              <button
+                class="mji mji-text-brown"
+                @click="importPlan"
+              >
+                导入
+              </button>
+            </span>
           </div>
-      </plan>
+        </plan>
       </div>
     </popup>
     <div>
@@ -308,6 +318,11 @@ export default class PlanView extends Vue {
 
 .solver {
   height: 85vh;
+}
+
+.share-control {
+  float: right;
+  text-align: right;
 }
 
 .control-buttons {
