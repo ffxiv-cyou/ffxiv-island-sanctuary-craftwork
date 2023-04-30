@@ -51,6 +51,12 @@ export default class Dialog extends Vue {
 .dialog-content>* {
   position: relative;
 }
+.dialog-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 .dialog-close {
   position: fixed;
   right: 10px;

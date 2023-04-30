@@ -67,8 +67,7 @@ export default class PreditionView extends Vue {
   margin: 0 auto;
 }
 .demand-view {
-  height: calc(100vh - 120px);
-  max-width: 1000px;
-  margin: 30px auto;
+  height: 85vh;
+  width: 1000px;
 }
 </style>

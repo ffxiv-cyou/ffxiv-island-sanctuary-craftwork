@@ -42,3 +42,15 @@
 .mji-text-small {
   font-size: 0.85em;
 }
+
+button.mji {
+  background: rgb(214, 210, 205);
+  border: 1px solid rgba(58, 45, 33, 0.5);
+  border-radius: 5px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+button.mji:hover {
+  filter: brightness(0.95);
+}

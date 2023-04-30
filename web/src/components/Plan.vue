@@ -1,12 +1,13 @@
 <template>
   <div class="plan mji-wooden-plate">
+    <slot></slot>
     <div class="plan-info mji-info-box">
       <span class="total-value">
         收益: <icon class="blue-coin" />{{ sumVal * factor }} 
         (<icon class="blue-coin" />{{ -sumCost * factor }})
         <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal * factor }}</span>
       </span>
-      <span class="share-link"><a
+      <span class="share-link" v-if="!hideShare"><a
         :href="shareLink"
         target="_blank"
       >分享</a><span class="hide-lg">: </span><span class="hide-lg share-link-url">{{ shareLink }}</span></span>
@@ -97,6 +98,9 @@ export default class PlanView extends Vue {
 
   @Prop()
   removeable?: boolean;
+
+  @Prop()
+  hideShare?: boolean;
 
   get workers() {
     return this.solver.config.workers;

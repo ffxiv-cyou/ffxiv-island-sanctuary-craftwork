@@ -10,11 +10,11 @@
             <span class="hide-xs">下周 </span>{{ popPatternNext }}</span>
         </span>
         <button
-          class="mji-text-brown"
+          class="mji mji-text-brown"
           @click="applyPredict(false)"
         >更新趋势</button>
         <button
-          class="mji-text-brown"
+          class="mji mji-text-brown"
           @click="applyPredict(true)"
         >覆盖趋势</button>
       </span>
@@ -286,6 +286,8 @@ export default class DemandChange extends Vue {
     border: none;
     border-bottom: 1px rgb(156, 134, 115) solid;
     color: rgb(82, 49, 33);
+    flex: 1;
+    width: 0;
   }
 
   input[type=text]:invalid {
@@ -300,18 +302,6 @@ export default class DemandChange extends Vue {
 
   &>*+* {
     margin-left: 3px;
-  }
-
-  button {
-    background: rgb(214, 210, 205);
-    border: 1px solid rgba(58, 45, 33, 0.5);
-    border-radius: 5px;
-    padding: 2px 5px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    filter: brightness(0.95);
   }
 }
 

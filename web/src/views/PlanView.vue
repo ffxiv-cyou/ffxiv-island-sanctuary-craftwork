@@ -18,25 +18,28 @@
     >
       <Loading />
     </popup>
-    <div v-if="shareCode">
-      <div>
-        <div>排班表可能由于需求和欢迎度设置的不同造成计算结果差异，若有需要请检查需求和欢迎度设置。</div>
-        <div>
-          <button
-            class="pure-button"
-            @click="importPlan"
-          >
-            导入此排班表
-          </button>
-        </div>
+    <popup v-if="shareCode" @close="closePlan">
+      <div class="plan-share-view">
+        <plan
+          v-if="shareCode"
+          :solver="solver"
+          :steps="shareSteps"
+          :hideShare="true"
+        >
+          <div class="mji-title">
+            <span class="mji-text-brown mji-text-small">收益计算结果会随着当前欢迎度和需求的设置而变动，若有需要请检查需求和欢迎度设置</span>
+            <button
+              class="mji mji-text-brown"
+              @click="importPlan"
+              style="float: right"
+            >
+              导入排班表
+            </button>
+          </div>
+      </plan>
       </div>
-      <plan
-        v-if="shareCode"
-        :solver="solver"
-        :steps="shareSteps"
-      />
-    </div>
-    <div v-else>
+    </popup>
+    <div>
       <plan
         v-for="(plan, key) in plans"
         :key="key"
@@ -236,6 +239,10 @@ export default class PlanView extends Vue {
   importPlan() {
     this.plans.push(this.shareSteps);
     this.save();
+    this.closePlan();
+  }
+
+  closePlan() {
     this.$router.push('/plan');
   }
 
@@ -294,17 +301,13 @@ export default class PlanView extends Vue {
   max-width: 1200px;
 }
 
+.plan-share-view,
 .solver {
-  max-width: 1200px;
-  height: calc(100vh - 120px);
-  margin: 30px auto;
+  width: 1200px;
 }
 
-.dialog-content>.lds-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.solver {
+  height: 85vh;
 }
 
 .control-buttons {
