@@ -7,6 +7,7 @@ import wasmPack from 'vite-plugin-wasm-pack';
 export default defineConfig({
   build: {
     minify: true,
+    assetsInlineLimit: 8192,
     rollupOptions: {
       input: {
         main: 'index.html',
