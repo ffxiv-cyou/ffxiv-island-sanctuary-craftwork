@@ -77,7 +77,7 @@ export default class App extends Vue {
 
 <style lang="scss">
 html {
-  font-family: "Helvetica", "Segoe UI", "Arial", "PingFang SC", "Helvetica Neue", "Source Han Sans SC", "Noto Sans SC", "Noto Sans CJK SC", "Microsoft YaHei" ,sans-serif;
+  font-family: "Noto Sans SC", "Helvetica", "Segoe UI", "Arial", "PingFang SC", "Helvetica Neue", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei" ,sans-serif;
   font-size: 16px;
 }
 icon.blue-coin {
