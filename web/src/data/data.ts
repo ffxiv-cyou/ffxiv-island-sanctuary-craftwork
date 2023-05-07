@@ -135,6 +135,7 @@ export class CraftworkData {
      */
     public static TrimName(name: string) {
         if (name.startsWith("海岛")) return name.slice(2);
+        if (name.startsWith("开拓工房无人")) return name.slice(6);
         if (name.startsWith("开拓工房")) return name.slice(4);
         if (name.startsWith("牧场动物的")) return name.slice(5);
         if (name.startsWith("无人岛")) return name.slice(3);

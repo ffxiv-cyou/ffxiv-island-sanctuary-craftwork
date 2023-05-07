@@ -13,7 +13,7 @@
             >
             国际服
           </label>
-          <span class="pure-form-message-inline">勾选后使用国际服配方和名字。注意需求变动表尚未更新，趋势预测会出错。</span>
+          <span class="pure-form-message-inline">勾选后使用国际服配方和名字。</span>
         </div>
       </fieldset>
       <fieldset>

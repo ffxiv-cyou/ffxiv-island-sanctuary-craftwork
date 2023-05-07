@@ -165,31 +165,31 @@
     "Id": 27,
     "Name": "无人岛香荠",
     "Icon": 22627,
-    "Category": 2
+    "Category": 1
   },
   {
     "Id": 28,
     "Name": "无人岛石榴石原石",
     "Icon": 21456,
-    "Category": 2
+    "Category": 1
   },
   {
     "Id": 29,
     "Name": "无人岛云杉原木",
     "Icon": 22413,
-    "Category": 2
+    "Category": 1
   },
   {
     "Id": 30,
     "Name": "无人岛锤头鲨",
     "Icon": 29026,
-    "Category": 2
+    "Category": 1
   },
   {
     "Id": 31,
     "Name": "无人岛银矿",
     "Icon": 21211,
-    "Category": 2
+    "Category": 1
   },
   {
     "Id": 32,
@@ -400,5 +400,59 @@
     "Name": "捕兽用催眠球",
     "Icon": 23721,
     "Category": 7
+  },
+  {
+    "Id": 67,
+    "Name": "无人岛天然树脂",
+    "Icon": 22638,
+    "Category": 1
+  },
+  {
+    "Id": 68,
+    "Name": "无人岛椰子",
+    "Icon": 25323,
+    "Category": 1
+  },
+  {
+    "Id": 69,
+    "Name": "无人岛蜂巢",
+    "Icon": 22611,
+    "Category": 1
+  },
+  {
+    "Id": 70,
+    "Name": "无人岛木化石",
+    "Icon": 21228,
+    "Category": 1
+  },
+  {
+    "Id": 71,
+    "Name": "无人岛色彩缤纷的花",
+    "Icon": 23727,
+    "Category": 1
+  },
+  {
+    "Id": 72,
+    "Name": "海岛红辣椒种子",
+    "Icon": 23728,
+    "Category": 3
+  },
+  {
+    "Id": 73,
+    "Name": "海岛韭菜种子",
+    "Icon": 23729,
+    "Category": 3
+  },
+  {
+    "Id": 74,
+    "Name": "海岛红辣椒",
+    "Icon": 25018,
+    "Category": 4
+  },
+  {
+    "Id": 75,
+    "Name": "海岛韭菜",
+    "Icon": 25216,
+    "Category": 4
   }
 ]

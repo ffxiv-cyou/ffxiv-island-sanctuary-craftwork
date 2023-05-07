@@ -5,7 +5,7 @@ const CONFIG_KEY = "MJICraftworksConfig";
 export class Config {
 
   _region: Region = Region.CN;
-  _level: number = 10;
+  _level: number = 12;
   _maxTension: number = 35;
   _craftLevel: number = 2;
   _workers: number = 3;
