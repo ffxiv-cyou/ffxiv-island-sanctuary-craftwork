@@ -153,7 +153,7 @@ export default class AdvancedSolver extends Vue {
   @Watch("date")
   updateDemands() {
     if (this.date === 0) return;
-    this.demands = this.solver.getPredictDemands(this.date - 1);
+    this.demands = new Array(...this.solver.getPredictDemands(this.date - 1));
   }
 
   mounted() {
