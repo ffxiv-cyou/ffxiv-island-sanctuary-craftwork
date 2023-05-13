@@ -35,13 +35,7 @@
           :key="day"
           class="demand-change"
         >
-          <span class="demand">
-            <icon
-              v-for="(i) in demand(day, item.Id)"
-              :key="i"
-              class="mji mji-box"
-            />
-          </span>
+          <MjiBox class="demand" :count="demand(day, item.Id)"/>
           <span class="change">
             <icon
               v-if="!rawMode"
@@ -67,8 +61,13 @@ import { CraftworkData, type CraftworkObject } from "@/data/data";
 import { DemandUtils, PatternNames } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
+import MjiBox from "./MjiBox.vue";
 
-@Component({})
+@Component({
+  components: {
+    MjiBox: MjiBox
+  }
+})
 export default class DemandList extends Vue {
   @Prop()
   solver!: SolverProxy;
@@ -218,10 +217,6 @@ export default class DemandList extends Vue {
     background-size: 1.75em 1.75em;
     vertical-align: middle;
   }
-}
-
-.mji-box+.mji-box {
-  margin-left: -20px !important;
 }
 
 .demand-item icon.mji {

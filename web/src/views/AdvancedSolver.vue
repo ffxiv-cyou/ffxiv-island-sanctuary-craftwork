@@ -47,17 +47,12 @@
               :class="popularity(item.Id)"
             />
           </span>
-          <span
+          <MjiBox
             class="item-demand-box pure-u-6-24"
             :class="{ 'pure-u-6-24': customDemand, 'pure-u-10-24': !customDemand }"
             @click="changeDemandBox(item.Id)"
-          >
-            <icon
-              v-for="(i) in getDemandBox(demands[item.Id])"
-              :key="i"
-              class="mji mji-box"
-            />
-          </span>
+            :count="getDemandBox(demands[item.Id])"
+          />
           <input
             v-if="customDemand"
             v-model.number="demands[item.Id]"
@@ -104,11 +99,13 @@ import { DemandUtils } from "@/model/data";
 import { CraftworkData } from "@/data/data";
 import BatchView from "@/components/BatchView.vue";
 import DateBar from "@/components/DateBar.vue";
+import MjiBox from "@/components/MjiBox.vue";
 
 @Component({
   components: {
     BatchView: BatchView,
-    DateBar: DateBar
+    DateBar: DateBar,
+    MjiBox: MjiBox
   }
 })
 export default class AdvancedSolver extends Vue {

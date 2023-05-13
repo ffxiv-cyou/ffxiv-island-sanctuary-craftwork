@@ -116,11 +116,7 @@
           :key="day"
           class="recipe-demand hide-xs"
         >
-          <icon
-            v-for="(i) in getDemandIcons(item.Id, day)"
-            :key="i"
-            class="mji mji-box"
-          />
+          <MjiBox class="demand" :count="getDemandIcons(item.Id, day)"/>
           <span>[{{ getDemand(item.Id, day) }}]</span>
         </span>
       </div>
@@ -136,6 +132,7 @@ import { ToShareCode } from "@/model/share";
 import SortLabel from "./SortLabel.vue";
 import Dialog from "./Dialog.vue";
 import DemandShare from "./DemandShare.vue";
+import MjiBox from "./MjiBox.vue";
 
 @Component({
   emits: [
@@ -145,6 +142,7 @@ import DemandShare from "./DemandShare.vue";
     SortLabel: SortLabel,
     Popup: Dialog,
     DemandShare: DemandShare,
+    MjiBox: MjiBox
   }
 })
 export default class DemandPattern extends Vue {
@@ -325,7 +323,7 @@ export default class DemandPattern extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .demand-share {
   width: 1000px;
   height: 85vh;

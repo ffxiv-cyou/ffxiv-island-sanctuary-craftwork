@@ -31,16 +31,11 @@
             :class="popularity"
           />
         </span>
-        <span
+        <MjiBox
           v-if="demand !== undefined"
           class="step-demand"
-        >
-          <icon
-            v-for="(i) in demandBox"
-            :key="i"
-            class="mji mji-box"
-          />
-        </span>
+          :count="demandBox"
+        />
       </div>
     </div>
   </div>
@@ -52,10 +47,12 @@ import { DemandUtils, PatternNames } from "@/model/data";
 import "@/assets/items.css";
 import Close from "./Close.vue";
 import { CraftworkData, type CraftworkObject } from "@/data/data";
+import MjiBox from "./MjiBox.vue";
 
 @Component({
   components: {
-    Close: Close
+    Close: Close,
+    MjiBox: MjiBox
   },
   emits: ["remove"]
 })

@@ -3,7 +3,7 @@ icon.mji {
 
     width: calc(var(--scale) * 40px);
     height: calc(var(--scale) * 40px);
-    background-size: calc(var(--scale) * 200px) calc(var(--scale) * 240px);
+    background-size: calc(var(--scale) * 200px) calc(var(--scale) * 280px);
     display: inline-block;
     vertical-align: bottom;
     background-image: url("./mjicraftdemandresearch_hr1.png");
@@ -38,6 +38,12 @@ icon.mji-change-1-down {
 }
 icon.mji-change-2-down {
     background-position: calc(var(--scale) * -160px) calc(var(--scale) * -40px);
+}
+icon.mji-no-box {
+    background-position: calc(var(--scale) * -0px) calc(var(--scale) * -240px);
+}
+icon.mji-clock {
+    background-position: calc(var(--scale) * -40px) calc(var(--scale) * -240px);
 }
 icon.blue-coin {
     --scale: 1;
