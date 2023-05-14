@@ -19,7 +19,7 @@ const REAL_DEMAND_TABLE: [[i8; 7]; 12] = [
 ];
 
 /// 根据指定的pattern获取需求
-/// 
+///
 /// day 从0开始
 pub fn get_demand(pattern: DemandPattern, day: u8, _offset: u8) -> i8 {
     if day >= 7 || pattern == DemandPattern::Unknown {
@@ -101,6 +101,87 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
     }
 
     DemandPattern::Unknown
+}
+
+/// （高级）预测物品需求，返回所有可能的Pattern
+///
+/// - seq 为当周从第一天开始的需求和变动
+/// - last_demand 为上周最后一天的实际需求
+/// - demand_changes 为本周从第一天开始的工坊产物造成的需求变动量
+pub fn predict_adv(
+    seq: &[(Demand, DemandChange)],
+    last_demand: i8,
+    demand_changes: &[i8],
+) -> Vec<DemandPattern> {
+    if seq.len() > 7 || seq.len() < demand_changes.len() {
+        return vec![];
+    }
+
+    let mut last_candidates = vec![];
+
+    let mut candidates = [true; 12];
+    let mut sum_change = 0; // 当前需求值的总变动量
+    for i in 0..seq.len() {
+        let (demand, change) = seq[i];
+
+        let demand_change = match i {
+            0 => 0,
+            _ => demand_changes[i - 1],
+        };
+        sum_change += demand_change;
+
+        // 筛选当前
+        for j in 0..candidates.len() {
+            if !candidates[j] {
+                continue;
+            }
+            let pred_demand = REAL_DEMAND_TABLE[j][i];
+            
+            // 检查变动后的需求值是否匹配指定模式
+            if Demand::from_val((pred_demand - sum_change) as i16) != demand {
+                candidates[j] = false;
+                continue;
+            }
+            
+            // 前一天的需求值
+            let last_demand = match i {
+                0 => last_demand,
+                _ => REAL_DEMAND_TABLE[j][i - 1],
+            };
+            
+            // 计算需求变动量
+            // 这里没有使用sum_change，是因为前面几天的需求变动对于今天的变动量差值计算没有影响。
+            // (pred_demand + sum_change) - (last_demand + sum_change - demand_change) = 下面的值
+            let delta = pred_demand - demand_change - last_demand;
+            if DemandChange::from_val(delta as i16) != change {
+                candidates[j] = false;
+                continue;
+            }
+        }
+
+        // 计算剩余可能的数量
+        let mut candidate_count = 0;
+        let mut last_candidate = 0;
+        for j in 0..candidates.len() {
+            last_candidates.clear();
+            if candidates[j] {
+                candidate_count += 1;
+                last_candidate = j;
+                last_candidates.push((i as u8 + 1).into())
+            }
+        }
+
+        // 唯一的可能，返回
+        if candidate_count == 1 {
+            return vec![((last_candidate as u8) + 1).into()];
+        }
+        // 没有可能，返回未知
+        if candidate_count == 0 {
+            return vec![];
+        }
+    }
+    // 信息量不够，返回已有的预测
+    return last_candidates;
 }
 
 /// 批量预测

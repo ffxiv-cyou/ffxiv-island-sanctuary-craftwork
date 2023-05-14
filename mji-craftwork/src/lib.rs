@@ -7,7 +7,7 @@ pub mod utils;
 
 use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
 use gsolver::{MildSolver, GSolver};
-use predition::{get_demands, predict_all, DemandPattern};
+use predition::{get_demands, predict_all, DemandPattern, predict_adv};
 use solver::{BFSolver, SolveLimit, Solver};
 use wasm_bindgen::prelude::*;
 
@@ -142,6 +142,45 @@ pub fn pattern_predict(array: &[u8], days: usize) -> Vec<u8> {
         result.push(i.into());
     }
 
+    result
+}
+
+/// 预测需求变动模式
+/// 
+/// 传入的Array按以下顺序排布
+/// - 0: 上周第七天的真实需求值
+/// - 1: 第一天的需求与变动
+/// - 2: 第一天工坊造成的需求变动量
+/// - 3: 第二天的需求与变动
+/// - 4: ...
+/// 
+/// 单个物品Array的长度为 2*days+1
+/// 
+/// 返回需求变动模式的数组，每个物品占用2bytes，分别代表两种可能的需求模式
+#[wasm_bindgen]
+pub fn pattern_predict_adv(array: &[u8], days: usize) -> Vec<u8> {
+    let mut result = vec![];
+
+    for i in (0..array.len()).step_by(days * 2 + 1) {
+        let last_demand = array[0] as i8;
+        let mut seqs = vec![];
+        let mut demand_change = vec![];
+        for j in 0..days {
+            let byte = array[i + 1];
+            let demand: Demand = (byte >> 4).into();
+            let change: DemandChange = (byte & 0x0F).into();
+            seqs.push((demand, change));
+            demand_change.push(array[i + 2] as i8);
+        }
+
+        let pats = predict_adv(&seqs, last_demand, &demand_change);
+        for i in 0..2 {
+            result.push(match i >= pats.len() {
+                true => DemandPattern::Unknown,
+                false => pats[i]
+            }.into())
+        }
+    }
     result
 }
 
