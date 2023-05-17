@@ -50,8 +50,8 @@
           <MjiBox
             class="item-demand-box pure-u-6-24"
             :class="{ 'pure-u-6-24': customDemand, 'pure-u-10-24': !customDemand }"
-            @click="changeDemandBox(item.Id)"
             :count="getDemandBox(demands[item.Id])"
+            @click="changeDemandBox(item.Id)"
           />
           <input
             v-if="customDemand"

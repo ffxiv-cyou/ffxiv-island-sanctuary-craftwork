@@ -1,7 +1,14 @@
 <template>
   <span>
-    <icon v-for="(i) in count" :key="i" class="mji mji-box" />
-    <icon v-if="!count" class="mji mji-no-box" />
+    <icon
+      v-for="(i) in count"
+      :key="i"
+      class="mji mji-box"
+    />
+    <icon
+      v-if="!count"
+      class="mji mji-no-box"
+    />
   </span>
 </template>
 

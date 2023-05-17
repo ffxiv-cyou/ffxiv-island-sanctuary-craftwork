@@ -1,7 +1,7 @@
 use mji_craftwork::{
-    data::{CraftworkInfo},
+    data::CraftworkInfo,
     init_repo, simulate, solve_singleday,
-    solver::{BFSolver, SolveLimit, Solver, SimplifySolver},
+    solver::{BFSolver, SimplifySolver, SolveLimit, Solver},
 };
 use rand::prelude::Distribution;
 
@@ -11,9 +11,9 @@ use crate::data::new_repo;
 /// 库初始化测试
 #[test]
 fn init_test() {
-    use data::{ CRAFT_OBJECTS, POPULARITY_LIST};
+    use data::{CRAFT_OBJECTS, POPULARITY_LIST};
     let mut recipes = vec![];
-  
+
     for i in 0..CRAFT_OBJECTS.len() {
         recipes.push(CRAFT_OBJECTS[i][0] as u16);
         recipes.push(CRAFT_OBJECTS[i][2] as u16);
@@ -29,7 +29,7 @@ fn init_test() {
             pop_vec.push(r[i] as u8);
         }
     }
-  
+
     let repo = init_repo(recipes, pop_vec, 62);
     let demands = vec![9; 62];
 
@@ -40,7 +40,7 @@ fn init_test() {
         vec![],
         &demands,
         24,
-        false
+        false,
     );
 }
 
@@ -121,10 +121,10 @@ fn compare_bf_simplify() {
     let empty = vec![];
     let limit = SolveLimit::new(10, &empty, 24, false);
     let info = CraftworkInfo::new(0, 35, 2, 3);
-    
+
     let demand_range = rand::distributions::Uniform::new(2, 24u8);
     let pop_range = rand::distributions::Uniform::new(1, 100);
-    
+
     let mut rng = rand::thread_rng();
 
     for i in 0..100000 {
@@ -136,12 +136,16 @@ fn compare_bf_simplify() {
 
         let simplify = SimplifySolver::new(&repo, info);
         let bf = BFSolver::new(&repo, info);
-        
+
         let sim_result = simplify.solve_best(&limit, &demands);
         let bf_result = bf.solve_best(&limit, &demands);
 
-        assert_eq!(bf_result.value, sim_result.value, "iter {}, pop {}, demands {:?}, bf {:?}, simple {:?},", i, pop, demands, bf_result, sim_result);
-    
+        assert_eq!(
+            bf_result.value, sim_result.value,
+            "iter {}, pop {}, demands {:?}, bf {:?}, simple {:?},",
+            i, pop, demands, bf_result, sim_result
+        );
+
         if i % 100 == 0 {
             println!("{}", i)
         }

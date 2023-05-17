@@ -1,6 +1,5 @@
 /// 步骤的可能解
-#[derive(Debug)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Batch {
     /// 步骤总数
     pub seq: usize,

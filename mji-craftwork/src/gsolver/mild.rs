@@ -2,15 +2,15 @@ use crate::{
     data::{CraftworkInfo, IDataRepo},
     predition::get_demands,
     simulator::{simulate_batch_seq, Batch},
-    solver::{Solver, SimplifySolver},
+    solver::{SimplifySolver, Solver},
 };
 
 use super::GSolver;
 
 /// Mild 全局求解器
-/// 
+///
 /// 尝试使用每天的最优解作为整周的最优解。
-/// 
+///
 /// 通过对求解顺序做简单的排列组合，辅以整周的需求变动算法，使其能部分考虑到物品需求对后续求解的影响。
 /// 求解时还会估计当前天的干劲对后续求解的影响，使其更准确。
 pub struct MildSolver<'a, T>
@@ -35,8 +35,17 @@ where
         let mut max_val = 0;
         let mut demand = vec![0; pat.len()];
         let mut seq = [0; 6];
-        self.dfs(limit, pat, &mut demand, &mut current, 0, &mut seq, &mut max, &mut max_val);
-        
+        self.dfs(
+            limit,
+            pat,
+            &mut demand,
+            &mut current,
+            0,
+            &mut seq,
+            &mut max,
+            &mut max_val,
+        );
+
         max
     }
 }
@@ -75,7 +84,7 @@ where
                     }
                 }
             }
-            
+
             // 计算当前干劲可能为后续带来的收益增加量
             let mut tension_delta = [0; 6];
             if tension < self.info.max_tension {
@@ -134,8 +143,17 @@ where
                     } * self.info.workers as i8;
                 }
 
-                self.dfs(limit, pat, demand_sub, current, depth + 1, seq, max, max_val);
-            
+                self.dfs(
+                    limit,
+                    pat,
+                    demand_sub,
+                    current,
+                    depth + 1,
+                    seq,
+                    max,
+                    max_val,
+                );
+
                 // 还原需求变动值
                 for i in 0..batch.steps.len() {
                     let id = batch.steps[i] as usize;

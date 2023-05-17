@@ -35,7 +35,10 @@
           :key="day"
           class="demand-change"
         >
-          <MjiBox class="demand" :count="demand(day, item.Id)"/>
+          <MjiBox
+            class="demand"
+            :count="demand(day, item.Id)"
+          />
           <span class="change">
             <icon
               v-if="!rawMode"
@@ -60,7 +63,7 @@
 import { CraftworkData, type CraftworkObject } from "@/data/data";
 import { DemandUtils, PatternNames } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
-import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
+import { Component, Vue, Prop } from "vue-facing-decorator";
 import MjiBox from "./MjiBox.vue";
 
 @Component({

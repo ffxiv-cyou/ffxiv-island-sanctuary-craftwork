@@ -4,7 +4,7 @@ pub use batch::Batch;
 use crate::data::{CraftworkInfo, RecipeState};
 
 /// 模拟一个操作
-/// 
+///
 /// dup: 需求变动值
 pub fn simulate(info: &CraftworkInfo, recipe: &RecipeState, dup: u8) -> u16 {
     let val = recipe.value() as f32 * info.factor();
@@ -21,7 +21,7 @@ pub fn simulate_batch(info: &CraftworkInfo, recipe: &[RecipeState]) -> Batch {
 }
 
 /// 模拟一系列的工序，返回工序Batch和对应变动后的工坊信息
-/// 
+///
 /// 注意，这里只考虑了连击的情况。
 pub fn simulate_batch_seq(info: &CraftworkInfo, recipe: &[RecipeState]) -> (Batch, CraftworkInfo) {
     let mut batch = Batch::new();

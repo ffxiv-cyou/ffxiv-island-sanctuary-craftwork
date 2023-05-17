@@ -116,7 +116,10 @@
           :key="day"
           class="recipe-demand hide-xs"
         >
-          <MjiBox class="demand" :count="getDemandIcons(item.Id, day)"/>
+          <MjiBox
+            class="demand"
+            :count="getDemandIcons(item.Id, day)"
+          />
           <span>[{{ getDemand(item.Id, day) }}]</span>
         </span>
       </div>

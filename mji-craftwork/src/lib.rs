@@ -6,8 +6,8 @@ pub mod solver;
 pub mod utils;
 
 use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
-use gsolver::{MildSolver, GSolver};
-use predition::{get_demands, predict_all, DemandPattern, predict_adv};
+use gsolver::{GSolver, MildSolver};
+use predition::{get_demands, predict_adv, predict_all, DemandPattern};
 use solver::{BFSolver, SolveLimit, Solver};
 use wasm_bindgen::prelude::*;
 
@@ -146,15 +146,15 @@ pub fn pattern_predict(array: &[u8], days: usize) -> Vec<u8> {
 }
 
 /// 预测需求变动模式
-/// 
+///
 /// 传入的Array按以下顺序排布
 /// - 0: 上周第七天的真实需求值
 /// - 1: 第一天的需求与变动
 /// - 2: 第二天的需求与变动
 /// - 4: ...
-/// 
+///
 /// 单个物品Array的长度为 days+1
-/// 
+///
 /// 返回需求变动模式的数组，每个物品占用2bytes，分别代表两种可能的需求模式
 #[wasm_bindgen]
 pub fn pattern_predict_adv(array: &[u8], days: usize) -> Vec<u16> {
@@ -208,7 +208,7 @@ pub fn solve_week(
 ) -> Vec<u16> {
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
     let solver = MildSolver::new(repo, state.clone());
-    
+
     let vec = DemandPattern::from_u8(pattern);
     let batches = solver.solve(&limit, &vec);
 
@@ -219,16 +219,16 @@ pub fn solve_week(
                 ret.push(0); // val
                 ret.push(0); // cost
                 ret.push(0); // seq
-                ret.extend_from_slice(&[0,0,0,0,0,0]); // steps
-                ret.extend_from_slice(&[0,0,0,0,0,0]); // values
-            },
+                ret.extend_from_slice(&[0, 0, 0, 0, 0, 0]); // steps
+                ret.extend_from_slice(&[0, 0, 0, 0, 0, 0]); // values
+            }
             Some(batch) => {
                 ret.push(batch.get_val());
                 ret.push(batch.get_cost());
                 ret.push(batch.seq as u16);
                 ret.extend_from_slice(batch.get_steps());
                 ret.extend_from_slice(batch.get_values());
-            },
+            }
         }
     }
     ret

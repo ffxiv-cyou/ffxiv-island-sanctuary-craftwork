@@ -1,4 +1,6 @@
-use mji_craftwork::{data::{Demand}, pattern_demand, pattern_predict, predition::{DemandPattern, predict_adv}, pattern_predict_adv};
+use mji_craftwork::{
+    data::Demand, pattern_demand, pattern_predict, pattern_predict_adv, predition::DemandPattern,
+};
 
 #[test]
 pub fn pattern() {

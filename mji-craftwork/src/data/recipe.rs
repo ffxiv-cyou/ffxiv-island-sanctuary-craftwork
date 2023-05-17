@@ -74,7 +74,7 @@ impl RecipeState {
         }
     }
     /// 配方系数
-    /// 
+    ///
     /// 系数 = 欢迎度系数 * 需求系数
     pub fn factor(&self, demand_sub: i16) -> f32 {
         (Demand::from_val(self.demand as i16 - demand_sub).factor() as u16

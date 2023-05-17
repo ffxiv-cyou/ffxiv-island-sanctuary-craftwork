@@ -48,7 +48,12 @@ pub trait Solver {
     }
 
     /// 使用指定函数解唯一最优
-    fn solve_best_fn(&self, limit: &SolveLimit, demands: &[i8], sort_val: impl Fn(u16,&Batch)->u16) ->Batch {
+    fn solve_best_fn(
+        &self,
+        limit: &SolveLimit,
+        demands: &[i8],
+        sort_val: impl Fn(u16, &Batch) -> u16,
+    ) -> Batch {
         let ret = self.solve_unordered(limit, demands);
         let mut max_val = 0;
         let mut max_batch = Batch::new();

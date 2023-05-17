@@ -6,14 +6,14 @@ use crate::{
 use super::{Batch, SolveLimit, Solver};
 
 /// Simplify 简易剪枝
-/// 
+///
 /// 此方法在暴力求解的过程中，动态对部分可能解做剪枝。
-/// 
+///
 /// 当一个配方大于等于12小时后，计算其每小时收益，并与最高收益对比。
 /// 若其收益小于最高收益的69%，则将其剪枝。
-/// 
+///
 /// 此方法不保证所有解一定正确，仅能尽量保证最高几个的解是正确的。
-/// 
+///
 /// 69%是通过实测得出的，对于其他配方可能不适用。
 pub struct SimplifySolver<'a, T>
 where
@@ -30,7 +30,14 @@ where
     fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch> {
         let mut ret: Vec<Batch> = vec![];
         let mut avg = 0;
-        self.solve_sub(limit, demands, &mut ret, Batch::new(), self.info.clone(), &mut avg);
+        self.solve_sub(
+            limit,
+            demands,
+            &mut ret,
+            Batch::new(),
+            self.info.clone(),
+            &mut avg,
+        );
         ret
     }
 

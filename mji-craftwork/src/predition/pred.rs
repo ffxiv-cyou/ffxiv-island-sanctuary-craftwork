@@ -107,12 +107,9 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
 ///
 /// - seq 为当周从第一天开始的需求和变动
 /// - last_demand 为上周最后一天的实际需求
-/// 
+///
 /// 返回值为可能的Pattern的Bitmap
-pub fn predict_adv(
-    seq: &[(Demand, DemandChange)],
-    last_demand: i8,
-) -> u16 {
+pub fn predict_adv(seq: &[(Demand, DemandChange)], last_demand: i8) -> u16 {
     if seq.len() > 7 {
         return 0;
     }
@@ -129,7 +126,7 @@ pub fn predict_adv(
             }
             let pred_demand = REAL_DEMAND_TABLE[j][i];
             let pred_dem = Demand::from_val(pred_demand as i16);
-            
+
             // 检查变动后的需求值是否匹配指定模式
             if pred_dem != demand {
                 // 第一和第二天使用本值，其他时间可能受做的东西影响导致出现变化
@@ -138,13 +135,13 @@ pub fn predict_adv(
                     continue;
                 }
             }
-            
+
             // 前一天的需求值
             let last_demand = match i {
                 0 => last_demand,
                 _ => REAL_DEMAND_TABLE[j][i - 1],
             };
-            
+
             // 计算需求变动量
             let delta = pred_demand - last_demand;
             if DemandChange::from_val(delta as i16) != change {

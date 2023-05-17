@@ -1,11 +1,12 @@
+use base64::{engine::general_purpose, Engine as _};
 use data::new_repo;
 use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo},
     gsolver::{GSolver, MildSolver, RadicalSolver},
     predition::DemandPattern,
-    solver::SolveLimit, simulator::Batch,
+    simulator::Batch,
+    solver::SolveLimit,
 };
-use base64::{Engine as _, engine::general_purpose};
 use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
 
@@ -39,14 +40,14 @@ fn generate_to(pop: u8, pat: &[DemandPattern]) -> String {
 
     for i in (0..pat.len()).step_by(2) {
         let v = pat[i] as u8;
-        let v2 = pat[i+1] as u8;
+        let v2 = pat[i + 1] as u8;
         arr.push((v2 << 4) + v);
     }
 
     general_purpose::URL_SAFE_NO_PAD.encode(arr)
 }
 
-fn batch_value(batches: &[Option<Batch>;6]) -> u16 {
+fn batch_value(batches: &[Option<Batch>; 6]) -> u16 {
     let mut sum_val = 0;
     for i in batches {
         match i {
@@ -63,7 +64,7 @@ fn test_gsolver_mild() {
 
     let code = b"DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAA";
     let (repo, info, pat) = generate_from(code);
-    
+
     let solver = MildSolver::new(&repo, info);
 
     let result = solver.solve(&limit, &pat);
@@ -77,7 +78,7 @@ fn test_gsolver_radical() {
 
     let code = b"SJByzIRRxbqHJzZmScUxUrO5qTSBS2ocorcIAAAAAAA";
     let (repo, info, pat) = generate_from(code);
-    
+
     let solver = RadicalSolver::new(&repo, info);
 
     let result = solver.solve(&limit, &pat);
@@ -91,11 +92,15 @@ fn test_gsolver_compare() {
     let limit = new_limit();
     let mut repo = new_repo(1);
     let info = CraftworkInfo::new(0, 35, 2, 3);
-    
+
     let pop_range = rand::distributions::Uniform::new(1, 100);
     let mut rng = rand::thread_rng();
 
-    let mut rand = [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let mut rand = [
+        0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8,
+        8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+    ];
 
     let mut cnt_mild = 0;
     let mut cnt_radical = 0;
@@ -129,6 +134,8 @@ fn test_gsolver_compare() {
         }
     }
 
-    println!("mild {}, rad {}, equal {}", cnt_mild, cnt_radical, cnt_equal);
-
+    println!(
+        "mild {}, rad {}, equal {}",
+        cnt_mild, cnt_radical, cnt_equal
+    );
 }
