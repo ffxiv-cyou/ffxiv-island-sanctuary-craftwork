@@ -24,10 +24,19 @@
 .mji-hr {
   border-bottom: 2px rgb(156,134,115) solid;
 }
+.mji-hr {
+  height: 5px;
+}
 
 .mji-title {
   line-height: 1.5em;
   margin-bottom: 3px;
+}
+.mji-footer {
+  margin-top: 6px;
+  border-top: 2px rgb(156,134,115) solid;
+  padding-top: 8px;
+  width: 100%;
 }
 
 .mji-text-brown {
@@ -44,13 +53,16 @@
 }
 
 button.mji {
-  background: rgb(214, 210, 205);
-  border: 1px solid rgba(58, 45, 33, 0.5);
-  border-radius: 5px;
-  padding: 2px 5px;
+  background: linear-gradient(rgb(140,109,90), rgb(107,81,66) 49%, rgb(99,73,49) 50%, rgb(82,61,41) 51%, rgb(107,85,58));
+  border: 1px solid rgba(99,81,58, 0.5);
+  color: #f0f0f0;
+  font-size: 14px;
+  font-weight: 400;
+  border-radius: 25px;
+  padding: 2px 3em 4px;
   cursor: pointer;
 }
 
 button.mji:hover {
-  filter: brightness(0.95);
+  filter: brightness(1.1);
 }

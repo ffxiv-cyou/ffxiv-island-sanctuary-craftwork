@@ -1,6 +1,6 @@
 <template>
   <div class="plan mji-wooden-plate">
-    <slot />
+    <slot name="header" />
     <div class="plan-info mji-info-box">
       <span class="total-value">
         收益: <icon class="blue-coin" />{{ sumVal * factor }} 
@@ -77,6 +77,7 @@
         :workers="workers"
       />
     </div>
+    <slot name="footer" />
   </div>
 </template>
 <script lang="ts">

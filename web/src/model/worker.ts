@@ -9,6 +9,7 @@ import init, {
   simulate,
   pattern_predict,
   pattern_demand,
+  pattern_predict_adv,
 } from "mji-craftwork";
 
 function get_craft_info(state: any): CraftworkInfo {
@@ -78,6 +79,11 @@ async function init_worker() {
       }
       case "pattern_predict": {
         const result = pattern_predict(data.array, data.demands);
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
+      case "pattern_predict_adv": {
+        const result = pattern_predict_adv(data.array, data.demands);
         self.postMessage(result, [result.buffer]);
         break;
       }

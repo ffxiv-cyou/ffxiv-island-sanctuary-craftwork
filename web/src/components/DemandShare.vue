@@ -5,20 +5,28 @@
     :demand-pats="patterns"
     :demands-raw="demands"
   >
-    <div class="mji-text-brown mji-title">
-      <span>需求与趋势分享</span>
-      <span class="demand-control">
-        <span class="mji-text-small">
-          <span class="mji-text-orange">欢迎度模式 </span>
-          <span class="mji-text-brown">{{ popPattern }}</span>
-          <span class="mji-text-orange"> 应用后会覆盖原有设置</span>
+    <template #header>
+      <div class="mji-text-brown mji-title">
+        <span>需求与趋势分享</span>
+        <span class="demand-control">
+          <span class="mji-text-small">
+            <span class="mji-text-orange">欢迎度模式 </span>
+            <span class="mji-text-brown">{{ popPattern }}</span>
+          </span>
         </span>
+      </div>
+    </template>
+    <template #footer>
+      <div class="demand-control mji-footer">
+        <span class="mji-text-small mji-text-orange"> 应用后会覆盖原有设置</span>
         <button
           class="mji mji-text-brown"
           @click="applyShare"
-        >应用</button>
-      </span>
-    </div>
+        >
+          应用
+        </button>
+      </div>
+    </template>
   </DemandList>
 </template>
 <script lang="ts">

@@ -148,6 +148,14 @@ export class SolverBG {
     });
   }
 
+  public pattern_predict_adv(array: Uint8Array, demands: number) {
+    return this.postMsg<Uint16Array>({
+      type: "pattern_predict_adv",
+      array: array,
+      demands: demands,
+    });
+  }
+
   public pattern_demand(array: Uint8Array, day: number) {
     return this.postMsg<Int8Array>({
       type: "pattern_demand",

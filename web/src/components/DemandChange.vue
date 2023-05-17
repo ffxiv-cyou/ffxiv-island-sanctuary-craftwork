@@ -6,39 +6,60 @@
     :demands="demands"
     :changes="changes"
     demand-pat-name="预测趋势"
+    :last-demands="lastDemands"
+    :demand-pats-raw="patternMasks"
   >
-    <div class="mji-text-brown mji-title">
-      <span>需求变动与趋势预测</span>
-      <span class="demand-control">
-        <span class="mji-text-small">
-          <span class="mji-text-orange">欢迎度模式 </span>
-          <span class="mji-text-brown">
-            <span class="hide-xs">本周 </span>{{ popPattern }} /
-            <span class="hide-xs">下周 </span>{{ popPatternNext }}</span>
+    <template #header>
+      <div class="mji-text-brown mji-title">
+        <span>需求变动与趋势预测</span>
+        <span class="demand-control">
+          <span class="mji-text-small">
+            <span class="mji-text-orange">欢迎度模式 </span>
+            <span class="mji-text-brown">
+              <span class="hide-xs">本周 </span>{{ popPattern }} /
+              <span class="hide-xs">下周 </span>{{ popPatternNext }}</span>
+          </span>
         </span>
+      </div>
+      <div class="demand-packet mji-text-small mji-title">
+        <span class="demand-packet-title mji-text-orange">上周模式</span>
+        <input
+          v-model="lastWeekPat"
+          class="mji-text-brown"
+          type="text"
+          placeholder="上周的分享链接"
+        >
+      </div>
+      <div class="demand-packet mji-text-small mji-title">
+        <span class="demand-packet-title mji-text-orange">抓包数据</span>
+        <input
+          v-for="(i) in 7"
+          :key="i"
+          v-model="datapacks[i - 1]"
+          type="text"
+          :placeholder="'第' + i + '天'"
+          :required="datapacks[i] !== undefined && datapacks[i].length > 0"
+          pattern="[0-9a-fA-F]+"
+          class="mji-text-brown"
+        >
+      </div>
+    </template>
+    <template #footer>
+      <div class="demand-control mji-footer">
         <button
-          class="mji mji-text-brown"
+          class="mji"
           @click="applyPredict(false)"
-        >更新趋势</button>
+        >
+          更新趋势
+        </button>
         <button
-          class="mji mji-text-brown"
+          class="mji"
           @click="applyPredict(true)"
-        >覆盖趋势</button>
-      </span>
-    </div>
-    <div class="demand-packet mji-text-small mji-title">
-      <span class="demand-packet-title mji-text-orange">抓包数据</span>
-      <input
-        v-for="(i) in 7"
-        :key="i"
-        v-model="datapacks[i - 1]"
-        type="text"
-        :placeholder="'第' + i + '天'"
-        :required="datapacks[i] !== undefined && datapacks[i].length > 0"
-        pattern="[0-9a-fA-F]+"
-        class="mji-text-brown"
-      >
-    </div>
+        >
+          覆盖趋势
+        </button>
+      </div>
+    </template>
   </DemandList>
 </template>
 <script lang="ts">
@@ -46,6 +67,7 @@ import { Utils } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import DemandList from "./DemandList.vue";
+import { FromShareCode } from "@/model/share";
 
 @Component({
   emits: ["on-apply"],
@@ -64,12 +86,16 @@ export default class DemandChange extends Vue {
     return this.solver.config;
   }
 
-  datapacks: string[] = ["","","","","","",""];
+  datapacks: string[] = ["", "", "", "", "", "", ""];
   data: Uint8Array[] = [];
 
   patterns: number[] = [];
+  patternMasks: number[] = [];
   demands: number[][] = [];
   changes: number[][] = [];
+
+  lastWeekPat: string = "";
+  lastDemands: number[] = [];
 
   get firstValidData() {
     for (let i = 0; i < this.data.length; i++) {
@@ -106,10 +132,37 @@ export default class DemandChange extends Vue {
     }
     day %= 7;
 
+    let hasOldData = false;
     this.datapacks[day] = this.inputData;
     for (let i = day + 1; i < this.datapacks.length; i++) {
+      if (this.datapacks[i])
+        hasOldData = true;
       this.datapacks[i] = "";
     }
+
+    if (hasOldData) {
+      this.lastWeekPat = this.solver.shareLink;
+    }
+  }
+
+  @Watch("lastWeekPat")
+  async onLastWeekPatChange() {
+    let reg = /(.*#\/pat\/)?([0-9A-Za-z-_]+)/;
+    let result = reg.exec(this.lastWeekPat);
+    if (result && result.length > 0) {
+      let binary = FromShareCode(result[2]);
+      let p = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      let patterns = await this.solver.demandsFromPredict(p, 6);
+      let demands = [];
+      for (let i = 1; i < binary.length; i++) {
+        demands.push(patterns[binary[i] & 0x0f]);
+        demands.push(patterns[(binary[i] & 0xf0) >> 4]);
+      }
+      this.lastDemands = demands;
+    } else {
+      this.lastDemands = [];
+    }
+    this.onDatapackChange();
   }
 
   @Watch("datapacks", { deep: true })
@@ -149,10 +202,17 @@ export default class DemandChange extends Vue {
       }
       else break;
     }
-    console.log(dataArray);
     if (dataArray.length == 0)
       return;
-    this.patterns = await this.solver.predictFromPackets(dataArray);
+
+    if (this.lastDemands.length > 0) {
+      this.patternMasks = await this.solver.predictFromPacketsAdv(dataArray, new Uint8Array(this.lastDemands));
+      console.log(dataArray, this.lastDemands, this.patternMasks);
+    } else {
+      this.patterns = await this.solver.predictFromPackets(dataArray);
+      this.patternMasks = [];
+      console.log(dataArray, this.patterns);
+    }
   }
 
   mounted() {
@@ -169,11 +229,15 @@ export default class DemandChange extends Vue {
     for (let i = 0; i < obj.length; i++) {
       this.datapacks[i] = obj[i];
     }
+
+    let lastWeek = localStorage.getItem("MJILastWeekPat");
+    if (lastWeek) this.lastWeekPat = lastWeek;
   }
 
   saveData() {
     let str = JSON.stringify(this.datapacks);
     localStorage.setItem("MJICraftworkPatPred", str);
+    localStorage.setItem("MJILastWeekPat", this.lastWeekPat);
   }
 
   applyPredict(updateAll: boolean) {

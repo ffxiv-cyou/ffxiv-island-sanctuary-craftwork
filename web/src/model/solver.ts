@@ -1,6 +1,7 @@
 import { CraftworkData, Region } from "@/data/data";
 import { Config } from "./config";
 import { SolverBG, WorkerInfo } from "./solver_bg";
+import { ToShareCode } from "./share";
 
 export class SolverProxy {
     solver: SolverBG = new SolverBG();
@@ -106,6 +107,17 @@ export class SolverProxy {
         this.config.region = val;
         this.data.SetRegion(val);
         this.loadData();
+    }
+
+    get shareLink() 
+    {
+        const binary = new Uint8Array(Math.ceil(this.config.demandPatterns.length / 2) + 1);
+        binary[0] = this.popPattern;
+        for (let i = 0; i < this.config.demandPatterns.length; i++) {
+          const p = this.config.demandPatterns[i];
+          binary[Math.floor(i / 2) + 1] |= (p << (i % 2 === 0 ? 0 : 4));
+        }
+        return ToShareCode(binary);
     }
 
     /**
@@ -245,6 +257,32 @@ export class SolverProxy {
         }
 
         const result = await this.solver.pattern_predict(array, packets.length);
+        const arr = [];
+        for (let i = 0; i < result.length; i++) {
+            arr.push(result[i]);
+        }
+        return arr;
+    }
+
+    /**
+     * 从已有的历史数据包推测变化模式
+     * @param packets 数据包
+     * @param lastDemand 上周最后一天的需求真实值
+     * @returns 可能的变化模式
+     */
+    async predictFromPacketsAdv(packets: Uint8Array[], lastDemand: Uint8Array) {
+        const days = packets.length;
+        const objs = packets[0].length - 2;
+        const array = new Uint8Array((days + 1) * objs);
+        for (let i = 0; i < objs; i++) {
+            array[i * (days + 1)] = lastDemand[i];
+            for (let j = 0; j < days; j++) {
+                const np = packets[j].slice(2);
+                array[i * (days + 1) + j + 1] = np[i];
+            }
+        }
+
+        const result = await this.solver.pattern_predict_adv(array, days);
         const arr = [];
         for (let i = 0; i < result.length; i++) {
             arr.push(result[i]);

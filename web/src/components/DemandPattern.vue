@@ -131,7 +131,6 @@ import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import { DemandUtils, PatternNames } from "@/model/data";
 import { CraftworkData, CraftworkObject } from "@/data/data";
-import { ToShareCode } from "@/model/share";
 import SortLabel from "./SortLabel.vue";
 import Dialog from "./Dialog.vue";
 import DemandShare from "./DemandShare.vue";
@@ -180,14 +179,7 @@ export default class DemandPattern extends Vue {
   }
 
   get shareLink() {
-    let binary = new Uint8Array(Math.ceil(this.demandPattern.length / 2) + 1);
-    binary[0] = this.popPattern;
-    for (let i = 0; i < this.demandPattern.length; i++) {
-      let p = this.demandPattern[i];
-      binary[Math.floor(i / 2) + 1] |= (p << (i % 2 === 0 ? 0 : 4));
-    }
-
-    return document.location.protocol + "//" + document.location.host + "/#/pat/" + ToShareCode(binary);
+    return document.location.protocol + "//" + document.location.host + "/#/pat/" + this.solver.shareLink;
   }
 
   set shareLink(val: string) {

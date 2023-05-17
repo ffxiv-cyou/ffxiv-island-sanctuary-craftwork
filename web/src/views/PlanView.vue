@@ -30,22 +30,31 @@
           :hide-share="true"
           :hide-btn="true"
         >
-          <div class="mji-title">
-            <span class="mji-text-brown">
-              排班表分享
-            </span>
-            <span class="share-control">
-              <span class="mji-text-brown mji-text-small">
-                收益计算结果会随着当前欢迎度和需求的设置而变动，若有需要请检查需求和欢迎度设置
+          <template #header>
+            <div class="mji-title">
+              <span class="mji-text-brown">
+                排班表分享
               </span>
+              <span class="share-control">
+                <span class="mji-text-brown mji-text-small">
+                  收益计算结果会随着当前欢迎度和需求的设置而变动，若有需要请检查需求和欢迎度设置
+                </span>
+              </span>
+            </div>
+          </template>
+          <template #footer>
+            <div
+              class="mji-footer"
+              style="text-align: right;"
+            >
               <button
                 class="mji mji-text-brown"
                 @click="importPlan"
               >
                 导入
               </button>
-            </span>
-          </div>
+            </div>
+          </template>
         </plan>
       </div>
     </popup>
