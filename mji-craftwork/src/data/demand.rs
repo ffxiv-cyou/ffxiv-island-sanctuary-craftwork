@@ -87,6 +87,14 @@ impl From<Demand> for u8 {
     }
 }
 
+impl PartialOrd<Demand> for Demand {
+    fn partial_cmp(&self, other: &Demand) -> Option<std::cmp::Ordering> {
+        let other: u8 = other.clone().into();
+        let this: u8 = self.clone().into();
+        return other.partial_cmp(&this);
+    }
+}
+
 /// 需求变化量
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
