@@ -52,11 +52,12 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
         let (demand, change) = seq[i];
         if i == 0 && demand == Demand::High {
             match change {
-                DemandChange::Decerease => return DemandPattern::Day2Weak,
                 DemandChange::Equal => return DemandPattern::Day2Strong,
                 DemandChange::Increase => return DemandPattern::Day2Weak,
                 // 2F or 2P
-                DemandChange::MassiveDecrease | DemandChange::MassiveIncrease => {
+                DemandChange::MassiveDecrease
+                | DemandChange::MassiveIncrease
+                | DemandChange::Decerease => {
                     for i in 2..candidates.len() {
                         candidates[i] = false;
                     }
