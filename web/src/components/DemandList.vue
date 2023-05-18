@@ -98,7 +98,7 @@
 import { CraftworkData, type CraftworkObject } from "@/data/data";
 import { DemandUtils, PatternNames } from "@/model/data";
 import type { SolverProxy } from "@/model/solver";
-import { Component, Vue, Prop } from "vue-facing-decorator";
+import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import MjiBox from "./MjiBox.vue";
 
 @Component({
@@ -198,6 +198,16 @@ export default class DemandList extends Vue {
 
   pattern(id: number) {
     var v = this.demandPats[id] ?? 0;
+
+    let mask = this.patternMask(id);
+    if (mask !== undefined) {
+      for(var i=0;i<12;i++) {
+        if (mask & (1 << i)) {
+          v = i + 1;
+          break;
+        }
+      }
+    }
     return PatternNames[v as number];
   }
 
@@ -239,6 +249,26 @@ export default class DemandList extends Vue {
     n = n - ((n >> 1) & 0x55555555)
     n = (n & 0x33333333) + ((n >> 2) & 0x33333333)
     return ((n + (n >> 4) & 0xF0F0F0F) * 0x1010101) >> 24
+  }
+
+  @Watch("demandPatsRaw")
+  onDemandsPatsRawChange() {
+    if (!this.demandPatsRaw) return;
+
+    for (var i=0;i<this.demandPatsRaw.length;i++) {
+      let mask = this.demandPatsRaw[i];
+      let bc = this.bitCount(mask);
+      if (bc != 1) {
+        this.demandPats[i] = 0;
+        continue;
+      }
+      for(var j=0;j<12;j++) {
+        if (mask & (1 << j)) {
+          this.demandPats[i] = j + 1;
+          break;
+        }
+      }
+    }
   }
 
   changeClass(day: number, id: number) {
