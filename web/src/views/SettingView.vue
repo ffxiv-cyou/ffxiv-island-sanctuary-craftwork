@@ -25,10 +25,10 @@
             v-model="level"
             type="number"
             min="1"
-            max="12"
-            placeholder="1-12"
+            max="16"
+            placeholder="1-16"
           >
-          <span class="pure-form-message-inline">当前开拓等级（1-12），大于此等级的配方不会被求解。</span>
+          <span class="pure-form-message-inline">当前开拓等级（1-16），大于此等级的配方不会被求解。</span>
         </div>
         <div class="pure-control-group">
           <label for="craft-level">工坊等级</label>
@@ -49,8 +49,8 @@
             v-model="max_tension"
             type="number"
             min="0"
-            max="35"
-            placeholder="0-35"
+            max="45"
+            placeholder="0-45"
           >
           <span class="pure-form-message-inline">工坊的干劲上限，影响产品价格。通常不需要修改。</span>
         </div>
@@ -61,8 +61,8 @@
             v-model="workers"
             type="number"
             min="1"
-            max="3"
-            placeholder="1-3"
+            max="4"
+            placeholder="1-4"
           >
           <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算。</span>
         </div>
