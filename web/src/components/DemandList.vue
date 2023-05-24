@@ -323,6 +323,7 @@ export default class DemandList extends Vue {
 .demand-header {
   .demand-name {
     flex: 150px;
+    text-overflow: ellipsis;
   }
 
   .demand-pat {
@@ -353,7 +354,7 @@ export default class DemandList extends Vue {
     width: 1.75em;
     height: 1.75em;
     background-size: 1.75em 1.75em;
-    vertical-align: middle;
+    vertical-align: top;
   }
 
   .select {
