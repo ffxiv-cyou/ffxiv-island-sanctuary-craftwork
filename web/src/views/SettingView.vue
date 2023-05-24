@@ -37,10 +37,10 @@
             v-model="craft_level"
             type="number"
             min="1"
-            max="3"
-            placeholder="1-3"
+            max="4"
+            placeholder="1-4"
           >
-          <span class="pure-form-message-inline">当前工坊等级（1-3），影响产品价格。</span>
+          <span class="pure-form-message-inline">当前工坊等级（1-4），影响产品价格。</span>
         </div>
         <div class="pure-control-group">
           <label for="max-tension">干劲上限</label>
