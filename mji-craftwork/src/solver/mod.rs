@@ -22,7 +22,7 @@ pub trait Solver {
         for mut item in ret {
             item.set_cmp_value(limit.with_cost);
             heap.push(item);
-            if heap.len() >= limit.max_result {
+            if heap.len() > limit.max_result {
                 heap.pop();
             }
         }
