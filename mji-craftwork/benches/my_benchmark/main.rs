@@ -1,9 +1,10 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use mji_craftwork::{
-    data::{CraftworkInfo, GameDataRepo, Popularity, Recipe},
+    data::{CraftworkInfo, GameDataRepo, IDataRepo, Popularity, Recipe},
     gsolver::{GSolver, MildSolver, RadicalSolver},
     predition::DemandPattern,
-    solver::{BFSolver, SimplifySolver, SolveLimit, Solver},
+    simulator::{simulate, simulate_batch_seq, simulate_multi_batch},
+    solver::{BFSolver, SimplifySolver, SolveLimit, Solver, SolverMulti},
 };
 mod test_data;
 use test_data::{CRAFT_OBJECTS, POPULARITY_LIST};
@@ -54,22 +55,22 @@ fn predition_benchmark(c: &mut Criterion) {
     let mut limit1 = limit.clone();
     limit1.max_result = 1;
 
-    let demands = vec![9; 80];
+    let demands = vec![9; 82];
     let mut group = c.benchmark_group("predition");
     group.bench_function(BenchmarkId::new("BFSolver", 100), |b| {
-        b.iter(|| solver.solve(black_box(&limit), black_box(&demands)))
+        b.iter(|| Solver::solve(&solver, black_box(&limit), black_box(&demands)))
     });
     group.bench_function(BenchmarkId::new("BFSolver", 1), |b| {
-        b.iter(|| solver.solve(black_box(&limit1), black_box(&demands)))
+        b.iter(|| Solver::solve(&solver, black_box(&limit1), black_box(&demands)))
     });
     group.bench_function(BenchmarkId::new("BFSolverUnorder", 1), |b| {
-        b.iter(|| solver.solve_unordered(black_box(&limit), black_box(&demands)))
+        b.iter(|| Solver::solve_unordered(&solver, black_box(&limit), black_box(&demands)))
     });
     group.bench_function(BenchmarkId::new("BFSolverBest", 1), |b| {
-        b.iter(|| solver.solve_best(black_box(&limit), black_box(&demands)))
+        b.iter(|| Solver::solve_best(&solver, black_box(&limit), black_box(&demands)))
     });
     group.bench_function(BenchmarkId::new("SimplifySolverUnorder", 1), |b| {
-        b.iter(|| sim_solver.solve_unordered(black_box(&limit), black_box(&demands)))
+        b.iter(|| Solver::solve_unordered(&sim_solver, black_box(&limit), black_box(&demands)))
     });
     group.finish();
 }
@@ -92,18 +93,85 @@ fn gsolver_benchmark(c: &mut Criterion) {
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
         c.benchmark_group("gpred");
     group.bench_function(BenchmarkId::new("Mild_GSolver", 1), |b| {
-        b.iter(|| mild_solver.solve(black_box(&limit), black_box(&pat)))
+        b.iter(|| GSolver::solve(&mild_solver, black_box(&limit), black_box(&pat)))
     });
     group.bench_function(BenchmarkId::new("Radical_GSolver", 1), |b| {
-        b.iter(|| radical_solver.solve(black_box(&limit), black_box(&pat)))
+        b.iter(|| GSolver::solve(&radical_solver, black_box(&limit), black_box(&pat)))
     });
     group.finish()
+}
+
+fn simulate_benchmark(c: &mut Criterion) {
+    let ban = [];
+    let (repo, info, _) = make_config(&ban);
+
+    let mut recipe = vec![];
+    for s in [14, 49, 14, 49] {
+        recipe.push(repo.state(s, 9));
+    }
+
+    let recipes = [
+        (
+            2,
+            [
+                Some(repo.state(14, 9)),
+                Some(repo.state(49, 9)),
+                Some(repo.state(14, 9)),
+                Some(repo.state(49, 9)),
+                None,
+                None,
+            ],
+        ),
+        (
+            2,
+            [
+                Some(repo.state(59, 9)),
+                Some(repo.state(58, 9)),
+                Some(repo.state(57, 9)),
+                Some(repo.state(58, 9)),
+                Some(repo.state(57, 9)),
+                None,
+            ],
+        ),
+    ];
+
+    let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
+        c.benchmark_group("simulate");
+
+    group.bench_function(BenchmarkId::new("Single", 4), |b| {
+        b.iter(|| simulate_batch_seq(&info, black_box(&recipe)))
+    });
+    group.bench_function(BenchmarkId::new("Multi", 4), |b| {
+        b.iter(|| simulate_multi_batch(&info, black_box(&recipes)))
+    });
+}
+
+fn solver_multi_benchmark(c: &mut Criterion) {
+    let ban = [];
+    let (repo, info, limit) = make_config(&ban);
+
+    let demands = vec![9; 82];
+    let mut recipe = vec![];
+    for s in [14, 49, 14, 49] {
+        recipe.push(repo.state(s, 9));
+    }
+    let solver = BFSolver::new(&repo, info);
+    let set = [(3, [14, 49, 14, 49, 0, 0])];
+
+    let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
+        c.benchmark_group("solver_multi");
+
+    group.bench_function(BenchmarkId::new("solver", 1), |b| {
+        b.iter(|| {
+            SolverMulti::solve_unordered(&solver, &limit, black_box(&set), black_box(&demands), 2)
+        })
+    });
 }
 
 criterion_group! {
     name = benches;
     // This can be any expression that returns a `Criterion` object.
     config = Criterion::default().with_profiler(FlamegraphProfiler::new(100));
-    targets = predition_benchmark, gsolver_benchmark
+    targets = predition_benchmark, gsolver_benchmark, simulate_benchmark, solver_multi_benchmark
 }
 criterion_main!(benches);

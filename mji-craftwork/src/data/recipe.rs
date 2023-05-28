@@ -46,7 +46,7 @@ impl Recipe {
 }
 
 /// 配方状态
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct RecipeState {
     /// 配方ID
     id: u16,
