@@ -75,6 +75,7 @@ pub trait Solver {
 }
 
 /// 求解器限制
+#[derive(Debug, Clone, Copy)]
 pub struct SolveLimit<'a> {
     /// 配方最高等级
     level: u8,

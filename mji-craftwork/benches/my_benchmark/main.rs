@@ -37,21 +37,24 @@ fn load_data<const T: usize>() -> GameDataRepo {
     GameDataRepo::new(recpies, pop_vec)
 }
 
-fn predition_benchmark(c: &mut Criterion) {
-    let mut repo = load_data::<51>();
+fn make_config(ban: &[u16]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
+    let mut repo = load_data::<73>();
     repo.set_popular_pattern(1);
-
     let info = CraftworkInfo::new(0, 35, 1, 1);
+    let limit = SolveLimit::new(16, ban, 24, false);
+    (repo, info, limit)
+}
+
+fn predition_benchmark(c: &mut Criterion) {
+    let empty = vec![];
+    let (repo, info, limit) = make_config(&empty);
     let solver = BFSolver::new(&repo, info);
     let sim_solver = SimplifySolver::new(&repo, info);
 
-    let empty = vec![];
-    let mut limit = SolveLimit::new(10, &empty, 24, false);
-    limit.max_result = 100;
-    let mut limit1 = SolveLimit::new(10, &empty, 24, false);
+    let mut limit1 = limit.clone();
     limit1.max_result = 1;
 
-    let demands = vec![9; 62];
+    let demands = vec![9; 80];
     let mut group = c.benchmark_group("predition");
     group.bench_function(BenchmarkId::new("BFSolver", 100), |b| {
         b.iter(|| solver.solve(black_box(&limit), black_box(&demands)))
@@ -72,15 +75,12 @@ fn predition_benchmark(c: &mut Criterion) {
 }
 
 fn gsolver_benchmark(c: &mut Criterion) {
-    let mut repo = load_data::<51>();
-    repo.set_popular_pattern(19);
+    let empty = vec![];
+    let (repo, info, mut limit) = make_config(&empty);
+    limit.max_result = 200;
 
-    let info = CraftworkInfo::new(0, 35, 2, 3);
     let mild_solver = MildSolver::new(&repo, info);
     let radical_solver = RadicalSolver::new(&repo, info);
-    let ban = vec![];
-    let mut limit = SolveLimit::new(10, &ban, 24, false);
-    limit.max_result = 200;
 
     let data = vec![
         0, 11, 12, 3, 3, 4, 1, 11, 12, 5, 2, 4, 7, 7, 12, 2, 1, 9, 1, 6, 2, 6, 11, 6, 8, 4, 9, 4,
