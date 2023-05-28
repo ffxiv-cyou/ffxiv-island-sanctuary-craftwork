@@ -45,10 +45,15 @@ impl CraftworkInfo {
         (1.0 + self.level as f32 * 0.1) * (1.0 + tension as f32 * 0.01)
     }
 
-    /// 增加一点干劲
+    /// 增加对应工坊数量的干劲
     pub fn next(self) -> Self {
+        self.add_tension(self.workers)
+    }
+
+    /// 增加指定点数的干劲
+    pub fn add_tension(self, n: u8) -> Self {
         CraftworkInfo {
-            tension: u8::saturating_add(self.tension, self.workers),
+            tension: u8::saturating_add(self.tension, n),
             max_tension: self.max_tension,
             level: self.level,
             workers: self.workers,
