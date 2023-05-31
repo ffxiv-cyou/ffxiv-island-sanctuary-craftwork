@@ -164,6 +164,27 @@ export class SolverProxy {
     }
 
     /**
+     * 模拟多个工坊同时工作的求解。注意只考虑连击
+     * @param workers 各个工坊的配方
+     * @param demands 当前需求值
+     * @param tension 当前干劲
+     * @returns 各个工坊的收益值
+     */
+    async simulateMulti(workers: WorkerSteps[], demands: number[], tension: number): Promise<BatchValues[]> {
+        const seq = WorkerSteps.toU8Array(workers);
+        const arr = await this.solver.simulate_multi(this.infoWithTension(tension), seq, new Int8Array(demands));
+    
+        const ret = [];
+        for (let i = 0; i < workers.length; i++) {
+            const worker = workers[i];
+            const offset = i * 7;
+            const batch = BatchValues.fromSteps(worker.steps, arr.slice(offset, offset + 1 + worker.steps.length)); 
+            ret.push(batch);
+        }
+        return ret;
+    }
+
+    /**
      * 模拟一整周的求解。注意只考虑连击
      * @param weekSteps 每一天的配方
      * @returns 
@@ -209,6 +230,50 @@ export class SolverProxy {
     }
 
     /**
+     * 模拟一整周的求解。注意只考虑连击
+     * @param weekSteps 每一天每一个工坊的配方
+     * @returns 
+     */
+    async simulateMultiWeek(weekSteps: WorkerSteps[][]) {
+        const batchValues = [];
+
+        const demandChanges = []; // 各个配方的需求变动值
+        for (let i = 0; i < this.Recipes.length; i++) {
+            demandChanges.push(0);
+        }
+        let tensionAdd = 0;
+
+        for (let i = 0; i < weekSteps.length; i++) {
+            const daySteps = weekSteps[i];
+            const demands = [...this.predictDemands[i]];
+            for (let j = 0; j < demandChanges.length; j++) {
+                demands[j] -= demandChanges[j];
+            }
+
+            const values = await this.simulateMulti(daySteps, demands, tensionAdd);
+            batchValues.push(values);
+
+            for (let j = 0; j < daySteps.length; j++) {
+                const steps = daySteps[j].steps;
+                const worker = daySteps[j].worker;
+                for (let k = 0; k < steps.length; k++) {
+                    const step = steps[k];
+                    if (k == 0) {
+                        demandChanges[step] += (1 * worker);
+                    } else {
+                        demandChanges[step] += (2 * worker);
+                        tensionAdd += worker;
+                    }
+                }
+            }
+            if (tensionAdd >= this.config.maxTension)
+                tensionAdd = this.config.maxTension;
+        }
+
+        return batchValues;
+    }
+
+    /**
      * 使用指定的需求值求解当天的最优值
      * @param demands 
      * @param banList 
@@ -223,6 +288,30 @@ export class SolverProxy {
         const arr = await this.solver.solve_day(info, this.config.level, banArr, demandArr, maxTime, this.config.withCost);
 
         return BatchValues.fromSimulateArray(arr);
+    }
+
+    /**
+     * 在已经设置了指定工坊的情况下求解当天最优值
+     * @param demands 需求值
+     * @param setWorkers 已设置的工坊情况
+     * @param banList 禁用列表
+     * @param tension 干劲
+     * @param worker 当前求解的工坊数量
+     * @param maxTime 最大工序时间
+     * @returns 解，和对应已设置工坊的值
+     */
+    async solveMultiDay(demands: number[], setWorkers: WorkerSteps[], banList: number[], tension: number, worker: number, maxTime: number = 24) {
+        const banArr = new Uint16Array(banList);
+        const demandArr = new Int8Array(demands);
+        const info = this.infoWithTension(tension);
+
+        const set = WorkerSteps.toU8Array(setWorkers);
+        const arr = await this.solver.solve_multi_day(info, this.config.level, banArr, set, demandArr, worker, maxTime, this.config.withCost);
+    
+        const workers = setWorkers.map(v => v.worker);
+        workers.push(worker);
+
+        return BatchValuesWithWorker.fromWorkerArrays(arr, workers);
     }
 
     /**
@@ -355,22 +444,21 @@ export class BatchValues extends Batch {
 
     public cost: number;
 
-    constructor(value: number, cost: number, steps: number[], values: Uint16Array) {
+    constructor(value: number, cost: number, steps: number[], values: number[]) {
         super(value, steps.length, steps);
 
         this.cost = cost;
-        this.stepValues = [];
-        for (let i = 0; i < steps.length; i++) {
-            this.stepValues.push(values[i]);
-        }
+        this.stepValues = values;
     }
 
     static fromSteps(steps: number[], values: Uint16Array) {
         let value = 0;
+        const valueArr = [];
         for (let i = 1; i < values.length; i++) {
             value += values[i];
+            valueArr.push(values[i]);
         }
-        return new BatchValues(value, values[0], steps, values.slice(1));
+        return new BatchValues(value, values[0], steps, valueArr);
     }
 
     static fromArray(array: Uint16Array): BatchValues {
@@ -382,7 +470,11 @@ export class BatchValues extends Batch {
             if (array[i] != 0)
                 steps.push(array[i]);
         }
-        return new BatchValues(value, cost, steps, array.slice(9));
+        const values = [];
+        for (let i = 9; i < 15; i++) {
+            values.push(array[i]);
+        }
+        return new BatchValues(value, cost, steps, values);
     }
 
     static fromSimulateArray(array: Uint16Array): BatchValues[] {
@@ -391,5 +483,78 @@ export class BatchValues extends Batch {
             result.push(BatchValues.fromArray(array.slice(i, i + 15)));
         }
         return result;
+    }
+}
+
+export class BatchValuesWithWorker extends BatchValues {
+    /**
+     * 已有步骤的收益
+     */
+    public workerVal: number;
+    /**
+     * 已有步骤的成本
+     */
+    public workerCost: number;
+    /**
+     * 当前步骤的工坊数量
+     */
+    public workers: number;
+
+    constructor(workers: number, workerValue: number, workerCost: number, value: number, cost: number, steps: number[], values: number[]) {
+        super(value, cost, steps, values);
+
+        this.workers = workers;
+        this.workerVal = workerValue;
+        this.workerCost = workerCost;
+    }
+
+    static fromWorkerArray(array: Uint16Array, workers: number): BatchValuesWithWorker {
+        const value = array[0];
+        const cost = array[1];
+        const batch = BatchValues.fromArray(array.slice(2));
+        return new BatchValuesWithWorker(workers, value, cost, batch.value, batch.cost, batch.steps, batch.stepValues);
+    }
+
+    static fromWorkerArrays(array: Uint16Array, workers: number[]): BatchValuesWithWorker[] {
+        const result = [];
+        for (let i = 0, j = 0; i < array.length; i += 17, j++) {
+            result.push(BatchValuesWithWorker.fromWorkerArray(array.slice(i, i + 17), workers[j]));
+        }
+        return result;
+    }
+}
+
+export class WorkerSteps {
+    worker: number = 1;
+    steps: number[] = [];
+
+    /**
+     * 
+     * @param worker 工坊数量
+     * @param steps 步骤，最多6步
+     */
+    constructor(worker: number, steps: number[]) {
+        this.worker = worker;
+        if (steps.length > 6)
+            steps = steps.slice(0, 6);
+        this.steps = steps;
+    }
+
+    setU8Array(arr: Uint8Array) {
+        arr[0] = this.worker;
+        for (let i = 0; i < this.steps.length; i++) {
+            arr[1 + i] = this.steps[i];
+        }
+        for (let i = this.steps.length; i < 6; i++) {
+            arr[1 + i] = 0;
+        }
+    }
+
+    static toU8Array(steps: WorkerSteps[]) {
+        const seq = new Uint8Array(steps.length * 7);
+        for (let i = 0; i < steps.length; i++) {
+            steps[i].setU8Array(seq.subarray(i * 7));
+        }
+        return seq;
     }
 }

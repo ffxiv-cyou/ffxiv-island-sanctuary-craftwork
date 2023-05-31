@@ -10,6 +10,8 @@ import init, {
   pattern_predict,
   pattern_demand,
   pattern_predict_adv,
+  simulate_multi,
+  solve_multi_day,
 } from "mji-craftwork";
 
 function get_craft_info(state: any): CraftworkInfo {
@@ -66,6 +68,21 @@ async function init_worker() {
         self.postMessage(result, [result.buffer]);
         break;
       }
+      case "solve_multi_day": {
+        const state = get_craft_info(data.state);
+        const result = solve_multi_day(
+          repo, 
+          state, 
+          data.level, 
+          data.ban_list, 
+          data.set, 
+          data.demands,
+          data.worker, 
+          data.time,
+          data.with_cost);
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
       case "simulate": {
         const state = get_craft_info(data.state);
         const result = simulate(
@@ -74,6 +91,12 @@ async function init_worker() {
           data.seq,
           data.demands,
         );
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
+      case "simulate_multi": {
+        const state = get_craft_info(data.state);
+        const result = simulate_multi(repo, state, data.seq, data.demands);
         self.postMessage(result, [result.buffer]);
         break;
       }

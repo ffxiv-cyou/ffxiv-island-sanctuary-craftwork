@@ -3,9 +3,9 @@
     <slot name="header" />
     <div class="plan-info mji-info-box">
       <span class="total-value">
-        收益: <icon class="blue-coin" />{{ sumVal * factor }} 
-        (<icon class="blue-coin" />{{ -sumCost * factor }})
-        <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal * factor }}</span>
+        收益: <icon class="blue-coin" />{{ sumVal }} 
+        (<icon class="blue-coin" />{{ -sumCost }})
+        <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal }}</span>
       </span>
       <span
         v-if="!hideShare"
@@ -30,59 +30,92 @@
           <div class="plan-batch-info">
             <span>第{{ index+1 }}天</span>
             <span
-              v-if="steps[index].length == 0"
+              v-if="workerSteps[index].every(v => v.steps.length === 0)"
               class="value"
             >休息</span>
             <span
               v-else
               class="value"
-            ><icon class="blue-coin" />{{ val.value * factor }}</span>
-          </div>
-          <div v-if="!hideBtn">
-            <button
-              v-if="steps[index].length == 0"
-              class="sched sched-green"
-              :disabled="isMax"
-              @click="add(index)"
-            >
-              +
-            </button>
-            <button
-              v-else
-              class="sched sched-red"
-              @click="del(index)"
-            >
-              -
-            </button>
+            ><icon class="blue-coin" />{{ getDayValue(index) }}</span>
           </div>
           <div
-            v-if="steps[index].length == 0"
+            v-if="workerSteps[index].length == 0"
             class="plan-rest"
           >
             <icon class="sched sched-rest" />
           </div>
-          <steps-comp
+          <div
             v-else
-            :solver="solver"
-            :values="val.stepValues"
-            :steps="val.steps"
-          />
+            class="plan-workers"
+          >
+            <div
+              v-for="(worker, subindex) in val"
+              :key="index * 100 + subindex"
+              class="plan-worker"
+            >
+              <div class="worker-num">
+                <input
+                  v-if="!hideBtn"
+                  type="number"
+                  min="0" 
+                  :max="maxWorker"
+                  :value="workerSteps[index][subindex].worker"
+                  @input="setWorkerNum(index, subindex, $event)"
+                >
+                <span v-else>{{ workerSteps[index][subindex].worker }}</span>&times;
+              </div>
+              <div
+                v-if="!hideBtn"
+                class="worker-btn"
+              >
+                <button
+                  v-if="worker.steps.length == 0"
+                  class="sched sched-green"
+                  :disabled="(isMax && workerSteps[index].every(v => v.steps.length === 0)) || workerSteps[index][subindex].worker === 0"
+                  @click="add(index, subindex)"
+                >
+                  +
+                </button>
+                <button
+                  v-else
+                  class="sched sched-red"
+                  @click="del(index, subindex)"
+                >
+                  -
+                </button>
+              </div>
+              <div
+                v-if="worker.steps.length == 0"
+                class="plan-rest"
+              >
+                <icon class="sched sched-rest" />
+              </div>
+              <steps-comp
+                v-else
+                :solver="solver"
+                :values="worker.stepValues"
+                :steps="worker.steps"
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <ingrid-comp
+      <div
         v-if="!solver.config.hideIngredients"
         class="plan-ingredients mji-info-box hide-xs"
-        :solver="solver"
-        :steps="flatSteps"
-        :workers="workers"
-      />
+      >
+        <ingrid-comp
+          :solver="solver"
+          :steps="flatSteps"
+        />
+      </div>
     </div>
     <slot name="footer" />
   </div>
 </template>
 <script lang="ts">
-import { ToShareCode } from "@/model/share";
-import type { SolverProxy, BatchValues } from "@/model/solver";
+import { ToShareCode, planToShare } from "@/model/share";
+import type { SolverProxy, BatchValues, WorkerSteps } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Close from "./Close.vue";
 import ingredients from "./Ingredients.vue";
@@ -100,7 +133,7 @@ export default class PlanView extends Vue {
   solver!: SolverProxy;
 
   @Prop()
-  steps!: number[][];
+  workerSteps!: WorkerSteps[][];
 
   @Prop()
   removeable?: boolean;
@@ -111,20 +144,26 @@ export default class PlanView extends Vue {
   @Prop()
   hideBtn?: boolean;
 
-  get workers() {
-    return this.solver.config.workers;
-  }
+  batchValues: BatchValues[][] = [];
 
-  get factor() {
-    return this.solver.config.allWorkerValue ? this.workers : 1;
+  getDayValue(day: number) {
+      let vals = this.batchValues[day];
+      let steps = this.workerSteps[day];
+      let sum = 0;
+      for (let i = 0; i < vals.length; i++) {
+        const workers = steps[i].worker;
+        const value = vals[i].value;
+        sum += workers * value;
+      }
+      return sum;
   }
-
-  batchValues: BatchValues[] = [];
 
   get sumVal() {
     let sum = 0;
     for (let i = 0; i < this.batchValues.length; i++) {
-      sum += this.batchValues[i].value;
+      for (let j = 0; j < this.batchValues[i].length; j++) {
+        sum += this.batchValues[i][j].value * this.workerSteps[i][j].worker;
+      }
     }
     return sum;
   }
@@ -132,7 +171,9 @@ export default class PlanView extends Vue {
   get sumCost() {
     let sum = 0;
     for (let i = 0; i < this.batchValues.length; i++) {
-      sum += this.batchValues[i].cost;
+      for (let j = 0; j < this.batchValues[i].length; j++) {
+        sum += this.batchValues[i][j].cost * this.workerSteps[i][j].worker;
+      }
     }
     return sum;
   }
@@ -143,16 +184,24 @@ export default class PlanView extends Vue {
 
   get flatSteps() {
     let arr: number[] = [];
-    for (let i = 0; i < this.steps.length; i++) {
-      arr.push(...this.steps[i]);
+    for (let i = 0; i < this.workerSteps.length; i++) {
+      for (let j = 0; j < this.workerSteps[i].length; j++) {
+        let worker = this.workerSteps[i][j];
+        for (let k = 0; k < worker.worker; k++) {
+          arr.push(...worker.steps);
+        }
+      }
     }
     return arr;
   }
   
-  @Watch("steps", { deep: true })
+  @Watch("workerSteps", { deep: true })
   async recalculateValue() {
     await this.solver.init();
-    this.batchValues = await this.solver.simulateWeek(this.steps);
+
+    // console.log("steps", this.workerSteps);
+    this.batchValues = await this.solver.simulateMultiWeek(this.workerSteps);
+    // console.log("values", this.batchValues);
   }
 
   mounted() {
@@ -163,32 +212,66 @@ export default class PlanView extends Vue {
     this.$emit("remove");
   }
   
-  add(index: number) {
-    this.$emit("addSteps", index);
+  add(day: number, index: number) {
+    this.$emit("addSteps", day, index);
   }
 
-  del(index: number) {
-    this.$emit("delSteps", index);
+  del(day: number, index: number) {
+    this.$emit("delSteps", day, index);
+  }
+
+  get maxWorker() {
+    return this.solver.config.workers;
+  }
+
+  setWorkerNum(day: number, index: number, evt: Event) {
+    let val = Number((evt.target as HTMLInputElement).value);
+    let arr = this.workerSteps[day];
+    let sumWorker = 0;
+    for (let i = 0; i < arr.length; i++) {
+      sumWorker += i == index ? val : arr[i].worker;
+    }
+
+    if (sumWorker <= this.maxWorker) {
+      this.workerSteps[day][index].worker = val;
+      return;
+    }
+
+    let delta = sumWorker - this.maxWorker;
+    for (let i = 1; i < arr.length; i++) {
+      let id = (i + index) % arr.length;
+      if (arr[id].worker < delta) {
+        delta -= arr[id].worker;
+        arr[id].worker = 0;
+      } else {
+        arr[id].worker -= delta;
+        delta = 0;
+        break;
+      }
+    }
+
+    if (delta > 0) {
+      val -= delta;
+    }
+    this.workerSteps[day][index].worker = val;
   }
 
   get isMax() {
     let sum = 0;
-    for (let i = 0; i < this.steps.length; i++) {
-      let steps = this.steps[i];
-      if (steps && steps.length > 0)
-        sum++;
+    for (let i = 0; i < this.workerSteps.length; i++) {
+      let steps = this.workerSteps[i];
+      for (let j = 0; j < steps.length; j++) {
+        if (steps[j].steps.length > 0) {
+          sum++;
+          break;
+        }
+      }
     }
     return sum >= 5;
   }
 
   getShareCode() {
-    let code = [];
-    for (let i = 0; i < this.steps.length; i++) {
-      const element = this.steps[i];
-      code.push(element.length);
-      code.push(...element);
-    }
-    return ToShareCode(new Uint8Array(code));
+    return planToShare(this.workerSteps);
   }
 
   get shareLink() {
@@ -200,7 +283,6 @@ export default class PlanView extends Vue {
 .plan-batch {
   display: flex;
   margin: 4px;
-  height: 42px;
 }
 .plan-batch-info {
   display: inline-flex;
@@ -218,7 +300,6 @@ export default class PlanView extends Vue {
   button.sched {
     --scale: 0.6;
   }
-
 }
 
 .plan-info {
@@ -228,6 +309,7 @@ export default class PlanView extends Vue {
   .share-link {
     flex: 1;
     text-align: right;
+    font-size: 14px;
     a {
       color: inherit;
     }
@@ -240,16 +322,40 @@ export default class PlanView extends Vue {
   }
 }
 
-.plan-body {
-  display: flex;
-}
-.plan-batches {
+.plan-workers {
   flex: 1;
 }
+.plan-worker {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  .worker-num input {
+    width: 2em;
+    // height: 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px rgb(156, 134, 115) solid;
+  }
+}
+
+.plan-body {
+  position: relative;
+  overflow: hidden;
+  height: auto;
+}
+.plan-batches {
+  height: auto;
+  overflow: hidden;
+  position: relative;
+  width: calc(100% - 160px);
+}
 .plan-ingredients {
-  flex: 150px 0 0;
+  width: 150px;
   overflow-y: auto;
-  max-height: 330px;
+  position: absolute;
+  height: calc(100% - 10px);
+  right: 0;
+  top: 0;
 }
 .plan-rest {
   flex: 1;

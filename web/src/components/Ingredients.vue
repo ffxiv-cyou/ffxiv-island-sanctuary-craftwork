@@ -76,7 +76,7 @@ export default class ingredients extends Vue {
   padding: 2px 4px;
 
   .ingridient-name {
-    max-width: calc(100% - 2em);
+    max-width: calc(100% - 2.25em);
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;

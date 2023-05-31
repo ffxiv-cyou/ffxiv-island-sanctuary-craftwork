@@ -5,8 +5,12 @@
   >
     <slot />
     <div class="batch-value">
-      <span class="bench-value"><icon class="blue-coin" />{{ batch.value }}</span>
-      <span class="bench-cost mji-text-small">(-{{ batch.cost }})</span>
+      <span class="bench-value">
+        <icon class="blue-coin" />{{ batch.value }}
+      </span>
+      <span class="bench-cost mji-text-small">
+        (-{{ batch.cost }}<span v-if="deltaVal">, {{ deltaVal > 0 ? "+": "" }}{{ deltaVal }}</span>)
+      </span>
     </div>
     <steps 
       :solver="solver"
@@ -40,6 +44,9 @@ export default class BatchView extends Vue {
   batch!: BatchValues;
 
   @Prop()
+  deltaVal?: number;
+
+  @Prop()
   removeable?: boolean;
 
   @Prop()
@@ -64,7 +71,7 @@ export default class BatchView extends Vue {
 }
 
 .batch-value {
-  width: 56px;
+  width: 80px;
   text-align: center;
 
   .bench-value,

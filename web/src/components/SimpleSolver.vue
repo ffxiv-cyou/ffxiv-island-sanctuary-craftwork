@@ -3,6 +3,27 @@
     <legend class="mji-title mji-text-brown">
       推荐队列
     </legend>
+    <template v-if="hasSetWorker">
+      <legend class="mji-title mji-text-orange mji-text-small">
+        已设置工坊
+      </legend>
+      <div class="set-workers">
+        <div
+          v-for="(worker, index) in cachedSetValues"
+          :key="index+1000"
+          class="set-worker"
+        >
+          <batch-view
+            v-if="cachedSets ? cachedSets[index].worker : 0"
+            :solver="solver"
+            :batch="worker"
+            :patterns="patterns"
+          >
+            {{ cachedSets ? cachedSets[index].worker : 1 }}&times;
+          </batch-view>
+        </div>
+      </div>
+    </template>
     <legend
       v-if="banList.length > 0"
       class="mji-title mji-text-orange mji-text-small"
@@ -39,6 +60,7 @@
         :demands="stepDemands[key]"
         :pops="stepPops[key]"
         :patterns="patterns"
+        :delta-val="val.workerVal - sumSetVal"
         @remove="addBan(key, $event)"
       >
         <button
@@ -58,14 +80,16 @@
   </div>
 </template>
 <script lang="ts">
-import type { BatchValues, SolverProxy } from "@/model/solver";
+import type { WorkerSteps, BatchValues, BatchValuesWithWorker, SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import BatchView from "@/components/BatchView.vue";
 import Close from "@/components/Close.vue";
 import { CraftworkData } from "@/data/data";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import Steps from "./Steps.vue";
 @Component({
   components: {
+    StepsComp: Steps,
     BatchView: BatchView,
     Close: Close,
     Loading: LoadingSpinner,
@@ -84,12 +108,29 @@ export default class SimpleSolver extends Vue {
   /**
    * 计算结果
    */
-  batches: BatchValues[] = [];
+  batches: BatchValuesWithWorker[] = [];
 
   /**
    * 是否计算中
    */
   isLoading = true;
+
+  /**
+   * 是否已有其他工坊
+   */
+  get hasSetWorker() {
+    return this.cachedSets && this.cachedSets.some(v => v.worker > 0 && v.steps.length > 0);
+  }
+
+  get sumSetVal() {
+    if (!this.cachedSetValues || !this.cachedSets) return 0;
+
+    let val = 0;
+    for (let i = 0; i < this.cachedSetValues.length; i++) {
+      val += this.cachedSetValues[i].value * this.cachedSets[i].worker;
+    }
+    return val;
+  }
 
   /**
    * 添加一个禁用物品
@@ -144,13 +185,28 @@ export default class SimpleSolver extends Vue {
    * 求解时的干劲
    */
   cachedtension?: number;
+  /**
+   * 求解时已有的工坊列表
+   */
+  cachedSets?: WorkerSteps[];
+  /**
+   * 求解得到的取值
+   */
+  cachedSetValues?: BatchValues[];
+  /**
+   * 求解时的工坊数量
+   */
+  cachedWorker?: number;
 
   /**
    * 根据当前需求值和干劲求解推荐队列
    */
   @Watch("banList", { deep: true })
   async solve() {
-    if (this.cachedDemands === undefined || this.cachedtension === undefined)
+    if (this.cachedDemands === undefined || 
+      this.cachedtension === undefined || 
+      this.cachedSets === undefined ||
+      this.cachedWorker === undefined)
       return;
 
     this.isLoading = true;
@@ -158,7 +214,8 @@ export default class SimpleSolver extends Vue {
     this.stepPops = [];
     this.batches = [];
 
-    let batches = await this.solver.solveDayDetail(this.cachedDemands, this.banList, this.cachedtension);
+    this.cachedSetValues = await this.solver.simulateMulti(this.cachedSets, this.cachedDemands, this.cachedtension);
+    let batches = await this.solver.solveMultiDay(this.cachedDemands, this.cachedSets, this.banList, this.cachedtension, this.cachedWorker);
     
     this.isLoading = false;
 
@@ -173,8 +230,9 @@ export default class SimpleSolver extends Vue {
         let step = steps[i];
         let demand = this.cachedDemands[step];
         for (let j = 0; j < i; j++) {
+          // todo: 可能并不一定正确，需要结合set的再次计算
           if (steps[j] == step) {
-            demand -= (j === 0 ? 1 : 2) * this.solver.config.workers;
+            demand -= (j === 0 ? 1 : 2) * this.cachedWorker;
           }
         }
         this.stepDemands[b].push(demand);
@@ -188,9 +246,11 @@ export default class SimpleSolver extends Vue {
    * @param demands 各个物品的需求值
    * @param tension 当前干劲
    */
-  public solveBatch(demands: number[], tension: number) {
+  public solveBatch(demands: number[], sets: WorkerSteps[], worker: number, tension: number) {
     this.cachedDemands = demands;
     this.cachedtension = tension;
+    this.cachedSets = sets;
+    this.cachedWorker = worker;
     this.banList = [];
     this.solve();
   }

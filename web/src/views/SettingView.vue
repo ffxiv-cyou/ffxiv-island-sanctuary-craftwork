@@ -15,6 +15,19 @@
           </label>
           <span class="pure-form-message-inline">勾选后使用国际服配方和名字。</span>
         </div>
+        <div class="pure-control-group">
+          <label for="differentWorkers">
+            工坊配方类型数量
+          </label>
+          <input
+            id="differentWorkers"
+            v-model="differentWorkers"
+            type="number"
+            min="1"
+            :max="workers"
+          >
+          <span class="pure-form-message-inline">设置排班表中每天能够配置多少种不同的配方</span>
+        </div>
       </fieldset>
       <fieldset>
         <legend>工坊设置</legend>
@@ -220,6 +233,14 @@ export default class SettingView extends Vue {
   
   set allWorkerValue(val: boolean) {
     this.config.allWorkerValue = val;
+  }
+
+  get differentWorkers() {
+    return this.config.differentWorkers;
+  }
+  
+  set differentWorkers(val: number) {
+    this.config.differentWorkers = val;
   }
 }
 </script>

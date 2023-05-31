@@ -8,7 +8,7 @@ pub mod utils;
 use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
 use gsolver::{GSolver, MildSolver};
 use predition::{get_demands, predict_adv, predict_all, DemandPattern};
-use solver::{BFSolver, SolveLimit, Solver};
+use solver::{BFSolver, SolveLimit, Solver, SolverMulti};
 use wasm_bindgen::prelude::*;
 
 use crate::data::CraftworkInfo;
@@ -102,7 +102,7 @@ pub fn solve_singleday(
 ) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let batches = solver.solve(&limit, demands);
+    let batches = Solver::solve(&solver, &limit, demands);
 
     let mut ret = vec![];
     for b in batches {
@@ -230,6 +230,96 @@ pub fn solve_week(
                 ret.extend_from_slice(batch.get_values());
             }
         }
+    }
+    ret
+}
+
+/// 模拟多个工坊同时的排班表。
+///
+/// 传入排班序列: [workers steps[6]]
+///
+/// 传出价格和总成本: [cost value[6]]
+#[wasm_bindgen]
+pub fn simulate_multi(
+    repo: &GameDataRepo,
+    state: &CraftworkInfo,
+    seq: &[u8],
+    demands: &[i8],
+) -> Vec<u16> {
+    let mut recp = vec![];
+    for i in (0..seq.len()).step_by(7) {
+        let mut arr = [None; 6];
+        for j in 0..6 {
+            let id = seq[i + j + 1] as usize;
+            arr[j] = match id {
+                0 => None,
+                _ => Some(repo.state(id, demands[id])),
+            };
+        }
+        recp.push((seq[i], arr));
+    }
+
+    let (batches, _) = simulator::simulate_multi_batch(state, &recp);
+    let mut ret = vec![];
+    for (_, batch) in batches {
+        ret.push(batch.get_cost());
+        ret.extend_from_slice(batch.get_values());
+    }
+    ret
+}
+
+/// 搜索单日在已有工坊配置下的的最优解
+///
+/// - sets: 已有的工坊: [工坊数量, 序列[6]]
+///
+/// 返回所有可能的解的数组，数组结构如下
+/// - value 总价
+/// - cost 成本
+/// - prev_value 之前工坊的总价
+/// - prev_cost 之前工坊的成本
+/// - step_count 步骤数目
+/// - steps[6] 每一步的物品ID
+/// - values[6] 每一步的价格
+#[wasm_bindgen]
+pub fn solve_multi_day(
+    repo: &GameDataRepo,
+    state: &CraftworkInfo,
+    level: u8,
+    ban_list: &[u16],
+    set: &[u8],
+    demands: &[i8],
+    worker: u8,
+    time: u16,
+    with_cost: bool,
+) -> Vec<u16> {
+    let solver = BFSolver::new(repo, state.clone());
+    let limit = SolveLimit::new(level, ban_list, time, with_cost);
+
+    let mut sets = vec![];
+    for i in (0..set.len()).step_by(7) {
+        sets.push((
+            set[i],
+            [
+                set[i + 1],
+                set[i + 2],
+                set[i + 3],
+                set[i + 4],
+                set[i + 5],
+                set[i + 6],
+            ],
+        ))
+    }
+    let batches = SolverMulti::solve(&solver, &limit, &sets, demands, worker);
+
+    let mut ret = vec![];
+    for b in batches {
+        ret.push(b.value);
+        ret.push(b.cost);
+        ret.push(b.batch.get_val());
+        ret.push(b.batch.get_cost());
+        ret.push(b.batch.seq as u16);
+        ret.extend_from_slice(b.batch.get_steps());
+        ret.extend_from_slice(b.batch.get_values());
     }
     ret
 }

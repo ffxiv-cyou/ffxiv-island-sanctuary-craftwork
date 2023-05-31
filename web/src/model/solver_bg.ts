@@ -119,6 +119,20 @@ export class SolverBG {
     });
   }
 
+  public solve_multi_day(state: WorkerInfo, level: number, ban_list: Uint16Array, set: Uint8Array, demands: Int8Array, worker: number, time: number, with_cost: boolean) {
+    return this.postMsg<Uint16Array>({
+      type: "solve_multi_day",
+      state: this.toInfoObj(state),
+      level: level,
+      ban_list: ban_list,
+      set: set,
+      demands: demands,
+      worker: worker,
+      time: time,
+      with_cost: with_cost,
+    });
+  }
+
   public solve_week(state: WorkerInfo, level: number, ban_list: Uint16Array, time: number, with_cost: boolean, pattern: Uint8Array) {
     return this.postMsg<Uint16Array>({
       type: "solve_week",
@@ -134,6 +148,15 @@ export class SolverBG {
   public simulate(state: WorkerInfo, seq: Uint8Array, demands: Int8Array) {
     return this.postMsg<Uint16Array>({
       type: "simulate",
+      state: this.toInfoObj(state),
+      seq: seq,
+      demands: demands,
+    });
+  }
+
+  public simulate_multi(state: WorkerInfo, seq: Uint8Array, demands: Int8Array) {
+    return this.postMsg<Uint16Array>({
+      type: "simulate_multi",
       state: this.toInfoObj(state),
       seq: seq,
       demands: demands,

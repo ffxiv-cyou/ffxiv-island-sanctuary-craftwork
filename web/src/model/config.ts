@@ -16,6 +16,7 @@ export class Config {
   _allWorkerValue: boolean = true;
   _hideIngredients: boolean = false;
   _showNetValue: boolean = false;
+  _differentWorkers: number = 1;
 
   /**
    * 需求变化规律表
@@ -158,6 +159,18 @@ export class Config {
     this.save();
   }
 
+  /**
+   * 每一天不同类型的工坊的数量
+   */
+  public get differentWorkers() {
+    return this._differentWorkers
+  }
+
+  public set differentWorkers(val: number) {
+    this._differentWorkers = val;
+    this.save;
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -188,6 +201,7 @@ export class Config {
     cfg._allWorkerValue = obj._allWorkerValue ?? true;
     cfg._hideIngredients = obj._hideIngredients ?? false;
     cfg._showNetValue = obj._showNetValue ?? false;
+    cfg._differentWorkers = obj._differentWorkers ?? 1;
     return cfg;
   }
 }
