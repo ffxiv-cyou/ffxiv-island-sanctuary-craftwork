@@ -21,7 +21,10 @@
       />
     </div>
     <div class="plan-body">
-      <div class="plan-batches">
+      <div
+        class="plan-batches"
+        :class="{ 'is-fullwidth': solver.config.hideIngredients }"
+      >
         <div
           v-for="(val, index) in batchValues"
           :key="index"
@@ -348,6 +351,9 @@ export default class PlanView extends Vue {
   overflow: hidden;
   position: relative;
   width: calc(100% - 160px);
+}
+.plan-batches.is-fullwidth {
+  width: 100%;
 }
 .plan-ingredients {
   width: 150px;
