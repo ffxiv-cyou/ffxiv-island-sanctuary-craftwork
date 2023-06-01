@@ -168,7 +168,7 @@ export class Config {
 
   public set differentWorkers(val: number) {
     this._differentWorkers = val;
-    this.save;
+    this.save();
   }
 
   constructor(len: number) {
