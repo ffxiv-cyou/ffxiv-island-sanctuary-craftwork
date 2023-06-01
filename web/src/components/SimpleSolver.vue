@@ -247,7 +247,7 @@ export default class SimpleSolver extends Vue {
           for (let k = 0; k < set.steps.length; k++) {
             let setStep = set.steps[k];
             time += this.solver.data.GetRecipe(setStep).Time;
-            if (time > endTime) break;
+            if (time >= endTime) break;
             if (setStep == step) {
               demand -= (k === 0 ? 1 : 2) * set.worker;
             }
