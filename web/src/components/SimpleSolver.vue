@@ -11,7 +11,7 @@
         <div
           v-for="(worker, index) in cachedSetValues"
           :key="index+1000"
-          class="set-worker"
+          class="set-worker mji-info-box"
         >
           <batch-view
             v-if="cachedSets ? cachedSets[index].worker : 0"
@@ -19,7 +19,9 @@
             :batch="worker"
             :patterns="patterns"
           >
-            {{ cachedSets ? cachedSets[index].worker : 1 }}&times;
+            <div class="set-worker-num">
+              {{ cachedSets ? cachedSets[index].worker : 1 }}&times;
+            </div>
           </batch-view>
         </div>
       </div>
@@ -301,6 +303,11 @@ export default class SimpleSolver extends Vue {
     width: 48px;
     text-align: center;
   }
+}
+
+.set-worker-num {
+  width: 41.6px;
+  text-align: center;
 }
 
 .ban-list {
