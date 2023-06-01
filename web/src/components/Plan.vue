@@ -1,24 +1,33 @@
 <template>
   <div class="plan mji-wooden-plate">
     <slot name="header" />
-    <div class="plan-info mji-info-box">
-      <span class="total-value">
-        收益: <icon class="blue-coin" />{{ sumVal }} 
-        (<icon class="blue-coin" />{{ -sumCost }})
-        <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal }}</span>
-      </span>
-      <span
+    <div class="plan-header mji-info-box">
+      <div class="plan-info">
+        <span class="total-value">
+          收益: <icon class="blue-coin" />{{ sumVal }} 
+          (<icon class="blue-coin" />{{ -sumCost }})
+          <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal }}</span>
+        </span>
+        <span class="share-link">
+          <a
+            v-if="!hideShare"
+            :href="shareLink"
+            target="_blank"
+            class=" visible-lg"
+          >分享</a>
+        </span>
+        <close
+          v-if="removeable"
+          class="plan-remove"
+          @close="onClose"
+        />
+      </div>
+      <div
         v-if="!hideShare"
-        class="share-link"
-      ><a
-        :href="shareLink"
-        target="_blank"
-      >分享</a><span class="hide-lg">: </span><span class="hide-lg share-link-url">{{ shareLink }}</span></span>
-      <close
-        v-if="removeable"
-        class="plan-remove"
-        @close="onClose"
-      />
+        class="mji-text-small"
+      >
+        <span class="hide-lg share-link-url">{{ shareLink }}</span>
+      </div>
     </div>
     <div class="plan-body">
       <div
@@ -305,23 +314,25 @@ export default class PlanView extends Vue {
   }
 }
 
-.plan-info {
+.plan-header {
   padding: 4px;
-  display: flex;
-  gap: 4px;
-  .share-link {
-    flex: 1;
-    text-align: right;
-    font-size: 14px;
-    a {
-      color: inherit;
+  .plan-info {
+    gap: 4px;
+    display: flex;
+    .share-link {
+      flex: 1;
+      text-align: right;
+      a {
+        color: inherit;
+      }
     }
-    .share-link-url {
-      user-select: all;
+    .plan-remove {
+      float: right;
     }
   }
-  .plan-remove {
-    float: right;
+  .share-link-url {
+    user-select: all;
+    line-break: loose;
   }
 }
 

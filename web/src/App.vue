@@ -148,6 +148,12 @@ select {
   padding: 0.2em 0.6em !important;
 }
 
+@media (min-width: 1024px) {
+  .visible-lg {
+    display: none !important;
+  }
+}
+
 @media (max-width: 1024px) {
   .hide-lg {
     display: none !important;
