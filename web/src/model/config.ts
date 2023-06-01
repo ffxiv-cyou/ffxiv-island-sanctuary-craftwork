@@ -13,7 +13,6 @@ export class Config {
   _withCost: boolean = false;
   _styleStepWidth: boolean = false;
   _totalDemand: boolean = false;
-  _allWorkerValue: boolean = true;
   _hideIngredients: boolean = false;
   _showNetValue: boolean = false;
   _differentWorkers: number = 1;
@@ -125,17 +124,6 @@ export class Config {
   }
 
   /**
-   * 计算总价时乘上工坊数量
-   */
-  public get allWorkerValue() {
-    return this._allWorkerValue;
-  }
-  public set allWorkerValue(val: boolean) {
-    this._allWorkerValue = val;
-    this.save();
-  }
-
-  /**
    * 是否不显示原材料
    */
   public get hideIngredients() {
@@ -198,7 +186,6 @@ export class Config {
     cfg._withCost = obj._withCost ?? false;
     cfg._styleStepWidth = obj._styleStepWidth ?? false;
     cfg._totalDemand = obj._totalDemand ?? false;
-    cfg._allWorkerValue = obj._allWorkerValue ?? true;
     cfg._hideIngredients = obj._hideIngredients ?? false;
     cfg._showNetValue = obj._showNetValue ?? false;
     cfg._differentWorkers = obj._differentWorkers ?? 1;
