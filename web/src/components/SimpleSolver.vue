@@ -226,13 +226,29 @@ export default class SimpleSolver extends Vue {
       this.stepDemands.push([]);
       this.stepPops.push([]);
 
+      let endTime = 0;
       for (let i = 0; i < steps.length; i++) {
         let step = steps[i];
+        endTime += this.solver.data.GetRecipe(step).Time;
+        
         let demand = this.cachedDemands[step];
+        // 计算本配方的叠箱
         for (let j = 0; j < i; j++) {
-          // todo: 可能并不一定正确，需要结合set的再次计算
           if (steps[j] == step) {
             demand -= (j === 0 ? 1 : 2) * this.cachedWorker;
+          }
+        }
+        // 计算其他配方的叠箱
+        for (let j = 0; j < this.cachedSets.length; j++) {
+          let set = this.cachedSets[j];
+          let time = 0;
+          for (let k = 0; k < set.steps.length; k++) {
+            let setStep = set.steps[k];
+            time += this.solver.data.GetRecipe(setStep).Time;
+            if (time > endTime) break;
+            if (setStep == step) {
+              demand -= (k === 0 ? 1 : 2) * set.worker;
+            }
           }
         }
         this.stepDemands[b].push(demand);

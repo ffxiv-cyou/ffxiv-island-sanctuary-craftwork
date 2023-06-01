@@ -193,7 +193,7 @@ export default class PlanView extends Vue {
         const workers = dayPlan[j];
         for (let k = 0; k < workers.steps.length; k++) {
           const step = workers.steps[k];
-          demands[step] -= ((j == 0) ? 1 : 2) * workers.worker;
+          demands[step] -= ((k == 0) ? 1 : 2) * workers.worker;
         }
       }
     }
