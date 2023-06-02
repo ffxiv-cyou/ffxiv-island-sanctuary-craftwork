@@ -189,7 +189,7 @@ where
             // if 当前时间结束了 -> calc
             // else 进入下一个地方
             // 快速判断是否还能插入新的步骤
-            if sum_time + 4 < limit.time as u8 && pos < 6 - 1 {
+            if sum_time + 4 <= limit.time as u8 && pos < 6 - 1 {
                 // 还可以，继续插入！
                 pos += 1;
                 continue;
