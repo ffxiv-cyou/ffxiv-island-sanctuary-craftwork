@@ -16,6 +16,7 @@ pub fn simulate_multi_batch(
     let mut info = info.clone();
 
     let mut max_recipe = 0;
+    let mut tension_adds = [0; 24];
     for i in 0..recipes.len() {
         batches.push((recipes[i].0, Batch::new()));
         let time = match &recipes[i].1[0] {
@@ -24,13 +25,22 @@ pub fn simulate_multi_batch(
         };
         states.push((0, 0, time));
 
-        // 计算产量要的数组长度
-        for r in &recipes[i].1 {
+        let recipe = &recipes[i];
+        let mut time = 0;
+        for j in 0..recipe.1.len() {
+            let r = recipe.1[j];
             if let Some(r) = r {
+                // 计算产量要的数组长度
                 max_recipe = max_recipe.max(r.id());
+                // 计算各个小时的干劲叠加表
+                if j != 0 {
+                    tension_adds[time as usize] += recipe.0;
+                }
+                time += r.craft_time()
             }
         }
     }
+
     // 产量，用于计算需求变动值
     let mut produces = vec![0; max_recipe as usize + 1];
 
@@ -39,15 +49,10 @@ pub fn simulate_multi_batch(
         // 查找最早结束的配方
         let mut first_end = 24;
         for i in 0..recipes.len() {
-            let (j, beg, end) = states[i];
+            let (_, beg, end) = states[i];
             // 长度为0，空配方
             if beg == end {
                 continue;
-            }
-            // 更新干劲
-            if beg == current_time && j != 0 {
-                let workers = recipes[i].0;
-                info = info.add_tension(workers)
             }
             // 计算首个结束的时间
             first_end = first_end.min(end)
@@ -57,10 +62,15 @@ pub fn simulate_multi_batch(
             break;
         }
 
+        // 结算前更新干劲
+        for i in current_time..first_end {
+            info = info.add_tension(tension_adds[i as usize]);
+        }
+
         // 计算配方值
         for i in 0..recipes.len() {
-            let (j, beg, _) = states[i];
-            if beg != current_time {
+            let (j, beg, end) = states[i];
+            if end != first_end || beg == end {
                 continue;
             }
             let recipe = &recipes[i].1[j];
@@ -69,6 +79,7 @@ pub fn simulate_multi_batch(
                 batches[i].1 = batches[i]
                     .1
                     .push(r.id(), val, r.cost(), r.craft_time() as u16);
+                // println!("{}({},{}): {} | tension {}", r.id(), i, j, val, info.tension);
             }
         }
 

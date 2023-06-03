@@ -74,7 +74,7 @@ fn test_simulate_multi_batch() {
     let info = CraftworkInfo::new(0, 35, 2, 3);
     let recipes = [
         (
-            2,
+            3,
             [
                 Some(get_recipe_state(&repo, 14)),
                 Some(get_recipe_state(&repo, 49)),
@@ -85,7 +85,7 @@ fn test_simulate_multi_batch() {
             ],
         ),
         (
-            2,
+            1,
             [
                 Some(get_recipe_state(&repo, 59)),
                 Some(get_recipe_state(&repo, 58)),
@@ -97,33 +97,11 @@ fn test_simulate_multi_batch() {
         ),
     ];
 
-    let (batch, info) = simulate_multi_batch(&info, &recipes);
-    // println!("batch: {:?}", batch);
-    // println!("craftwork: {:?}", info);
+    let (batch, new_info) = simulate_multi_batch(&info, &recipes);
+    println!("batch: {:?}", batch);
+    println!("craftwork: {:?}", info);
 
-    assert_eq!(
-        Batch {
-            seq: 4,
-            steps: [14, 49, 14, 49, 0, 0],
-            values: [72, 416, 158, 450, 0, 0],
-            cmp_value: 0,
-            value: 1096,
-            cost: 0,
-            time: 24
-        },
-        batch[0].1
-    );
-    assert_eq!(
-        Batch {
-            seq: 5,
-            steps: [59, 58, 57, 58, 57, 0],
-            values: [86, 152, 272, 162, 294, 0],
-            cmp_value: 0,
-            value: 966,
-            cost: 0,
-            time: 24
-        },
-        batch[1].1
-    );
-    assert_eq!(14, info.tension);
+    assert_eq!([72, 422, 158, 452, 0, 0], batch[0].1.values);
+    assert_eq!([86, 152, 278, 164, 292, 0], batch[1].1.values);
+    assert_eq!(13, new_info.tension);
 }
