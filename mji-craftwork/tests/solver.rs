@@ -171,6 +171,14 @@ fn test_solver_multi() {
     let set = [(3, [14, 49, 14, 49, 0, 0])];
     let result = SolverMulti::solve_unordered(&solver, &limit, &set, &demands, 1);
     println!("solve space: {}", result.len());
+    let mut max_len = 0;
+    let mut max_time = 0;
+    for r in result {
+        max_len = max_len.max(r.batch.seq);
+        max_time = max_time.max(r.batch.time);
+    }
+    assert_eq!(max_len, 6);
+    assert_eq!(max_time, 24);
 
     let result = SolverMulti::solve(&solver, &limit, &set, &demands, 1);
     assert_eq!(result.len(), limit.max_result);
