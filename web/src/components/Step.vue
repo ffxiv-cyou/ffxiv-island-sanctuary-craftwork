@@ -113,10 +113,10 @@ export default class Step extends Vue {
   }
   .item-text {
     flex: 1;
-    line-height: 1.15;
-    padding-right: 2px;
+    padding: 0 2px 4px 0;
     width: calc(100% - 44px);
     .item-primary {
+      line-height: 1.5;
       .item-remove {
         float: right;
       }
