@@ -119,6 +119,7 @@ export default class Step extends Vue {
       line-height: 1.5;
       .item-remove {
         float: right;
+        margin-top: 2px;
       }
     }
     .item-name,
