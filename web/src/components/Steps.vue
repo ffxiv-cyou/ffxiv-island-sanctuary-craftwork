@@ -83,7 +83,7 @@ export default class Steps extends Vue {
   flex-flow: nowrap !important;
   flex: 1;
   .step-item   {
-    margin-right: 2px;
+    margin-left: 2px;
   }
 }
 
@@ -103,6 +103,13 @@ export default class Steps extends Vue {
   .step-6,
   .step-8 {
     width: calc(100% / 6 - 2px);
+  }
+}
+
+@media (max-width: 568px) {
+  .steps .step-item {
+    width: 42px;
+    margin-left: 0px;
   }
 }
 </style>

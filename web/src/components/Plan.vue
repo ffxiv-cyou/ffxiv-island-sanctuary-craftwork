@@ -363,6 +363,12 @@ export default class PlanView extends Vue {
   position: relative;
   width: calc(100% - 160px);
 }
+@media (max-width: 568px) {
+  .plan-batches {
+    width: 100% !important;
+  }
+}
+
 .plan-batches.is-fullwidth {
   width: 100%;
 }

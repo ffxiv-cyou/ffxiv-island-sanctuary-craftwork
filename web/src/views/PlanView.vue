@@ -36,7 +36,7 @@
                 排班表分享
               </span>
               <span class="share-control">
-                <span class="mji-text-brown mji-text-small">
+                <span class="mji-text-brown mji-text-small hide-xs">
                   收益计算结果会随着当前欢迎度和需求的设置而变动，若有需要请检查需求和欢迎度设置
                 </span>
               </span>
