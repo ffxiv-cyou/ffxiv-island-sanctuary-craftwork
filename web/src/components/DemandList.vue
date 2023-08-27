@@ -177,7 +177,8 @@ export default class DemandList extends Vue {
   }
   
   lastDemand(id: number) {
-    return DemandUtils.GetDemand(this.lastDemandRaw(id));
+    const val = this.lastDemandRaw(id);
+    return val === -128 ? -1 : DemandUtils.GetDemand(val);
   }
 
   demand(day: number, id: number) {
