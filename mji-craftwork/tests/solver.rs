@@ -162,6 +162,7 @@ fn compare_bf_simplify() {
     }
 }
 
+/// 测试已设定一个排班的情况下求解
 #[test]
 fn test_solver_multi() {
     let empty = vec![];

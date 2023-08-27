@@ -4,10 +4,15 @@ use std::collections::BinaryHeap;
 
 use super::super::simulator::Batch;
 
+/// 步骤解
 pub struct BatchWithBatch {
+    /// 当前步骤
     pub batch: Batch,
+    /// 已设置步骤的值
     pub value: u16,
+    /// 已设置步骤的费用
     pub cost: u16,
+    /// 用于比较的总值
     pub cmp_value: u16,
 }
 
@@ -45,7 +50,7 @@ impl Ord for BatchWithBatch {
 }
 impl Eq for BatchWithBatch {}
 
-/// 每天排班求解器
+/// 带已设置排版的求解器
 pub trait SolverMulti {
     /// 解最优
     ///

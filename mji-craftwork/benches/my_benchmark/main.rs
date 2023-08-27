@@ -6,10 +6,10 @@ use mji_craftwork::{
     simulator::{simulate, simulate_batch_seq, simulate_multi_batch},
     solver::{BFSolver, SimplifySolver, SolveLimit, Solver, SolverMulti},
 };
+use base64::{engine::general_purpose, Engine as _};
+
 mod test_data;
 use test_data::{CRAFT_OBJECTS, POPULARITY_LIST};
-mod pref;
-use pref::FlamegraphProfiler;
 
 fn load_data<const T: usize>() -> GameDataRepo {
     let mut recpies = vec![];
@@ -46,35 +46,43 @@ fn make_config(ban: &[u16]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
     (repo, info, limit)
 }
 
+/// 测试单日单种类求解器
 fn predition_benchmark(c: &mut Criterion) {
     let empty = vec![];
     let (repo, info, limit) = make_config(&empty);
     let solver = BFSolver::new(&repo, info);
     let sim_solver = SimplifySolver::new(&repo, info);
 
+    // 求解单个
     let mut limit1 = limit.clone();
     limit1.max_result = 1;
 
     let demands = vec![9; 82];
     let mut group = c.benchmark_group("predition");
+    // 暴力搜索，排序前100
     group.bench_function(BenchmarkId::new("BFSolver", 100), |b| {
         b.iter(|| Solver::solve(&solver, black_box(&limit), black_box(&demands)))
     });
+    // 暴力搜索，排序前1
     group.bench_function(BenchmarkId::new("BFSolver", 1), |b| {
         b.iter(|| Solver::solve(&solver, black_box(&limit1), black_box(&demands)))
     });
+    // 暴力搜索，不排序
     group.bench_function(BenchmarkId::new("BFSolverUnorder", 1), |b| {
         b.iter(|| Solver::solve_unordered(&solver, black_box(&limit), black_box(&demands)))
     });
+    // 暴力搜索，取最优
     group.bench_function(BenchmarkId::new("BFSolverBest", 1), |b| {
         b.iter(|| Solver::solve_best(&solver, black_box(&limit), black_box(&demands)))
     });
+    // 剪枝搜索，不排序
     group.bench_function(BenchmarkId::new("SimplifySolverUnorder", 1), |b| {
         b.iter(|| Solver::solve_unordered(&sim_solver, black_box(&limit), black_box(&demands)))
     });
     group.finish();
 }
 
+/// 测试整周求解器
 fn gsolver_benchmark(c: &mut Criterion) {
     let empty = vec![];
     let (repo, info, mut limit) = make_config(&empty);
@@ -83,24 +91,27 @@ fn gsolver_benchmark(c: &mut Criterion) {
     let mild_solver = MildSolver::new(&repo, info);
     let radical_solver = RadicalSolver::new(&repo, info);
 
-    let data = vec![
-        0, 11, 12, 3, 3, 4, 1, 11, 12, 5, 2, 4, 7, 7, 12, 2, 1, 9, 1, 6, 2, 6, 11, 6, 8, 4, 9, 4,
-        11, 7, 3, 3, 6, 2, 7, 10, 1, 10, 12, 12, 8, 10, 5, 5, 8, 5, 11, 9, 10, 9, 8, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-    ];
-    let pat = DemandPattern::from_u8(&data);
+    let code = &general_purpose::URL_SAFE_NO_PAD.decode("DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAAA").unwrap();
+    let mut pat = vec![];
+    for b in &code[1..] {
+        pat.push(DemandPattern::from(b & 0x0f));
+        pat.push(DemandPattern::from(b >> 4));
+    }
 
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
         c.benchmark_group("gpred");
+    // Mild 版本，剪枝+求解排列组合
     group.bench_function(BenchmarkId::new("Mild_GSolver", 1), |b| {
         b.iter(|| GSolver::solve(&mild_solver, black_box(&limit), black_box(&pat)))
     });
+    // Radical 版本，对最高可能队列排列组合
     group.bench_function(BenchmarkId::new("Radical_GSolver", 1), |b| {
         b.iter(|| GSolver::solve(&radical_solver, black_box(&limit), black_box(&pat)))
     });
     group.finish()
 }
 
+/// 测试模拟器性能
 fn simulate_benchmark(c: &mut Criterion) {
     let ban = [];
     let (repo, info, _) = make_config(&ban);
@@ -138,14 +149,17 @@ fn simulate_benchmark(c: &mut Criterion) {
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
         c.benchmark_group("simulate");
 
+    // 单作业模拟器
     group.bench_function(BenchmarkId::new("Single", 4), |b| {
         b.iter(|| simulate_batch_seq(&info, black_box(&recipe)))
     });
+    // 多作业模拟器
     group.bench_function(BenchmarkId::new("Multi", 4), |b| {
         b.iter(|| simulate_multi_batch(&info, black_box(&recipes)))
     });
 }
 
+/// 测试单日多种类模拟器
 fn solver_multi_benchmark(c: &mut Criterion) {
     let ban = [];
     let (repo, info, limit) = make_config(&ban);
@@ -161,6 +175,7 @@ fn solver_multi_benchmark(c: &mut Criterion) {
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
         c.benchmark_group("solver_multi");
 
+    // 多种类，不排序
     group.bench_function(BenchmarkId::new("solver", 1), |b| {
         b.iter(|| {
             SolverMulti::solve_unordered(&solver, &limit, black_box(&set), black_box(&demands), 2)
@@ -168,10 +183,24 @@ fn solver_multi_benchmark(c: &mut Criterion) {
     });
 }
 
+#[cfg(unix)]
+mod pref;
+
+#[cfg(unix)]
+fn get_criterion() -> Criterion {
+    use pref::FlamegraphProfiler;
+    Criterion::default().with_profiler(FlamegraphProfiler::new(100))
+}
+
+#[cfg(windows)]
+fn get_criterion() -> Criterion {
+    Criterion::default()
+}
+
 criterion_group! {
     name = benches;
     // This can be any expression that returns a `Criterion` object.
-    config = Criterion::default().with_profiler(FlamegraphProfiler::new(100));
+    config = get_criterion();
     targets = predition_benchmark, gsolver_benchmark, simulate_benchmark, solver_multi_benchmark
 }
 criterion_main!(benches);
