@@ -89,8 +89,8 @@ export default class DemandChange extends Vue {
   datapacks: string[] = ["", "", "", "", "", "", ""];
   data: Uint8Array[] = [];
 
-  patterns: number[] = [];
-  patternMasks: number[] = [];
+  patterns: number[] = []; // 用户选择的Pattern
+  patternMasks: number[] = []; // 预测得到的可能的Pattern的Mask
   demands: number[][] = [];
   changes: number[][] = [];
 
@@ -153,6 +153,7 @@ export default class DemandChange extends Vue {
       let binary = FromShareCode(result[2]);
       let p = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
       let patterns = await this.solver.demandsFromPredict(p, 6);
+      patterns[0] = -128; // 未知类别：-128
       let demands = [];
       for (let i = 1; i < binary.length; i++) {
         demands.push(patterns[binary[i] & 0x0f]);
@@ -205,14 +206,11 @@ export default class DemandChange extends Vue {
     if (dataArray.length == 0)
       return;
 
-    if (this.lastDemands.length > 0) {
-      this.patternMasks = await this.solver.predictFromPacketsAdv(dataArray, new Uint8Array(this.lastDemands));
-      console.log(dataArray, this.lastDemands, this.patternMasks);
-    } else {
-      this.patterns = await this.solver.predictFromPackets(dataArray);
-      this.patternMasks = [];
-      console.log(dataArray, this.patterns);
-    }
+    while(this.lastDemands.length < dataArray[0].length)
+      this.lastDemands.push(-128);
+
+    this.patternMasks = await this.solver.predictFromPacketsAdv(dataArray, new Uint8Array(this.lastDemands));
+    console.log(dataArray, this.lastDemands, this.patternMasks);
   }
 
   mounted() {

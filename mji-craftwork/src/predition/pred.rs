@@ -110,7 +110,7 @@ pub fn predict(seq: &[(Demand, DemandChange)]) -> DemandPattern {
 /// - last_demand 为上周最后一天的实际需求
 ///
 /// 返回值为可能的Pattern的Bitmap
-pub fn predict_adv(seq: &[(Demand, DemandChange)], last_demand: i8) -> u16 {
+pub fn predict_adv(seq: &[(Demand, DemandChange)], last_demand: Option<i8>) -> u16 {
     if seq.len() > 7 {
         return 0;
     }
@@ -140,14 +140,18 @@ pub fn predict_adv(seq: &[(Demand, DemandChange)], last_demand: i8) -> u16 {
             // 前一天的需求值
             let last_demand = match i {
                 0 => last_demand,
-                _ => REAL_DEMAND_TABLE[j][i - 1],
+                _ => Some(REAL_DEMAND_TABLE[j][i - 1]),
             };
 
             // 计算需求变动量
-            let delta = pred_demand - last_demand;
-            if DemandChange::from_val(delta as i16) != change {
-                candidates &= !mask;
-                continue;
+            match last_demand {
+                Some(last_demand) => {
+                    let delta = pred_demand - last_demand;
+                    if DemandChange::from_val(delta as i16) != change {
+                        candidates &= !mask;
+                    }
+                }
+                None => (),
             }
         }
 

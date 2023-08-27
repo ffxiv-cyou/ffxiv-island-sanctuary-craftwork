@@ -45,6 +45,12 @@ icon.mji-no-box {
 icon.mji-clock {
     background-position: calc(var(--scale) * -40px) calc(var(--scale) * -240px);
 }
+icon.mji-true {
+    background-position: calc(var(--scale) * -0px) calc(var(--scale) * -120px);
+}
+icon.mji-false {
+    background-position: calc(var(--scale) * -160px) calc(var(--scale) * -80px);
+}
 icon.blue-coin {
     --scale: 1;
     width: calc(var(--scale) * 36px);

@@ -43,7 +43,7 @@
             :count="lastDemand(item.Id)"
           />
           <span class="change">
-            <span class="demand-raw mji-text-small">[{{ lastDemandRaw(item.Id) }}]</span>
+            <span class="demand-raw mji-text-small">[{{ lastDemandText(item.Id) }}]</span>
           </span>
         </span>
         <span
@@ -165,8 +165,15 @@ export default class DemandList extends Vue {
   }
 
   lastDemandRaw(id: number) {
-    if (this.lastDemands) return this.lastDemands[id] ?? 9;
-    return 9;
+    if (this.lastDemands) {
+      return this.lastDemands[id] ?? -128
+    }
+    return -128;
+  }
+
+  lastDemandText(id: number) {
+    const val = this.lastDemandRaw(id);
+    return val === -128 ? "?" : val;
   }
   
   lastDemand(id: number) {

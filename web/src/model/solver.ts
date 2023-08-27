@@ -333,6 +333,7 @@ export class SolverProxy {
      * 从已有的历史数据包推测变化模式
      * @param packets 数据包
      * @returns 变化模式
+     * @deprecated 请使用 predictFromPacketsAdv
      */
     async predictFromPackets(packets: Uint8Array[]) {
         const days = packets.length;

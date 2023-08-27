@@ -126,7 +126,7 @@
   </div>
 </template>
 <script lang="ts">
-import { ToShareCode, planToShare } from "@/model/share";
+import { planToShare } from "@/model/share";
 import type { SolverProxy, BatchValues, WorkerSteps } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Close from "./Close.vue";

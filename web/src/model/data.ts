@@ -36,6 +36,7 @@ export class DemandUtils {
         if (val >= 10) return 1;
         if (val >= 2) return 2;
         if (val >= -6) return 3;
+        if (val === -128) return -1; // 未知
         return 4;
     }
 

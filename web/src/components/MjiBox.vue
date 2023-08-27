@@ -1,13 +1,21 @@
 <template>
   <span>
+    <template 
+      v-if="count > 0"
+    >
+      <icon
+        v-for="(i) in count"
+        :key="i"
+        class="mji mji-box"
+      />
+    </template>
     <icon
-      v-for="(i) in count"
-      :key="i"
-      class="mji mji-box"
+      v-if="count === 0"
+      class="mji mji-no-box"
     />
     <icon
-      v-if="!count"
-      class="mji mji-no-box"
+      v-if="count === -1"
+      class="mji mji-false"
     />
   </span>
 </template>

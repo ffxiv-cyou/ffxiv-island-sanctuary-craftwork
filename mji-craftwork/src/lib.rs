@@ -148,7 +148,7 @@ pub fn pattern_predict(array: &[u8], days: usize) -> Vec<u8> {
 /// 预测需求变动模式
 ///
 /// 传入的Array按以下顺序排布
-/// - 0: 上周第七天的真实需求值
+/// - 0: 上周第七天的真实需求值，传入-128则表示无此值
 /// - 1: 第一天的需求与变动
 /// - 2: 第二天的需求与变动
 /// - 4: ...
@@ -169,7 +169,10 @@ pub fn pattern_predict_adv(array: &[u8], days: usize) -> Vec<u16> {
             let change: DemandChange = (byte & 0x0F).into();
             seqs.push((demand, change));
         }
-
+        let last_demand = match last_demand {
+            -128 => None,
+            _ => Some(last_demand),
+        };
         let pats = predict_adv(&seqs, last_demand);
         result.push(pats)
     }
