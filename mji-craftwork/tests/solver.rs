@@ -1,7 +1,7 @@
 use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo},
     init_repo, simulate, solve_singleday,
-    solver::{BFSolver, SimplifySolver, SolveLimit, Solver, SolverMulti},
+    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch},
 };
 use rand::prelude::Distribution;
 
@@ -68,10 +68,10 @@ fn predict() {
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
-    let result = Solver::solve_unordered(&solver, &limit, &demands);
+    let result = SolverSingle::solve_unordered(&solver, &limit, &demands);
     println!("solve space: {}", result.len());
 
-    let result = Solver::solve(&solver, &limit, &demands);
+    let result = SolverSingle::solve(&solver, &limit, &demands);
     assert_eq!(result.len(), limit.max_result);
     for i in 0..1 {
         println!(
@@ -90,7 +90,7 @@ fn predict_simplify() {
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = SimplifySolver::new(&repo, info);
 
-    let result = Solver::solve_unordered(&solver, &limit, &demands);
+    let result = SolverSingle::solve_unordered(&solver, &limit, &demands);
     println!("solve space: {}", result.len());
 }
 
@@ -101,7 +101,7 @@ fn predict_best() {
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
-    let result = Solver::solve_best(&solver, &limit, &demands);
+    let result = SolverSingle::solve_best(&solver, &limit, &demands);
     println!("{:?}", result);
 }
 
@@ -111,7 +111,7 @@ fn predict_simplify_best() {
     let empty = vec![];
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = SimplifySolver::new(&repo, info);
-    let result = Solver::solve_best(&solver, &limit, &demands);
+    let result = SolverSingle::solve_best(&solver, &limit, &demands);
     println!("{:?}", result);
 }
 
@@ -147,8 +147,8 @@ fn compare_bf_simplify() {
         let simplify = SimplifySolver::new(&repo, info);
         let bf = BFSolver::new(&repo, info);
 
-        let sim_result = Solver::solve_best(&simplify, &limit, &demands);
-        let bf_result = Solver::solve_best(&bf, &limit, &demands);
+        let sim_result = SolverSingle::solve_best(&simplify, &limit, &demands);
+        let bf_result = SolverSingle::solve_best(&bf, &limit, &demands);
 
         assert_eq!(
             bf_result.value, sim_result.value,
@@ -170,7 +170,7 @@ fn test_solver_multi() {
     let solver = BFSolver::new(&repo, info);
 
     let set = [(3, [14, 49, 14, 49, 0, 0])];
-    let result = SolverMulti::solve_unordered(&solver, &limit, &set, &demands, 1);
+    let result = SolverWithBatch::solve_unordered(&solver, &limit, &set, &demands, 1);
     println!("solve space: {}", result.len());
     let mut max_len = 0;
     let mut max_time = 0;
@@ -181,7 +181,7 @@ fn test_solver_multi() {
     assert_eq!(max_len, 6);
     assert_eq!(max_time, 24);
 
-    let result = SolverMulti::solve(&solver, &limit, &set, &demands, 1);
+    let result = SolverWithBatch::solve(&solver, &limit, &set, &demands, 1);
     assert_eq!(result.len(), limit.max_result);
     for i in 0..10 {
         println!(

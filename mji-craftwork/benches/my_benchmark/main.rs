@@ -3,8 +3,8 @@ use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo, IDataRepo, Popularity, Recipe},
     gsolver::{GSolver, MildSolver, RadicalSolver},
     predition::DemandPattern,
-    simulator::{simulate, simulate_batch_seq, simulate_multi_batch},
-    solver::{BFSolver, SimplifySolver, SolveLimit, Solver, SolverMulti},
+    simulator::{simulate_batch_seq, simulate_multi_batch},
+    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch},
 };
 use base64::{engine::general_purpose, Engine as _};
 
@@ -61,23 +61,23 @@ fn predition_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("predition");
     // 暴力搜索，排序前100
     group.bench_function(BenchmarkId::new("BFSolver", 100), |b| {
-        b.iter(|| Solver::solve(&solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve(&solver, black_box(&limit), black_box(&demands)))
     });
     // 暴力搜索，排序前1
     group.bench_function(BenchmarkId::new("BFSolver", 1), |b| {
-        b.iter(|| Solver::solve(&solver, black_box(&limit1), black_box(&demands)))
+        b.iter(|| SolverSingle::solve(&solver, black_box(&limit1), black_box(&demands)))
     });
     // 暴力搜索，不排序
     group.bench_function(BenchmarkId::new("BFSolverUnorder", 1), |b| {
-        b.iter(|| Solver::solve_unordered(&solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve_unordered(&solver, black_box(&limit), black_box(&demands)))
     });
     // 暴力搜索，取最优
     group.bench_function(BenchmarkId::new("BFSolverBest", 1), |b| {
-        b.iter(|| Solver::solve_best(&solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve_best(&solver, black_box(&limit), black_box(&demands)))
     });
     // 剪枝搜索，不排序
     group.bench_function(BenchmarkId::new("SimplifySolverUnorder", 1), |b| {
-        b.iter(|| Solver::solve_unordered(&sim_solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve_unordered(&sim_solver, black_box(&limit), black_box(&demands)))
     });
     group.finish();
 }
@@ -178,7 +178,7 @@ fn solver_multi_benchmark(c: &mut Criterion) {
     // 多种类，不排序
     group.bench_function(BenchmarkId::new("solver", 1), |b| {
         b.iter(|| {
-            SolverMulti::solve_unordered(&solver, &limit, black_box(&set), black_box(&demands), 2)
+            SolverWithBatch::solve_unordered(&solver, &limit, black_box(&set), black_box(&demands), 2)
         })
     });
 }

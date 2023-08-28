@@ -3,7 +3,7 @@ use crate::{
     simulator::{simulate, simulate_multi_batch},
 };
 
-use super::{Batch, BatchWithBatch, SolveLimit, Solver, SolverMulti};
+use super::{Batch, BatchWithBatch, SolveLimit, SolverSingle, SolverWithBatch};
 
 /// Bruce Force 暴力搜索
 ///
@@ -16,7 +16,7 @@ where
     data: &'a T,
 }
 
-impl<'a, T> Solver for BFSolver<'a, T>
+impl<'a, T> SolverSingle for BFSolver<'a, T>
 where
     T: IDataRepo,
 {
@@ -93,7 +93,7 @@ where
     }
 }
 
-impl<'a, T> SolverMulti for BFSolver<'a, T>
+impl<'a, T> SolverWithBatch for BFSolver<'a, T>
 where
     T: IDataRepo,
 {
