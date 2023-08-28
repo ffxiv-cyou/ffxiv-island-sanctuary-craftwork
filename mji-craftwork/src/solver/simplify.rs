@@ -3,7 +3,7 @@ use crate::{
     simulator::simulate,
 };
 
-use super::{Batch, SolveLimit, Solver};
+use super::{Batch, SolveLimit, SolverSingle};
 
 /// Simplify 简易剪枝
 ///
@@ -23,7 +23,7 @@ where
     data: &'a T,
 }
 
-impl<'a, T> Solver for SimplifySolver<'a, T>
+impl<'a, T> SolverSingle for SimplifySolver<'a, T>
 where
     T: IDataRepo,
 {

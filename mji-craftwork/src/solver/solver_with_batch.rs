@@ -50,8 +50,8 @@ impl Ord for BatchWithBatch {
 }
 impl Eq for BatchWithBatch {}
 
-/// 带已设置排版的求解器
-pub trait SolverMulti {
+/// 带已设置排班的当日求解器
+pub trait SolverWithBatch {
     /// 解最优
     ///
     /// - limit: 求解限制

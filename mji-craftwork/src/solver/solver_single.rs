@@ -5,8 +5,8 @@ use std::collections::BinaryHeap;
 
 use super::super::simulator::Batch;
 
-/// 每天排班求解器
-pub trait Solver {
+/// 每天排班求解器，单一工坊
+pub trait SolverSingle {
     /// 解最优
     fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch>;
 

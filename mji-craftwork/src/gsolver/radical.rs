@@ -2,7 +2,7 @@ use crate::{
     data::{CraftworkInfo, IDataRepo, RecipeState},
     predition::{get_demands, DemandPattern},
     simulator::{simulate, simulate_batch_seq, Batch},
-    solver::{BFSolver, Solver},
+    solver::{BFSolver, SolverSingle},
 };
 
 use super::GSolver;

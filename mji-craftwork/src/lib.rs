@@ -8,7 +8,7 @@ pub mod utils;
 use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
 use gsolver::{GSolver, MildSolver};
 use predition::{get_demands, predict_adv, predict_all, DemandPattern};
-use solver::{BFSolver, SolveLimit, Solver, SolverMulti};
+use solver::{BFSolver, SolveLimit, SolverSingle, SolverWithBatch};
 use wasm_bindgen::prelude::*;
 
 use crate::data::CraftworkInfo;
@@ -102,7 +102,7 @@ pub fn solve_singleday(
 ) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let batches = Solver::solve(&solver, &limit, demands);
+    let batches = SolverSingle::solve(&solver, &limit, demands);
 
     let mut ret = vec![];
     for b in batches {
@@ -312,7 +312,7 @@ pub fn solve_multi_day(
             ],
         ))
     }
-    let batches = SolverMulti::solve(&solver, &limit, &sets, demands, worker);
+    let batches = SolverWithBatch::solve(&solver, &limit, &sets, demands, worker);
 
     let mut ret = vec![];
     for b in batches {
