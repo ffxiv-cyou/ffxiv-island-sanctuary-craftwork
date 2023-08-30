@@ -27,15 +27,20 @@ impl<'a, T> SolverSingle for SimplifySolver<'a, T>
 where
     T: IDataRepo,
 {
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch> {
+    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batch> {
         let mut ret: Vec<Batch> = vec![];
         let mut avg = 0;
+        let mut info = self.info.clone();
+        if workers != 0 {
+            info.workers = workers;
+        }
+
         self.solve_sub(
             limit,
             demands,
             &mut ret,
             Batch::new(),
-            self.info.clone(),
+            info,
             &mut avg,
         );
         ret

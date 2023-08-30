@@ -8,11 +8,11 @@ use super::super::simulator::Batch;
 /// 每天排班求解器，单一工坊
 pub trait SolverSingle {
     /// 解最优
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch>;
+    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batch>;
 
     /// 解最优后对结果排序
-    fn solve(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch> {
-        let ret = self.solve_unordered(limit, demands);
+    fn solve(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batch> {
+        let ret = self.solve_unordered(limit, demands, workers);
         // 结果排序
         let mut heap = BinaryHeap::new();
         for mut item in ret {
@@ -26,8 +26,8 @@ pub trait SolverSingle {
     }
 
     /// 解唯一最优
-    fn solve_best(&self, limit: &SolveLimit, demands: &[i8]) -> Batch {
-        let ret = self.solve_unordered(limit, demands);
+    fn solve_best(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Batch {
+        let ret = self.solve_unordered(limit, demands, workers);
         let mut max_val = 0;
         let mut max_batch = Batch::new();
         for item in ret {
@@ -48,9 +48,10 @@ pub trait SolverSingle {
         &self,
         limit: &SolveLimit,
         demands: &[i8],
+        workers: u8,
         sort_val: impl Fn(u16, &Batch) -> u16,
     ) -> Batch {
-        let ret = self.solve_unordered(limit, demands);
+        let ret = self.solve_unordered(limit, demands, workers);
         let mut max_val = 0;
         let mut max_batch = Batch::new();
         for item in ret {

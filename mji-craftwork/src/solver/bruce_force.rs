@@ -20,9 +20,14 @@ impl<'a, T> SolverSingle for BFSolver<'a, T>
 where
     T: IDataRepo,
 {
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8]) -> Vec<Batch> {
+    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batch> {
         let mut ret: Vec<Batch> = vec![];
-        self.solve_sub(limit, demands, &mut ret, Batch::new(), self.info.clone());
+        let mut info = self.info.clone();
+        if workers != 0 {
+            info.workers = workers;
+        }
+
+        self.solve_sub(limit, demands, &mut ret, Batch::new(), info);
         ret
     }
 

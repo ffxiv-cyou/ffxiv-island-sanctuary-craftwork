@@ -2,12 +2,16 @@ mod bruce_force;
 mod simplify;
 mod solver_single;
 mod solver_with_batch;
+mod solver_multi;
+mod simplify_adv;
 
 use super::simulator::Batch;
 pub use bruce_force::BFSolver;
 pub use simplify::SimplifySolver;
 pub use solver_single::SolverSingle;
 pub use solver_with_batch::{BatchWithBatch, SolverWithBatch};
+pub use solver_multi::{Batches, SolverDual};
+pub use simplify_adv::AdvancedSimplifySolver;
 
 use crate::data::Recipe;
 

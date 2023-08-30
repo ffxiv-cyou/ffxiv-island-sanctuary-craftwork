@@ -55,7 +55,7 @@ where
 
             let solver = BFSolver::new(self.data, self.info);
             let mut batch = vec![];
-            let results = solver.solve(limit, &demands);
+            let results = solver.solve(limit, &demands, 0);
             for r in &results {
                 for j in 0..m {
                     if item_count[j] == 0 {
