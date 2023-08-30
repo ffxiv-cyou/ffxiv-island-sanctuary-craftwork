@@ -73,6 +73,17 @@ impl RecipeState {
             popularity,
         }
     }
+    /// 空值
+    pub fn empty() -> Self {
+        Self {
+            id: 0,
+            value: 0,
+            cost: 0,
+            time: 0,
+            demand: 0,
+            popularity: Popularity::Average,
+        }
+    }
     /// 配方系数
     ///
     /// 系数 = 欢迎度系数 * 需求系数

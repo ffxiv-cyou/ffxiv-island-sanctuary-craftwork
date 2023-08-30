@@ -108,7 +108,7 @@ where
             }
 
             // 计算最佳
-            let batch = solver.solve_best_fn(limit, &demand, |v, b| {
+            let batch = solver.solve_best_fn(limit, &demand, 0, |v, b| {
                 return v + tension_delta[b.seq - 1];
             });
             current[i] = Some(batch);

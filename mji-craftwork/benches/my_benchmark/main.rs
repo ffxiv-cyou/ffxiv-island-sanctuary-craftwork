@@ -1,12 +1,12 @@
+use base64::{engine::general_purpose, Engine as _};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo, IDataRepo, Popularity, Recipe},
     gsolver::{GSolver, MildSolver, RadicalSolver},
     predition::DemandPattern,
     simulator::{simulate_batch_seq, simulate_multi_batch},
-    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch},
+    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch, AdvancedSimplifySolver, SolverDual},
 };
-use base64::{engine::general_purpose, Engine as _};
 
 mod test_data;
 use test_data::{CRAFT_OBJECTS, POPULARITY_LIST};
@@ -27,7 +27,7 @@ fn load_data<const T: usize>() -> GameDataRepo {
         recpies.push(rec);
     }
 
-    let mut pop_vec = vec![];
+    let mut pop_vec = vec![vec![]];
     for r in POPULARITY_LIST {
         let mut pop: Vec<Popularity> = vec![];
         for i in 1..usize::min(r.len(), T + 1) {
@@ -39,9 +39,9 @@ fn load_data<const T: usize>() -> GameDataRepo {
 }
 
 fn make_config(ban: &[u16]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
-    let mut repo = load_data::<73>();
+    let mut repo = load_data::<82>();
     repo.set_popular_pattern(1);
-    let info = CraftworkInfo::new(0, 35, 1, 1);
+    let info = CraftworkInfo::new(0, 35, 2, 3);
     let limit = SolveLimit::new(16, ban, 24, false);
     (repo, info, limit)
 }
@@ -52,6 +52,7 @@ fn predition_benchmark(c: &mut Criterion) {
     let (repo, info, limit) = make_config(&empty);
     let solver = BFSolver::new(&repo, info);
     let sim_solver = SimplifySolver::new(&repo, info);
+    let adv_solver = AdvancedSimplifySolver::new(&repo, &solver, info);
 
     // 求解单个
     let mut limit1 = limit.clone();
@@ -61,23 +62,37 @@ fn predition_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("predition");
     // 暴力搜索，排序前100
     group.bench_function(BenchmarkId::new("BFSolver", 100), |b| {
-        b.iter(|| SolverSingle::solve(&solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve(&solver, black_box(&limit), black_box(&demands), 0))
     });
     // 暴力搜索，排序前1
     group.bench_function(BenchmarkId::new("BFSolver", 1), |b| {
-        b.iter(|| SolverSingle::solve(&solver, black_box(&limit1), black_box(&demands)))
+        b.iter(|| SolverSingle::solve(&solver, black_box(&limit1), black_box(&demands), 0))
     });
     // 暴力搜索，不排序
     group.bench_function(BenchmarkId::new("BFSolverUnorder", 1), |b| {
-        b.iter(|| SolverSingle::solve_unordered(&solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve_unordered(&solver, black_box(&limit), black_box(&demands), 0))
     });
     // 暴力搜索，取最优
     group.bench_function(BenchmarkId::new("BFSolverBest", 1), |b| {
-        b.iter(|| SolverSingle::solve_best(&solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| SolverSingle::solve_best(&solver, black_box(&limit), black_box(&demands), 0))
     });
     // 剪枝搜索，不排序
     group.bench_function(BenchmarkId::new("SimplifySolverUnorder", 1), |b| {
-        b.iter(|| SolverSingle::solve_unordered(&sim_solver, black_box(&limit), black_box(&demands)))
+        b.iter(|| {
+            SolverSingle::solve_unordered(&sim_solver, black_box(&limit), black_box(&demands), 0)
+        })
+    });
+    // 剪枝多工坊搜索，不排序
+    group.bench_function(BenchmarkId::new("AdvSimSolverUnorder", 1), |b| {
+        b.iter(|| {
+            SolverDual::solve_unordered(&adv_solver, black_box(&limit), black_box(&demands), 4)
+        })
+    });
+    // 剪枝多工坊搜索，不排序
+    group.bench_function(BenchmarkId::new("AdvSimSolverBest", 1), |b| {
+        b.iter(|| {
+            SolverDual::solve_best(&adv_solver, black_box(&limit), black_box(&demands), 4)
+        })
     });
     group.finish();
 }
@@ -91,7 +106,9 @@ fn gsolver_benchmark(c: &mut Criterion) {
     let mild_solver = MildSolver::new(&repo, info);
     let radical_solver = RadicalSolver::new(&repo, info);
 
-    let code = &general_purpose::URL_SAFE_NO_PAD.decode("DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAAA").unwrap();
+    let code = &general_purpose::URL_SAFE_NO_PAD
+        .decode("DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAAA")
+        .unwrap();
     let mut pat = vec![];
     for b in &code[1..] {
         pat.push(DemandPattern::from(b & 0x0f));
@@ -178,7 +195,13 @@ fn solver_multi_benchmark(c: &mut Criterion) {
     // 多种类，不排序
     group.bench_function(BenchmarkId::new("solver", 1), |b| {
         b.iter(|| {
-            SolverWithBatch::solve_unordered(&solver, &limit, black_box(&set), black_box(&demands), 2)
+            SolverWithBatch::solve_unordered(
+                &solver,
+                &limit,
+                black_box(&set),
+                black_box(&demands),
+                2,
+            )
         })
     });
 }

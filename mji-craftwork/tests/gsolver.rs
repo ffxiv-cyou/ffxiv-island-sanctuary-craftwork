@@ -1,7 +1,7 @@
-use base64::{engine::general_purpose, Engine as _};
-use data::new_repo;
+mod data;
+use data::{new_repo,from_pattern_code, to_pattern_code};
 use mji_craftwork::{
-    data::{CraftworkInfo, GameDataRepo},
+    data::CraftworkInfo,
     gsolver::{GSolver, MildSolver, RadicalSolver},
     predition::DemandPattern,
     simulator::Batch,
@@ -10,41 +10,11 @@ use mji_craftwork::{
 use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
 
-mod data;
-
 fn new_limit<'a>() -> SolveLimit<'a> {
     let mut limit = SolveLimit::new(10, &[], 24, false);
     limit.max_result = 1000;
 
     limit
-}
-
-fn generate_from(code: &[u8]) -> (GameDataRepo, CraftworkInfo, Vec<DemandPattern>) {
-    let arr = &general_purpose::URL_SAFE_NO_PAD.decode(code).unwrap();
-
-    let repo = new_repo(arr[0] as usize);
-    let info = CraftworkInfo::new(0, 35, 2, 3);
-
-    let mut pat = vec![];
-    for b in &arr[1..] {
-        pat.push(DemandPattern::from(b & 0x0f));
-        pat.push(DemandPattern::from(b >> 4));
-    }
-
-    (repo, info, pat)
-}
-
-fn generate_to(pop: u8, pat: &[DemandPattern]) -> String {
-    let mut arr = vec![];
-    arr.push(pop);
-
-    for i in (0..pat.len()).step_by(2) {
-        let v = pat[i] as u8;
-        let v2 = pat[i + 1] as u8;
-        arr.push((v2 << 4) + v);
-    }
-
-    general_purpose::URL_SAFE_NO_PAD.encode(arr)
 }
 
 fn batch_value(batches: &[Option<Batch>; 6]) -> u16 {
@@ -63,7 +33,7 @@ fn test_gsolver_mild() {
     let limit = new_limit();
 
     let code = b"DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAA";
-    let (repo, info, pat) = generate_from(code);
+    let (repo, info, pat) = from_pattern_code(code);
 
     let solver = MildSolver::new(&repo, info);
 
@@ -77,7 +47,7 @@ fn test_gsolver_radical() {
     let limit = new_limit();
 
     let code = b"SJByzIRRxbqHJzZmScUxUrO5qTSBS2ocorcIAAAAAAA";
-    let (repo, info, pat) = generate_from(code);
+    let (repo, info, pat) = from_pattern_code(code);
 
     let solver = RadicalSolver::new(&repo, info);
 
@@ -126,7 +96,7 @@ fn test_gsolver_compare() {
         println!("{}: mild {}, radical {}", i, mild_val, radical_val);
         if mild_val > radical_val {
             cnt_mild += 1;
-            println!("code: {}", generate_to(pop as u8, &pat));
+            println!("code: {}", to_pattern_code(pop as u8, &pat));
         } else if mild_val < radical_val {
             cnt_radical += 1;
         } else {

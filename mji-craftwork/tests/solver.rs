@@ -1,19 +1,20 @@
 use mji_craftwork::{
     data::{CraftworkInfo, GameDataRepo},
     init_repo, simulate, solve_singleday,
-    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch},
+    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch, AdvancedSimplifySolver, SolverDual}, predition::get_demands,
 };
 use rand::prelude::Distribution;
 
 mod data;
 use crate::data::new_repo;
+use data::from_pattern_code;
 
 fn make_demands() -> Vec<i8> {
     vec![9; 82]
 }
 
 fn make_limit(ban: &[u16]) -> SolveLimit {
-    SolveLimit::new(11, ban, 24, false)
+    SolveLimit::new(16, ban, 24, false)
 }
 
 fn make_config(pop: usize, ban: &[u16]) -> (GameDataRepo, Vec<i8>, CraftworkInfo, SolveLimit) {
@@ -68,10 +69,10 @@ fn predict() {
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
-    let result = SolverSingle::solve_unordered(&solver, &limit, &demands);
+    let result = SolverSingle::solve_unordered(&solver, &limit, &demands, 0);
     println!("solve space: {}", result.len());
 
-    let result = SolverSingle::solve(&solver, &limit, &demands);
+    let result = SolverSingle::solve(&solver, &limit, &demands, 0);
     assert_eq!(result.len(), limit.max_result);
     for i in 0..1 {
         println!(
@@ -90,7 +91,7 @@ fn predict_simplify() {
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = SimplifySolver::new(&repo, info);
 
-    let result = SolverSingle::solve_unordered(&solver, &limit, &demands);
+    let result = SolverSingle::solve_unordered(&solver, &limit, &demands, 0);
     println!("solve space: {}", result.len());
 }
 
@@ -101,7 +102,7 @@ fn predict_best() {
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
-    let result = SolverSingle::solve_best(&solver, &limit, &demands);
+    let result = SolverSingle::solve_best(&solver, &limit, &demands, 0);
     println!("{:?}", result);
 }
 
@@ -111,7 +112,7 @@ fn predict_simplify_best() {
     let empty = vec![];
     let (repo, demands, info, limit) = make_config(1, &empty);
     let solver = SimplifySolver::new(&repo, info);
-    let result = SolverSingle::solve_best(&solver, &limit, &demands);
+    let result = SolverSingle::solve_best(&solver, &limit, &demands, 0);
     println!("{:?}", result);
 }
 
@@ -147,8 +148,8 @@ fn compare_bf_simplify() {
         let simplify = SimplifySolver::new(&repo, info);
         let bf = BFSolver::new(&repo, info);
 
-        let sim_result = SolverSingle::solve_best(&simplify, &limit, &demands);
-        let bf_result = SolverSingle::solve_best(&bf, &limit, &demands);
+        let sim_result = SolverSingle::solve_best(&simplify, &limit, &demands, 0);
+        let bf_result = SolverSingle::solve_best(&bf, &limit, &demands, 0);
 
         assert_eq!(
             bf_result.value, sim_result.value,
@@ -191,5 +192,26 @@ fn test_solver_multi() {
             result[i].batch.get_values(),
             result[i].value
         );
+    }
+}
+
+#[test]
+fn test_solver_simp_adv() {
+    let empty = vec![49];
+    let (repo, info, demand_pat) = from_pattern_code(b"AWCJtKVXcyvBnLQ7EzyKZ4sckoYqRlIaR5xjg7kqxUF3SoyVIwYAAAAA");
+    let limit = make_limit(&empty);
+    let demands = get_demands(&demand_pat, 1);
+
+    print!("{:?}", demands);
+
+    let solver = BFSolver::new(&repo, info);
+    let solver = AdvancedSimplifySolver::new(&repo, &solver, info);
+    
+    let result = SolverDual::solve_unordered(&solver, &limit, &demands, 4);
+    println!("solve space: {}", result.len());
+
+    let result = SolverDual::solve(&solver, &limit, &demands, 4);
+    for i in 0..result.len().min(10) {
+        println!("{:?}", result[i]);
     }
 }
