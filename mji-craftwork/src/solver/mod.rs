@@ -21,17 +21,17 @@ pub struct SolveLimit<'a> {
     /// 配方最高等级
     level: u8,
     /// 禁用配方
-    ban_list: &'a [u16],
+    ban_list: &'a [u8],
     /// 结果数量
     pub max_result: usize,
     /// 是否考虑成本
     pub with_cost: bool,
     /// 工序耗时限制
-    pub time: u16,
+    pub time: u8,
 }
 
 impl<'a> SolveLimit<'a> {
-    pub fn new(level: u8, ban_list: &'a [u16], time: u16, with_cost: bool) -> SolveLimit {
+    pub fn new(level: u8, ban_list: &'a [u8], time: u8, with_cost: bool) -> SolveLimit {
         Self {
             level,
             ban_list,

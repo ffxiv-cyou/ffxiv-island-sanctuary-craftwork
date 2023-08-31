@@ -61,7 +61,7 @@ where
                     if item_count[j] == 0 {
                         continue;
                     }
-                    if r.steps.contains(&(candidate[j] as u16)) {
+                    if r.steps.contains(&(candidate[j] as u8)) {
                         batch.push(r.steps);
 
                         item_count[j] -= 1;
@@ -257,7 +257,7 @@ where
         &self,
         pat: &[DemandPattern],
         day: u8,
-        batch: &[u16; 6],
+        batch: &[u8; 6],
         demand_sub: &[i8],
     ) -> Vec<RecipeState> {
         let demand = get_demands(pat, day);
@@ -273,7 +273,7 @@ where
     }
 
     fn update_demand_sub(&self, batch: &Batch, dst: &mut [i8]) {
-        for i in 0..batch.seq {
+        for i in 0..batch.seq as usize {
             let id = batch.steps[i] as usize;
             let produce = match i {
                 0 => 1,

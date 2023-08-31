@@ -109,7 +109,7 @@ where
 
             // 计算最佳
             let batch = solver.solve_best_fn(limit, &demand, 0, |v, b| {
-                return v + tension_delta[b.seq - 1];
+                return v + tension_delta[b.seq as usize - 1];
             });
             current[i] = Some(batch);
 
@@ -200,7 +200,7 @@ where
                     // 计算需求变动
                     let demand = get_demands(pat, i as u8 + 1);
                     let mut recipe = vec![];
-                    for i in 0..batch.seq {
+                    for i in 0..batch.seq as usize {
                         let id = batch.steps[i] as usize;
                         recipe.push(self.data.state(id, demand[id] - demand_sub[id]))
                     }
@@ -209,7 +209,7 @@ where
                     (batch, info) = simulate_batch_seq(&info, &recipe);
 
                     // 更新需求变动表
-                    for i in 0..batch.seq {
+                    for i in 0..batch.seq as usize {
                         let id = batch.steps[i] as usize;
                         let produce = match i {
                             0 => 1,

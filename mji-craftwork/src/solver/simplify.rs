@@ -83,7 +83,7 @@ where
         }
 
         self.data.foreach(|r| {
-            if r.craft_time == 0 || remain < r.craft_time as u16 {
+            if r.craft_time == 0 || remain < r.craft_time {
                 return;
             }
             if !limit.check(r) || last.id == r.id {
@@ -102,10 +102,10 @@ where
             let s = self.data.state(id, demands[id]);
             let demand_sub = current.get_produce(s.id()) * info.workers;
             let val = simulate(&info, &s, demand_sub);
-            let current = current.push(r.id, val, r.cost, r.craft_time as u16);
+            let current = current.push(r.id, val, r.cost, r.craft_time);
 
             if current.get_time() >= 12 {
-                let avg = current.value / current.get_time();
+                let avg = current.value / current.get_time() as u16;
 
                 // 平均收益不达标，剪枝
                 if avg < (*max as f32 * 0.69) as u16 {
@@ -117,7 +117,7 @@ where
                 // 当前工序结束
                 vec.push(current);
 
-                let avg = current.value / limit.time;
+                let avg = current.value / limit.time as u16;
                 if avg > *max {
                     *max = avg;
                 }

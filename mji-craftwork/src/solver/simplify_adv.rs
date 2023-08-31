@@ -50,8 +50,8 @@ where
         let batches = self.solver.solve_unordered(limit, demands, 1);
         for b in batches {
             // 补偿多个worker的干劲加成
-            let factor = 1f32 + (0.01 * ((b.seq as u8 - 1) * workers) as f32);
-            // let factor = (100 + (b.seq as u8 - 1) * workers) as f32 / (100 + b.seq as u8 - 1) as f32;
+            // let factor = 1f32 + (0.01 * ((b.seq as u8 - 1) * workers) as f32);
+            let factor = (100 + (b.seq as u8 - 1) * workers) as f32 / (100 + b.seq as u8 - 1) as f32;
             let value = (b.value as f32 * factor) as u16;
             let value = match limit.with_cost {
                 true => value - b.cost,
@@ -59,7 +59,7 @@ where
             };
             if value >= max_batch_val {
                 let mut recipe: [Option<RecipeState>; 6] = [None, None, None, None, None, None];
-                for i in 0..b.seq {
+                for i in 0..b.seq as usize {
                     let id = b.steps[i] as usize;
                     recipe[i] = Some(self.data.state(id, demands[id]));
                 }

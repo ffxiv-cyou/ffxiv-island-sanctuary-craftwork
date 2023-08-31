@@ -29,8 +29,8 @@ impl BatchWithBatch {
 
 impl PartialOrd for BatchWithBatch {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let a = self.cmp_value as usize * 10 + self.batch.seq;
-        let b = other.cmp_value as usize * 10 + other.batch.seq;
+        let a = self.cmp_value as usize * 10 + self.batch.seq as usize;
+        let b = other.cmp_value as usize * 10 + other.batch.seq as usize;
         b.partial_cmp(&a)
     }
 }
@@ -43,8 +43,8 @@ impl PartialEq for BatchWithBatch {
 
 impl Ord for BatchWithBatch {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        let a = self.cmp_value as usize * 10 + self.batch.seq;
-        let b = other.cmp_value as usize * 10 + other.batch.seq;
+        let a = self.cmp_value as usize * 10 + self.batch.seq as usize;
+        let b = other.cmp_value as usize * 10 + other.batch.seq as usize;
         b.cmp(&a)
     }
 }

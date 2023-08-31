@@ -4,7 +4,7 @@ use super::{Demand, Popularity};
 #[derive(Clone, Copy)]
 pub struct Recipe {
     /// 配方ID
-    pub id: u16,
+    pub id: u8,
     /// 主题1
     pub theme1: u8,
     /// 主题2
@@ -34,7 +34,7 @@ impl Recipe {
 
     pub fn from_array(arr: &[u16]) -> Self {
         Recipe {
-            id: arr[0],
+            id: arr[0] as u8,
             theme1: arr[1] as u8,
             theme2: arr[2] as u8,
             level: arr[3] as u8,
@@ -49,7 +49,7 @@ impl Recipe {
 #[derive(Debug, Clone, Copy)]
 pub struct RecipeState {
     /// 配方ID
-    id: u16,
+    id: u8,
     /// 产品收益
     value: u16,
     /// 原料成本
@@ -98,7 +98,7 @@ impl RecipeState {
     pub fn cost(&self) -> u16 {
         self.cost
     }
-    pub fn id(&self) -> u16 {
+    pub fn id(&self) -> u8 {
         self.id
     }
     pub fn craft_time(&self) -> u8 {

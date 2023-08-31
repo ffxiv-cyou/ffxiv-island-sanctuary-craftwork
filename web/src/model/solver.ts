@@ -281,7 +281,7 @@ export class SolverProxy {
      * @returns 
      */
     async solveDayDetail(demands: number[], banList: number[], tension: number, maxTime: number = 24) {
-        const banArr = new Uint16Array(banList);
+        const banArr = new Uint8Array(banList);
         const demandArr = new Int8Array(demands);
 
         const info = this.infoWithTension(tension);
@@ -301,7 +301,7 @@ export class SolverProxy {
      * @returns 解，和对应已设置工坊的值
      */
     async solveMultiDay(demands: number[], setWorkers: WorkerSteps[], banList: number[], tension: number, worker: number, maxTime: number = 24) {
-        const banArr = new Uint16Array(banList);
+        const banArr = new Uint8Array(banList);
         const demandArr = new Int8Array(demands);
         const info = this.infoWithTension(tension);
 
@@ -322,7 +322,7 @@ export class SolverProxy {
     async solveWeek(banList: number[]): Promise<BatchValues[]> 
     {
         const info = this.infoWithTension(0);
-        const banArr = new Uint16Array(banList);
+        const banArr = new Uint8Array(banList);
         const patternArr = new Uint8Array(this.config.demandPatterns);
 
         const arr = await this.solver.solve_week(info, this.config.level, banArr, 24, this.config.withCost, patternArr);
