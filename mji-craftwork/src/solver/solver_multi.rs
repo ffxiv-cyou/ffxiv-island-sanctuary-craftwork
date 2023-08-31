@@ -1,6 +1,6 @@
 use super::SolveLimit;
-use crate::data::CraftworkInfo;
 
+use core::fmt;
 use std::collections::BinaryHeap;
 
 use super::super::simulator::Batch;
@@ -53,6 +53,11 @@ impl Eq for Batches {}
 impl Ord for Batches {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         other.cmp_value.cmp(&self.cmp_value)
+    }
+}
+impl fmt::Display for Batches {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}] {}x {:?}, {}x {:?}", self.cmp_value, self.batches[0].0, self.batches[0].1.steps, self.batches[1].0, self.batches[1].1.steps)
     }
 }
 

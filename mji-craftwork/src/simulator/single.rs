@@ -31,7 +31,7 @@ pub fn simulate_batch_seq(info: &CraftworkInfo, recipe: &[RecipeState]) -> (Batc
             info = info.next();
         }
         let val = simulate(&info, r, demand_sub);
-        batch = batch.push(r.id(), val, r.cost(), r.craft_time() as u16);
+        batch = batch.push(r.id(), val, r.cost(), r.craft_time());
     }
     (batch, info)
 }

@@ -95,9 +95,9 @@ pub fn solve_singleday(
     repo: &GameDataRepo,
     state: &CraftworkInfo,
     level: u8,
-    ban_list: Vec<u16>,
+    ban_list: Vec<u8>,
     demands: &[i8],
-    time: u16,
+    time: u8,
     with_cost: bool,
 ) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
@@ -109,7 +109,9 @@ pub fn solve_singleday(
         ret.push(b.get_val());
         ret.push(b.get_cost());
         ret.push(b.seq as u16);
-        ret.extend_from_slice(b.get_steps());
+        for i in b.get_steps() {
+            ret.push(*i as u16);
+        }
         ret.extend_from_slice(b.get_values());
     }
     ret
@@ -204,8 +206,8 @@ pub fn solve_week(
     repo: &GameDataRepo,
     state: &CraftworkInfo,
     level: u8,
-    ban_list: Vec<u16>,
-    time: u16,
+    ban_list: Vec<u8>,
+    time: u8,
     with_cost: bool,
     pattern: &[u8],
 ) -> Vec<u16> {
@@ -229,7 +231,9 @@ pub fn solve_week(
                 ret.push(batch.get_val());
                 ret.push(batch.get_cost());
                 ret.push(batch.seq as u16);
-                ret.extend_from_slice(batch.get_steps());
+                for i in batch.get_steps() {
+                    ret.push(*i as u16);
+                }
                 ret.extend_from_slice(batch.get_values());
             }
         }
@@ -288,11 +292,11 @@ pub fn solve_multi_day(
     repo: &GameDataRepo,
     state: &CraftworkInfo,
     level: u8,
-    ban_list: &[u16],
+    ban_list: &[u8],
     set: &[u8],
     demands: &[i8],
     worker: u8,
-    time: u16,
+    time: u8,
     with_cost: bool,
 ) -> Vec<u16> {
     let solver = BFSolver::new(repo, state.clone());
@@ -321,7 +325,9 @@ pub fn solve_multi_day(
         ret.push(b.batch.get_val());
         ret.push(b.batch.get_cost());
         ret.push(b.batch.seq as u16);
-        ret.extend_from_slice(b.batch.get_steps());
+        for i in b.batch.get_steps() {
+            ret.push(*i as u16);
+        }
         ret.extend_from_slice(b.batch.get_values());
     }
     ret

@@ -13,11 +13,11 @@ fn make_demands() -> Vec<i8> {
     vec![9; 82]
 }
 
-fn make_limit(ban: &[u16]) -> SolveLimit {
+fn make_limit(ban: &[u8]) -> SolveLimit {
     SolveLimit::new(16, ban, 24, false)
 }
 
-fn make_config(pop: usize, ban: &[u16]) -> (GameDataRepo, Vec<i8>, CraftworkInfo, SolveLimit) {
+fn make_config(pop: usize, ban: &[u8]) -> (GameDataRepo, Vec<i8>, CraftworkInfo, SolveLimit) {
     let repo = new_repo(pop);
     let demands = make_demands();
     let info = CraftworkInfo::new(0, 35, 2, 3);
@@ -199,19 +199,33 @@ fn test_solver_multi() {
 fn test_solver_simp_adv() {
     let empty = vec![49];
     let (repo, info, demand_pat) = from_pattern_code(b"AWCJtKVXcyvBnLQ7EzyKZ4sckoYqRlIaR5xjg7kqxUF3SoyVIwYAAAAA");
-    let limit = make_limit(&empty);
+    let mut limit = make_limit(&empty);
     let demands = get_demands(&demand_pat, 1);
 
-    print!("{:?}", demands);
+    println!("demands: {:?}", demands);
 
     let solver = BFSolver::new(&repo, info);
     let solver = AdvancedSimplifySolver::new(&repo, &solver, info);
     
-    let result = SolverDual::solve_unordered(&solver, &limit, &demands, 4);
-    println!("solve space: {}", result.len());
+    // let result = SolverDual::solve_unordered(&solver, &limit, &demands, 4);
+    // println!("solve space: {}", result.len());
 
+    limit.max_result = 100;
     let result = SolverDual::solve(&solver, &limit, &demands, 4);
-    for i in 0..result.len().min(10) {
-        println!("{:?}", result[i]);
+    for i in 0..result.len() {
+        println!("{}", result[i]);
+    }
+}
+
+#[test]
+fn test_solver_simp_loop() {
+    let empty = vec![];
+    for pop in 1..99 {
+        let (repo, demands, info, limit) = make_config(pop, &empty);
+        let solver = BFSolver::new(&repo, info);
+        let solver = AdvancedSimplifySolver::new(&repo, &solver, info);
+        
+        let result = SolverDual::solve_unordered(&solver, &limit, &demands, 4);
+        println!("pop {} solve space: {}", pop, result.len());
     }
 }

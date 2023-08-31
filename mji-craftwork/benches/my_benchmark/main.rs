@@ -16,7 +16,7 @@ fn load_data<const T: usize>() -> GameDataRepo {
 
     for i in 0..usize::min(CRAFT_OBJECTS.len(), T) {
         let rec = Recipe {
-            id: CRAFT_OBJECTS[i][0],
+            id: CRAFT_OBJECTS[i][0] as u8,
             theme1: CRAFT_OBJECTS[i][2] as u8,
             theme2: CRAFT_OBJECTS[i][3] as u8,
             level: CRAFT_OBJECTS[i][13] as u8,
@@ -38,7 +38,7 @@ fn load_data<const T: usize>() -> GameDataRepo {
     GameDataRepo::new(recpies, pop_vec)
 }
 
-fn make_config(ban: &[u16]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
+fn make_config(ban: &[u8]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
     let mut repo = load_data::<82>();
     repo.set_popular_pattern(1);
     let info = CraftworkInfo::new(0, 35, 2, 3);

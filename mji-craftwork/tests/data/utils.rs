@@ -10,7 +10,7 @@ pub fn recipes() -> Vec<Recipe> {
     let mut recpies = vec![];
     for i in 0..CRAFT_OBJECTS.len() {
         let rec = Recipe {
-            id: CRAFT_OBJECTS[i][0],
+            id: CRAFT_OBJECTS[i][0] as u8,
             theme1: CRAFT_OBJECTS[i][2] as u8,
             theme2: CRAFT_OBJECTS[i][3] as u8,
             level: CRAFT_OBJECTS[i][13] as u8,
