@@ -3,8 +3,7 @@ use mji_craftwork::data::{
 };
 use mji_craftwork::simulator::{simulate, simulate_batch_seq, simulate_multi_batch, Batch};
 
-mod data;
-use data::new_repo;
+use test_data::new_repo;
 
 fn get_recipe_state(repo: &GameDataRepo, id: u8) -> RecipeState {
     repo.state(id as usize, 9)

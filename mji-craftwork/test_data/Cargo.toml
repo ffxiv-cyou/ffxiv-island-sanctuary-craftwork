@@ -1,0 +1,12 @@
+[package]
+name = "test-data"
+version = "0.1.0"
+authors = ["Jim Jiang <jim@lotlab.org>"]
+edition = "2018"
+description = "Test data for mji-craftwork"
+repository = "https://github.com/Lotlab/ffxiv-mji-craftwork"
+license = "apache2"
+
+[dependencies]
+base64 = "0.21"
+mji-craftwork = { path = "../" }

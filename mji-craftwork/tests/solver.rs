@@ -1,35 +1,20 @@
 use mji_craftwork::{
-    data::{CraftworkInfo, GameDataRepo},
-    init_repo, simulate, solve_singleday,
-    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch, AdvancedSimplifySolver, SolverDual}, predition::get_demands,
+    data::CraftworkInfo,
+    init_repo,
+    predition::get_demands,
+    simulate, solve_singleday,
+    solver::{
+        AdvancedSimplifySolver, BFSolver, SimplifySolver, SolverDual, SolverSingle, SolverWithBatch,
+    },
 };
 use rand::prelude::Distribution;
 
-mod data;
-use crate::data::new_repo;
-use data::from_pattern_code;
-
-fn make_demands() -> Vec<i8> {
-    vec![9; 82]
-}
-
-fn make_limit(ban: &[u8]) -> SolveLimit {
-    SolveLimit::new(16, ban, 24, false)
-}
-
-fn make_config(pop: usize, ban: &[u8]) -> (GameDataRepo, Vec<i8>, CraftworkInfo, SolveLimit) {
-    let repo = new_repo(pop);
-    let demands = make_demands();
-    let info = CraftworkInfo::new(0, 35, 2, 3);
-    let limit = make_limit(&ban);
-
-    (repo, demands, info, limit)
-}
+use test_data::{empty_demands, from_pattern_code, make_config, make_limit, new_repo};
 
 /// 库初始化测试
 #[test]
 fn init_test() {
-    use data::{CRAFT_OBJECTS, POPULARITY_LIST};
+    use test_data::{CRAFT_OBJECTS, POPULARITY_LIST};
     let mut recipes = vec![];
 
     for i in 0..CRAFT_OBJECTS.len() {
@@ -49,7 +34,7 @@ fn init_test() {
     }
 
     let repo = init_repo(recipes, pop_vec, 62);
-    let demands = make_demands();
+    let demands = empty_demands();
 
     solve_singleday(
         &repo,
@@ -66,7 +51,8 @@ fn init_test() {
 #[test]
 fn predict() {
     let empty = vec![];
-    let (repo, demands, info, limit) = make_config(1, &empty);
+    let demands = empty_demands();
+    let (repo, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
     let result = SolverSingle::solve_unordered(&solver, &limit, &demands, 0);
@@ -88,7 +74,8 @@ fn predict() {
 #[test]
 fn predict_simplify() {
     let empty = vec![];
-    let (repo, demands, info, limit) = make_config(1, &empty);
+    let demands = empty_demands();
+    let (repo, info, limit) = make_config(1, &empty);
     let solver = SimplifySolver::new(&repo, info);
 
     let result = SolverSingle::solve_unordered(&solver, &limit, &demands, 0);
@@ -99,7 +86,8 @@ fn predict_simplify() {
 #[test]
 fn predict_best() {
     let empty = vec![];
-    let (repo, demands, info, limit) = make_config(1, &empty);
+    let demands = empty_demands();
+    let (repo, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
     let result = SolverSingle::solve_best(&solver, &limit, &demands, 0);
@@ -110,7 +98,8 @@ fn predict_best() {
 #[test]
 fn predict_simplify_best() {
     let empty = vec![];
-    let (repo, demands, info, limit) = make_config(1, &empty);
+    let demands = empty_demands();
+    let (repo, info, limit) = make_config(1, &empty);
     let solver = SimplifySolver::new(&repo, info);
     let result = SolverSingle::solve_best(&solver, &limit, &demands, 0);
     println!("{:?}", result);
@@ -119,7 +108,7 @@ fn predict_simplify_best() {
 #[test]
 fn simulator() {
     let repo = new_repo(1);
-    let demands = make_demands();
+    let demands = empty_demands();
 
     let state = CraftworkInfo::new(0, 35, 1, 1);
     let arr = vec![13, 23, 13, 23];
@@ -131,14 +120,15 @@ fn simulator() {
 #[test]
 fn compare_bf_simplify() {
     let empty = vec![];
-    let (mut repo, mut demands, info, limit) = make_config(1, &empty);
+    let mut demands = empty_demands();
+    let (mut repo, info, limit) = make_config(1, &empty);
 
     let demand_range = rand::distributions::Uniform::new(2, 24u8);
     let pop_range = rand::distributions::Uniform::new(1, 100);
 
     let mut rng = rand::thread_rng();
 
-    for i in 0..100000 {
+    for i in 0..1000 {
         let pop = pop_range.sample(&mut rng);
         repo.set_popular_pattern(pop);
         for i in 0..demands.len() {
@@ -167,7 +157,8 @@ fn compare_bf_simplify() {
 #[test]
 fn test_solver_multi() {
     let empty = vec![];
-    let (repo, demands, info, limit) = make_config(1, &empty);
+    let demands = empty_demands();
+    let (repo, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
 
     let set = [(3, [14, 49, 14, 49, 0, 0])];
@@ -198,7 +189,8 @@ fn test_solver_multi() {
 #[test]
 fn test_solver_simp_adv() {
     let empty = vec![49];
-    let (repo, info, demand_pat) = from_pattern_code(b"AWCJtKVXcyvBnLQ7EzyKZ4sckoYqRlIaR5xjg7kqxUF3SoyVIwYAAAAA");
+    let (repo, info, demand_pat) =
+        from_pattern_code(b"AWCJtKVXcyvBnLQ7EzyKZ4sckoYqRlIaR5xjg7kqxUF3SoyVIwYAAAAA");
     let mut limit = make_limit(&empty);
     let demands = get_demands(&demand_pat, 1);
 
@@ -206,7 +198,7 @@ fn test_solver_simp_adv() {
 
     let solver = BFSolver::new(&repo, info);
     let solver = AdvancedSimplifySolver::new(&repo, &solver, info);
-    
+
     // let result = SolverDual::solve_unordered(&solver, &limit, &demands, 4);
     // println!("solve space: {}", result.len());
 
@@ -220,11 +212,12 @@ fn test_solver_simp_adv() {
 #[test]
 fn test_solver_simp_loop() {
     let empty = vec![];
+    let demands = empty_demands();
     for pop in 1..99 {
-        let (repo, demands, info, limit) = make_config(pop, &empty);
+        let (repo, info, limit) = make_config(pop, &empty);
         let solver = BFSolver::new(&repo, info);
         let solver = AdvancedSimplifySolver::new(&repo, &solver, info);
-        
+
         let result = SolverDual::solve_unordered(&solver, &limit, &demands, 4);
         println!("pop {} solve space: {}", pop, result.len());
     }

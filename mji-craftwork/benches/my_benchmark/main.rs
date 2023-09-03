@@ -1,55 +1,16 @@
-use base64::{engine::general_purpose, Engine as _};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use mji_craftwork::{
-    data::{CraftworkInfo, GameDataRepo, IDataRepo, Popularity, Recipe},
+    data::IDataRepo,
     gsolver::{GSolver, MildSolver, RadicalSolver},
-    predition::DemandPattern,
     simulator::{simulate_batch_seq, simulate_multi_batch},
-    solver::{BFSolver, SimplifySolver, SolveLimit, SolverSingle, SolverWithBatch, AdvancedSimplifySolver, SolverDual},
+    solver::{BFSolver, SimplifySolver, SolverSingle, SolverWithBatch, AdvancedSimplifySolver, SolverDual},
 };
-
-mod test_data;
-use test_data::{CRAFT_OBJECTS, POPULARITY_LIST};
-
-fn load_data<const T: usize>() -> GameDataRepo {
-    let mut recpies = vec![];
-
-    for i in 0..usize::min(CRAFT_OBJECTS.len(), T) {
-        let rec = Recipe {
-            id: CRAFT_OBJECTS[i][0] as u8,
-            theme1: CRAFT_OBJECTS[i][2] as u8,
-            theme2: CRAFT_OBJECTS[i][3] as u8,
-            level: CRAFT_OBJECTS[i][13] as u8,
-            craft_time: CRAFT_OBJECTS[i][14] as u8,
-            value: CRAFT_OBJECTS[i][15],
-            cost: 0,
-        };
-        recpies.push(rec);
-    }
-
-    let mut pop_vec = vec![vec![]];
-    for r in POPULARITY_LIST {
-        let mut pop: Vec<Popularity> = vec![];
-        for i in 1..usize::min(r.len(), T + 1) {
-            pop.push(r[i].into());
-        }
-        pop_vec.push(pop);
-    }
-    GameDataRepo::new(recpies, pop_vec)
-}
-
-fn make_config(ban: &[u8]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
-    let mut repo = load_data::<82>();
-    repo.set_popular_pattern(1);
-    let info = CraftworkInfo::new(0, 35, 2, 3);
-    let limit = SolveLimit::new(16, ban, 24, false);
-    (repo, info, limit)
-}
+use test_data::{make_config, make_limit, from_pattern_code};
 
 /// 测试单日单种类求解器
 fn predition_benchmark(c: &mut Criterion) {
     let empty = vec![];
-    let (repo, info, limit) = make_config(&empty);
+    let (repo, info, limit) = make_config(1, &empty);
     let solver = BFSolver::new(&repo, info);
     let sim_solver = SimplifySolver::new(&repo, info);
     let adv_solver = AdvancedSimplifySolver::new(&repo, &solver, info);
@@ -100,20 +61,12 @@ fn predition_benchmark(c: &mut Criterion) {
 /// 测试整周求解器
 fn gsolver_benchmark(c: &mut Criterion) {
     let empty = vec![];
-    let (repo, info, mut limit) = make_config(&empty);
-    limit.max_result = 200;
+    let mut limit = make_limit(&empty);
+    limit.max_result = 100;
 
+    let (repo, info, pat) = from_pattern_code(b"DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzWCertGSRcyVHaYugwAAAAA");
     let mild_solver = MildSolver::new(&repo, info);
     let radical_solver = RadicalSolver::new(&repo, info);
-
-    let code = &general_purpose::URL_SAFE_NO_PAD
-        .decode("DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAAA")
-        .unwrap();
-    let mut pat = vec![];
-    for b in &code[1..] {
-        pat.push(DemandPattern::from(b & 0x0f));
-        pat.push(DemandPattern::from(b >> 4));
-    }
 
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
         c.benchmark_group("gpred");
@@ -131,7 +84,7 @@ fn gsolver_benchmark(c: &mut Criterion) {
 /// 测试模拟器性能
 fn simulate_benchmark(c: &mut Criterion) {
     let ban = [];
-    let (repo, info, _) = make_config(&ban);
+    let (repo, info, _) = make_config(1, &ban);
 
     let mut recipe = vec![];
     for s in [14, 49, 14, 49] {
@@ -179,7 +132,7 @@ fn simulate_benchmark(c: &mut Criterion) {
 /// 测试单日多种类模拟器
 fn solver_multi_benchmark(c: &mut Criterion) {
     let ban = [];
-    let (repo, info, limit) = make_config(&ban);
+    let (repo, info, limit) = make_config(1, &ban);
 
     let demands = vec![9; 82];
     let mut recipe = vec![];
