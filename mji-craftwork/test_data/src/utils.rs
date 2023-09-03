@@ -1,6 +1,6 @@
 use mji_craftwork::{
-    data::{GameDataRepo, Popularity, Recipe},
-    predition::DemandPattern,
+    data::{CraftworkInfo, GameDataRepo, Popularity, Recipe},
+    solver::SolveLimit,
 };
 
 use super::{CRAFT_OBJECTS, POPULARITY_LIST};
@@ -36,10 +36,35 @@ pub fn popularity() -> Vec<Vec<Popularity>> {
     pop_vec
 }
 
+/// 新建一个repo
 pub fn new_repo(pop: usize) -> GameDataRepo {
     let recpies = recipes();
     let pop_vec = popularity();
     let mut repo = GameDataRepo::new(recpies, pop_vec);
     repo.set_popular_pattern(pop);
     repo
+}
+
+/// 默认全9的需求
+pub fn empty_demands() -> Vec<i8> {
+    vec![9; 82]
+}
+
+/// 新建一个通用求解限制
+pub fn make_limit(ban: &[u8]) -> SolveLimit {
+    SolveLimit::new(16, ban, 24, false)
+}
+
+/// 新建一个通用工房信息
+pub fn make_info() -> CraftworkInfo {
+    CraftworkInfo::new(0, 35, 2, 3)
+}
+
+/// 使用最常用配置创建库
+pub fn make_config(pop: usize, ban: &[u8]) -> (GameDataRepo, CraftworkInfo, SolveLimit) {
+    let repo = new_repo(pop);
+    let info = make_info();
+    let limit = make_limit(&ban);
+
+    (repo, info, limit)
 }

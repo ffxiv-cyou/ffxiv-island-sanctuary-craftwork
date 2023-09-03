@@ -4,13 +4,13 @@ use mji_craftwork::{
     predition::DemandPattern,
 };
 
-use super::new_repo;
+use super::{new_repo, make_info};
 
 pub fn from_pattern_code(code: &[u8]) -> (GameDataRepo, CraftworkInfo, Vec<DemandPattern>) {
     let arr = &general_purpose::URL_SAFE_NO_PAD.decode(code).unwrap();
 
     let repo = new_repo(arr[0] as usize);
-    let info = CraftworkInfo::new(0, 35, 2, 3);
+    let info = make_info();
 
     let mut pat = vec![];
     for b in &arr[1..] {

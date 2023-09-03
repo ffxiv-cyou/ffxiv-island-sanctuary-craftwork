@@ -1,5 +1,3 @@
-mod data;
-use data::{new_repo,from_pattern_code, to_pattern_code};
 use mji_craftwork::{
     data::CraftworkInfo,
     gsolver::{GSolver, MildSolver, RadicalSolver},
@@ -7,6 +5,7 @@ use mji_craftwork::{
     simulator::Batch,
     solver::SolveLimit,
 };
+use test_data::{new_repo,from_pattern_code, to_pattern_code};
 use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
 
