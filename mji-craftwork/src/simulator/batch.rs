@@ -100,6 +100,15 @@ impl Batch {
     pub fn get_values(&self) -> &[u16] {
         &self.values
     }
+    pub fn demand_sub(&self, demands: &mut [i8], worker: i8) {
+        for i in 0..self.seq {
+            let id = self.steps[i as usize] as usize;
+            demands[id] += match i {
+                0 => 1,
+                _ => 2,
+            } * worker;
+        }
+    }
 }
 
 impl PartialOrd for Batch {

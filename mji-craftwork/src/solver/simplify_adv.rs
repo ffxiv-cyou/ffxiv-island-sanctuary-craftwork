@@ -69,11 +69,11 @@ where
 
         // println!("{} {:?} {:?}", self.data.recipe_len(), self.info, limit);
         // println!("{} {} {} {}", self.data.popular(1) as u8, self.data.popular(2) as u8, self.data.popular(3) as u8, self.data.popular(4) as u8);
-        println!(
-            "candidates: {}, max_val: {}",
-            candidates.len(),
-            max_batch_val
-        );
+        // println!(
+        //     "candidates: {}, max_val: {}",
+        //     candidates.len(),
+        //     max_batch_val
+        // );
 
         let mut result = vec![];
 
@@ -81,12 +81,24 @@ where
         for i in 0..candidates.len() {
             for j in i + 1..candidates.len() {
                 let mut k = workers - 1;
+                let mut max_batches = Batches::new();
+                let mut max_val = 0;
                 while k > 0 {
                     let recipes = [(k, candidates[i]), (workers - k, candidates[j])];
-                    let (val, _) = simulate_multi_batch(&self.info, &recipes);
-                    result.push(Batches::from_batch(&val));
+                    let (batch, _) = simulate_multi_batch(&self.info, &recipes);
+                    let batch = Batches::from_batch(&batch);
+                    let value = match limit.with_cost {
+                        true => batch.value - batch.cost,
+                        false => batch.value,
+                    };
+                    if value > max_val {
+                        max_val = value;
+                        max_batches = batch;
+                    }
                     k -= 1;
                 }
+
+                result.push(max_batches)
             }
 
             let mut recipe: [RecipeState; 6] = [RecipeState::empty(); 6];
