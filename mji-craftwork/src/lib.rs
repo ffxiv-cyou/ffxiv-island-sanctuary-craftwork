@@ -6,9 +6,11 @@ pub mod solver;
 pub mod utils;
 
 use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
-use gsolver::{GSolver, MildSolver};
+use gsolver::{GMultiSolver, GSolver, MildMulitSolver, MildSolver};
 use predition::{get_demands, predict_adv, predict_all, DemandPattern};
-use solver::{BFSolver, SolveLimit, SolverSingle, SolverWithBatch};
+use solver::{
+    AdvancedSimplifySolver, BFSolver, SolveLimit, SolverDual, SolverSingle, SolverWithBatch,
+};
 use wasm_bindgen::prelude::*;
 
 use crate::data::CraftworkInfo;
@@ -329,6 +331,127 @@ pub fn solve_multi_day(
             ret.push(*i as u16);
         }
         ret.extend_from_slice(b.batch.get_values());
+    }
+    ret
+}
+
+/// 搜索单日多工坊下的可能最优解
+///
+/// 返回所有可能解的数组，数组结构如下
+/// - value 总价
+/// - cost 成本
+/// - count 不同种类工坊个数
+///   - worker 工坊个数
+///   - value 此工坊单价
+///   - cost 此工坊成本
+///   - step_count 步骤数目
+///   - steps[6] 每一步的物品ID
+///   - values[6] 每一步的价格
+#[wasm_bindgen]
+pub fn solve_day_dual(
+    repo: &GameDataRepo,
+    state: &CraftworkInfo,
+    level: u8,
+    ban_list: &[u8],
+    demands: &[i8],
+    worker: u8,
+    time: u8,
+    with_cost: bool,
+) -> Vec<u16> {
+    let solver = BFSolver::new(repo, state.clone());
+    let solver = AdvancedSimplifySolver::new(repo, &solver, state.clone());
+    let limit = SolveLimit::new(level, ban_list, time, with_cost);
+
+    let results = SolverDual::solve(&solver, &limit, demands, worker);
+    let mut ret = vec![];
+    for b in results {
+        ret.push(b.value);
+        ret.push(b.cost);
+
+        let index = ret.len();
+        ret.push(b.batches.len() as u16);
+
+        for (worker, batch) in b.batches {
+            // 跳过空的
+            if worker == 0 {
+                ret[index] -= 1;
+                continue;
+            }
+
+            ret.push(worker as u16);
+            ret.push(batch.value as u16);
+            ret.push(batch.cost as u16);
+            ret.push(batch.seq as u16);
+            for i in batch.get_steps() {
+                ret.push(*i as u16);
+            }
+            ret.extend_from_slice(batch.get_values());
+        }
+    }
+    ret
+}
+
+/// 尝试分片解整周数据
+///
+/// 传入的是需求趋势模式数组
+///
+/// 返回值：
+/// - val: 用于比较的值
+/// - batches: []
+///   - value: 收益
+///   - cost: 成本
+///   - workers: 有多少不同种的worker
+///     - worker
+///     - seq
+///     - steps[]
+///     - values[]
+#[wasm_bindgen]
+pub fn solve_week_part(
+    repo: &GameDataRepo,
+    state: &CraftworkInfo,
+    level: u8,
+    ban_list: Vec<u8>,
+    time: u8,
+    with_cost: bool,
+    pattern: &[u8],
+    part_id: u16,
+) -> Vec<u16> {
+    let limit = SolveLimit::new(level, &ban_list, time, with_cost);
+    let solver = MildMulitSolver::new(repo, state.clone());
+
+    let vec = DemandPattern::from_u8(pattern);
+    let (batches, val) = solver.solve_part(&limit, &vec, part_id as usize);
+
+    let mut ret = vec![val];
+    for b in batches {
+        match b {
+            None => {
+                ret.push(0); // value
+                ret.push(0); // cost
+                ret.push(0); // worker types
+            },
+            Some(batch) => {
+                ret.push(batch.value);
+                ret.push(batch.cost);
+
+                let index = ret.len();
+                ret.push(batch.batches.len() as u16);
+
+                for (worker, batch) in batch.batches {
+                    // 跳过空的
+                    if worker == 0 {
+                        ret[index] -= 1;
+                        continue;
+                    }
+                    ret.push(worker as u16);
+                    ret.push(batch.seq as u16);
+                    for i in batch.get_steps() {
+                        ret.push(*i as u16);
+                    }
+                    ret.extend_from_slice(batch.get_values());
+                }
+            }
+        }
     }
     ret
 }

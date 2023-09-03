@@ -37,6 +37,44 @@ impl Batches {
             cmp_value: 0,
         }
     }
+    pub fn set_result(&mut self, batches: &[(u8, Batch)]) {
+        self.batches[0] = batches[0];
+        self.batches[1] = batches[1];
+
+        let mut value = 0;
+        let mut cost = 0;
+        for b in batches {
+            value += b.0 as u16 * b.1.value;
+            cost += b.0 as u16 * b.1.cost;
+        }
+        self.value = value;
+        self.cost = cost;
+    }
+    /// 干劲增加量
+    pub fn tension_add(&self) -> u8 {
+        let mut tension = 0;
+        for (worker, batch) in &self.batches {
+            if *worker == 0 {
+                continue;
+            }
+            tension += worker * (batch.seq - 1);
+        }
+        tension
+    }
+
+    /// 需求变动量
+    pub fn produce_add(&self, demands: &mut [i8]) {
+        for (worker, batch) in &self.batches {
+            batch.demand_sub(demands, *worker as i8);
+        }
+    }
+
+    /// 需求变动量
+    pub fn produce_sub(&self, demands: &mut [i8]) {
+        for (worker, batch) in &self.batches {
+            batch.demand_sub(demands, *worker as i8 * -1);
+        }
+    }
 }
 impl PartialOrd for Batches {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -57,7 +95,18 @@ impl Ord for Batches {
 }
 impl fmt::Display for Batches {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}] {}x {:?}, {}x {:?}", self.cmp_value, self.batches[0].0, self.batches[0].1.steps, self.batches[1].0, self.batches[1].1.steps)
+        write!(
+            f,
+            "[{}] {}x {:?}, {}x {:?}",
+            match self.cmp_value {
+                0 => self.value,
+                _ => self.cmp_value,
+            },
+            self.batches[0].0,
+            self.batches[0].1.steps,
+            self.batches[1].0,
+            self.batches[1].1.steps
+        )
     }
 }
 
@@ -96,6 +145,31 @@ pub trait SolverDual {
                 true => item.value - item.cost,
                 false => item.value,
             };
+            if max_val < val {
+                max_val = val;
+                max_batch = item;
+            }
+        }
+        max_batch
+    }
+
+    /// 使用指定函数解唯一最优
+    fn solve_best_fn(
+        &self,
+        limit: &SolveLimit,
+        demands: &[i8],
+        workers: u8,
+        sort_val: impl Fn(u16, &Batches) -> u16,
+    ) -> Batches {
+        let ret = self.solve_unordered(limit, demands, workers);
+        let mut max_val = 0;
+        let mut max_batch = Batches::new();
+        for item in ret {
+            let val = match limit.with_cost {
+                true => item.value - item.cost,
+                false => item.value,
+            };
+            let val = sort_val(val, &item);
             if max_val < val {
                 max_val = val;
                 max_batch = item;

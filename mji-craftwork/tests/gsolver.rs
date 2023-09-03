@@ -1,11 +1,11 @@
 use mji_craftwork::{
     data::CraftworkInfo,
-    gsolver::{GSolver, MildSolver, RadicalSolver},
+    gsolver::{GSolver, MildSolver, RadicalSolver, MildMulitSolver, GMultiSolver, print_week_result},
     predition::DemandPattern,
     simulator::Batch,
     solver::SolveLimit,
 };
-use test_data::{new_repo,from_pattern_code, to_pattern_code};
+use test_data::{new_repo,from_pattern_code, to_pattern_code, to_plan_code, make_limit};
 use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
 
@@ -107,4 +107,17 @@ fn test_gsolver_compare() {
         "mild {}, rad {}, equal {}",
         cnt_mild, cnt_radical, cnt_equal
     );
+}
+
+#[test]
+fn test_gsolver_mild_multi() {
+    let limit = make_limit(&[]);
+
+    let (repo, mut info, pat) = from_pattern_code(b"QVBGh7oanMZyE7uYaTJSIXq3xFZKyVg8QYtTmshkMhu3qFnBIwcAAAAA");
+    info.workers = 4;
+    let solver = MildMulitSolver::new(&repo, info);
+
+    let result = solver.solve(&limit, &pat);
+    println!("code: {}", to_plan_code(&result));
+    print_week_result(&result);
 }
