@@ -20,15 +20,13 @@ impl<'a, T> SolverSingle for BFSolver<'a, T>
 where
     T: IDataRepo,
 {
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batch> {
-        let mut ret: Vec<Batch> = vec![];
+    fn solve_fn(&self, limit: &SolveLimit, demands: &[i8], workers: u8, mut cb: impl FnMut(&Batch)) {
         let mut info = self.info.clone();
         if workers != 0 {
             info.workers = workers;
         }
 
-        self.solve_sub(limit, demands, &mut ret, Batch::new(), info);
-        ret
+        self.solve_sub(limit, demands, Batch::new(), info, &mut cb);
     }
 
     fn update_info(&mut self, info: CraftworkInfo) {
@@ -52,9 +50,9 @@ where
         &self,
         limit: &SolveLimit,
         demands: &[i8],
-        vec: &mut Vec<Batch>,
         current: Batch,
         mut info: CraftworkInfo,
+        cb: &mut impl FnMut(&Batch)
     ) {
         let last = current.last();
         let first_batch = last == 0;
@@ -90,9 +88,9 @@ where
 
             if current.get_time() > limit.time - 4 {
                 // 当前工序结束
-                vec.push(current)
+                cb(&current);
             } else {
-                self.solve_sub(limit, demands, vec, current, info)
+                self.solve_sub(limit, demands, current, info, cb)
             }
         });
     }
@@ -102,15 +100,14 @@ impl<'a, T> SolverWithBatch for BFSolver<'a, T>
 where
     T: IDataRepo,
 {
-    fn solve_unordered(
+    fn solve_fn(
         &self,
         limit: &SolveLimit,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
-    ) -> Vec<BatchWithBatch> {
-        let mut ret = vec![];
-
+        mut cb: impl FnMut(&BatchWithBatch)
+    ) {
         // 准备计算状态
         let mut recipes = vec![];
         for (num, seq) in set {
@@ -210,8 +207,7 @@ where
             }
 
             // println!("batch: {:?}", b2b.batch);
-            ret.push(b2b);
+            cb(&b2b);
         }
-        ret
     }
 }
