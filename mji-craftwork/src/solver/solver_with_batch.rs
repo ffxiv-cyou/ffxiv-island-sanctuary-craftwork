@@ -5,6 +5,7 @@ use std::collections::BinaryHeap;
 use super::super::simulator::Batch;
 
 /// 步骤解
+#[derive(Clone, Copy, Debug)]
 pub struct BatchWithBatch {
     /// 当前步骤
     pub batch: Batch,
@@ -52,6 +53,15 @@ impl Eq for BatchWithBatch {}
 
 /// 带已设置排班的当日求解器
 pub trait SolverWithBatch {
+    fn solve_fn(
+        &self,
+        limit: &SolveLimit,
+        set: &[(u8, [u8; 6])],
+        demands: &[i8],
+        workers: u8,
+        cb: impl FnMut(&BatchWithBatch),
+    );
+
     /// 解最优
     ///
     /// - limit: 求解限制
@@ -66,7 +76,13 @@ pub trait SolverWithBatch {
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
-    ) -> Vec<BatchWithBatch>;
+    ) -> Vec<BatchWithBatch> {
+        let mut result = vec![];
+        self.solve_fn(limit, set, demands, workers, |steps| {
+            result.push(*steps);
+        });
+        result
+    }
 
     /// 解最优后对结果排序
     fn solve(
@@ -76,10 +92,10 @@ pub trait SolverWithBatch {
         demands: &[i8],
         workers: u8,
     ) -> Vec<BatchWithBatch> {
-        let ret = self.solve_unordered(limit, set, demands, workers);
         // 结果排序
         let mut heap = BinaryHeap::new();
-        for mut item in ret {
+        self.solve_fn(limit, set, demands, workers, |item| {
+            let mut item = *item;
             item.cmp_value = match limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
@@ -91,7 +107,7 @@ pub trait SolverWithBatch {
             if heap.len() > limit.max_result {
                 heap.pop();
             }
-        }
+        });
         heap.into_sorted_vec()
     }
 
@@ -103,10 +119,9 @@ pub trait SolverWithBatch {
         demands: &[i8],
         workers: u8,
     ) -> BatchWithBatch {
-        let ret = self.solve_unordered(limit, set, demands, workers);
         let mut max_val = 0;
         let mut max_batch = BatchWithBatch::from_batch(Batch::new());
-        for item in ret {
+        self.solve_fn(limit, set, demands, workers, |item| {
             let val = match limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
@@ -116,9 +131,9 @@ pub trait SolverWithBatch {
             };
             if max_val < val {
                 max_val = val;
-                max_batch = item;
+                max_batch = *item;
             }
-        }
+        });
         max_batch
     }
 
@@ -131,10 +146,9 @@ pub trait SolverWithBatch {
         workers: u8,
         sort_val: impl Fn(u16, &BatchWithBatch) -> u16,
     ) -> BatchWithBatch {
-        let ret = self.solve_unordered(limit, set, demands, workers);
         let mut max_val = 0;
         let mut max_batch = BatchWithBatch::from_batch(Batch::new());
-        for item in ret {
+        self.solve_fn(limit, set, demands, workers, |item| {
             let val = match limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
@@ -145,9 +159,9 @@ pub trait SolverWithBatch {
             let val = sort_val(val, &item);
             if max_val < val {
                 max_val = val;
-                max_batch = item;
+                max_batch = *item;
             }
-        }
+        });
         max_batch
     }
 }

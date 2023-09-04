@@ -27,23 +27,20 @@ impl<'a, T> SolverSingle for SimplifySolver<'a, T>
 where
     T: IDataRepo,
 {
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batch> {
-        let mut ret: Vec<Batch> = vec![];
+    fn solve_fn(
+        &self,
+        limit: &SolveLimit,
+        demands: &[i8],
+        workers: u8,
+        mut cb: impl FnMut(&Batch),
+    ) {
         let mut avg = 0;
         let mut info = self.info.clone();
         if workers != 0 {
             info.workers = workers;
         }
 
-        self.solve_sub(
-            limit,
-            demands,
-            &mut ret,
-            Batch::new(),
-            info,
-            &mut avg,
-        );
-        ret
+        self.solve_sub(limit, demands, Batch::new(), info, &mut avg, &mut cb);
     }
 
     fn update_info(&mut self, info: CraftworkInfo) {
@@ -67,10 +64,10 @@ where
         &self,
         limit: &SolveLimit,
         demands: &[i8],
-        vec: &mut Vec<Batch>,
         current: Batch,
         mut info: CraftworkInfo,
         max: &mut u16,
+        cb: &mut impl FnMut(&Batch),
     ) {
         let last = current.last();
         let first_batch = last == 0;
@@ -115,14 +112,14 @@ where
 
             if current.get_time() > limit.time - 4 {
                 // 当前工序结束
-                vec.push(current);
+                cb(&current);
 
                 let avg = current.value / limit.time as u16;
                 if avg > *max {
                     *max = avg;
                 }
             } else {
-                self.solve_sub(limit, demands, vec, current, info, max)
+                self.solve_sub(limit, demands, current, info, max, cb)
             }
         });
     }

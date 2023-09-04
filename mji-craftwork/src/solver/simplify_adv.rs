@@ -34,10 +34,16 @@ where
     T: IDataRepo,
     U: SolverSingle,
 {
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batches> {
+    fn solve_fn(
+        &self,
+        limit: &SolveLimit,
+        demands: &[i8],
+        workers: u8,
+        mut cb: impl FnMut(&Batches),
+    ) {
         let mut info = self.info.clone();
         info.workers = workers;
-        
+
         // 使用最大worker计算在最坏叠箱发生时（即各队列在各种组合下的理论最小值）的最大值
         let max_batch = self.solver.solve_best(limit, demands, workers);
         let max_batch_val = match limit.with_cost {
@@ -47,11 +53,11 @@ where
 
         // 计算非叠箱时的最大值（即各种组合中的理论最大值）
         let mut candidates = vec![];
-        let batches = self.solver.solve_unordered(limit, demands, 1);
-        for b in batches {
+        self.solver.solve_fn(limit, demands, 1, |b| {
             // 补偿多个worker的干劲加成
             // let factor = 1f32 + (0.01 * ((b.seq as u8 - 1) * workers) as f32);
-            let factor = (100 + (b.seq as u8 - 1) * workers) as f32 / (100 + b.seq as u8 - 1) as f32;
+            let factor =
+                (100 + (b.seq as u8 - 1) * workers) as f32 / (100 + b.seq as u8 - 1) as f32;
             let value = (b.value as f32 * factor) as u16;
             let value = match limit.with_cost {
                 true => value - b.cost,
@@ -65,7 +71,7 @@ where
                 }
                 candidates.push(recipe);
             }
-        }
+        });
 
         // println!("{} {:?} {:?}", self.data.recipe_len(), self.info, limit);
         // println!("{} {} {} {}", self.data.popular(1) as u8, self.data.popular(2) as u8, self.data.popular(3) as u8, self.data.popular(4) as u8);
@@ -75,8 +81,6 @@ where
         //     max_batch_val
         // );
 
-        let mut result = vec![];
-
         // 模拟计算
         for i in 0..candidates.len() {
             for j in i + 1..candidates.len() {
@@ -84,7 +88,10 @@ where
                 let mut max_batches = Batches::new();
                 let mut max_val = 0;
                 while k > 0 {
-                    let recipes = [(k, candidates[i]), (workers - k, candidates[j])];
+                    let recipes = match k > (workers - k) {
+                        true => [(k, candidates[i]), (workers - k, candidates[j])],
+                        false => [(workers - k, candidates[j]), (k, candidates[i])],
+                    };
                     let (batch, _) = simulate_multi_batch(&self.info, &recipes);
                     let batch = Batches::from_batch(&batch);
                     let value = match limit.with_cost {
@@ -97,8 +104,7 @@ where
                     }
                     k -= 1;
                 }
-
-                result.push(max_batches)
+                cb(&max_batches);
             }
 
             let mut recipe: [RecipeState; 6] = [RecipeState::empty(); 6];
@@ -115,9 +121,7 @@ where
 
             let batch = simulate_batch(&info, &recipe[0..len]);
             let batches = [(workers, batch), (0, Batch::new())];
-            result.push(Batches::from_batch(&batches));
+            cb(&Batches::from_batch(&batches));
         }
-
-        result
     }
 }

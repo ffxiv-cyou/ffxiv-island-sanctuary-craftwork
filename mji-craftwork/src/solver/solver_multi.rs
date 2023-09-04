@@ -75,22 +75,27 @@ impl Batches {
             batch.demand_sub(demands, *worker as i8 * -1);
         }
     }
+
+    fn cmp(&self) -> u32 {
+        let diff = (self.batches[0].0 as i8 - self.batches[1].0 as i8).abs();
+        self.cmp_value as u32 * 10 + diff as u32
+    }
 }
 impl PartialOrd for Batches {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        other.cmp_value.partial_cmp(&self.cmp_value)
+        other.cmp().partial_cmp(&self.cmp())
     }
 }
 impl PartialEq for Batches {
     fn eq(&self, other: &Self) -> bool {
-        self.cmp_value == other.cmp_value
+        self.cmp() == other.cmp()
     }
 }
 impl Eq for Batches {}
 
 impl Ord for Batches {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.cmp_value.cmp(&self.cmp_value)
+        other.cmp().cmp(&self.cmp())
     }
 }
 impl fmt::Display for Batches {
@@ -117,12 +122,20 @@ pub trait SolverDual {
     /// - limit: 求解限制
     /// - demands: 需求
     /// - workers: 工坊数量
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batches>;
+    fn solve_fn(&self, limit: &SolveLimit, demands: &[i8], workers: u8, cb: impl FnMut(&Batches));
+
+    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batches> {
+        let mut result = vec![];
+        self.solve_fn(limit, demands, workers, |steps: &Batches| {
+            result.push(*steps);
+        });
+        result
+    }
 
     fn solve(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batches> {
-        let ret = self.solve_unordered(limit, demands, workers);
         let mut heap = BinaryHeap::new();
-        for mut item in ret {
+        self.solve_fn(limit, demands, workers, |bathces|{
+            let mut item = *bathces;
             item.cmp_value = match limit.with_cost {
                 true => item.value - item.cost,
                 false => item.value,
@@ -131,25 +144,24 @@ pub trait SolverDual {
             if heap.len() > limit.max_result {
                 heap.pop();
             }
-        }
+        });
         heap.into_sorted_vec()
     }
 
     /// 解唯一最优
     fn solve_best(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Batches {
-        let ret = self.solve_unordered(limit, demands, workers);
         let mut max_val = 0;
         let mut max_batch = Batches::new();
-        for item in ret {
+        self.solve_fn(limit, demands, workers, |item| {
             let val = match limit.with_cost {
                 true => item.value - item.cost,
                 false => item.value,
             };
             if max_val < val {
                 max_val = val;
-                max_batch = item;
+                max_batch = *item;
             }
-        }
+        });
         max_batch
     }
 
@@ -161,10 +173,9 @@ pub trait SolverDual {
         workers: u8,
         sort_val: impl Fn(u16, &Batches) -> u16,
     ) -> Batches {
-        let ret = self.solve_unordered(limit, demands, workers);
         let mut max_val = 0;
         let mut max_batch = Batches::new();
-        for item in ret {
+        self.solve_fn(limit, demands, workers, |item| {
             let val = match limit.with_cost {
                 true => item.value - item.cost,
                 false => item.value,
@@ -172,9 +183,9 @@ pub trait SolverDual {
             let val = sort_val(val, &item);
             if max_val < val {
                 max_val = val;
-                max_batch = item;
+                max_batch = *item;
             }
-        }
+        });
         max_batch
     }
 }
