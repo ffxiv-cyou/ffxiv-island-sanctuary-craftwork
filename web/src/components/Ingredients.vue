@@ -6,8 +6,7 @@
       class="ingridient"
       :class="getCategory(value[0])"
     >
-      <span class="ingridient-name">{{ getName(value[0]) }}</span>
-      <span class="ingridient-count">&times;{{ value[1] * factor }}</span>
+      <span class="ingridient-name">{{ getName(value[0]) }}</span><span class="ingridient-count"><span class="cross">&times;</span>{{ value[1] * factor }}</span>
     </div>
   </div>
 </template>
@@ -71,12 +70,12 @@ export default class ingredients extends Vue {
 
 <style lang="scss" scoped>
 .ingridient {
-  height: 1.25em;
-  line-height: 1.25em;
+  height: 1.3em;
+  line-height: 1.35em;
   padding: 2px 4px;
 
   .ingridient-name {
-    max-width: calc(100% - 2.25em);
+    max-width: calc(100% - 2em);
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -84,6 +83,9 @@ export default class ingredients extends Vue {
   }
   .ingridient-count {
     float: right;
+    .cross {
+      font-size: 9px;
+    }
   }
   &.category-0,
   &.category-1,
