@@ -12,6 +12,8 @@ import init, {
   pattern_predict_adv,
   simulate_multi,
   solve_multi_day,
+  solve_day_dual,
+  solve_week_part,
 } from "mji-craftwork";
 
 function get_craft_info(state: any): CraftworkInfo {
@@ -80,6 +82,34 @@ async function init_worker() {
           data.worker, 
           data.time,
           data.with_cost);
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
+      case "solve_day_dual": {
+        const state = get_craft_info(data.state);
+        const result = solve_day_dual(
+          repo, 
+          state, 
+          data.level, 
+          data.ban_list, 
+          data.demands,
+          data.worker, 
+          data.time,
+          data.with_cost);
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
+      case "solve_week_part": {
+        const state = get_craft_info(data.state);
+        const result = solve_week_part(
+          repo,
+          state,
+          data.level,
+          data.ban_list,
+          data.time,
+          data.with_cost,
+          data.pattern,
+          data.part_id);
         self.postMessage(result, [result.buffer]);
         break;
       }
