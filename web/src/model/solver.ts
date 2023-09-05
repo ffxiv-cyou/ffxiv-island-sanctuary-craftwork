@@ -109,13 +109,12 @@ export class SolverProxy {
         this.loadData();
     }
 
-    get shareLink() 
-    {
+    get shareLink() {
         const binary = new Uint8Array(Math.ceil(this.config.demandPatterns.length / 2) + 1);
         binary[0] = this.popPattern;
         for (let i = 0; i < this.config.demandPatterns.length; i++) {
-          const p = this.config.demandPatterns[i];
-          binary[Math.floor(i / 2) + 1] |= (p << (i % 2 === 0 ? 0 : 4));
+            const p = this.config.demandPatterns[i];
+            binary[Math.floor(i / 2) + 1] |= (p << (i % 2 === 0 ? 0 : 4));
         }
         return ToShareCode(binary);
     }
@@ -173,12 +172,12 @@ export class SolverProxy {
     async simulateMulti(workers: WorkerSteps[], demands: number[], tension: number): Promise<BatchValues[]> {
         const seq = WorkerSteps.toU8Array(workers);
         const arr = await this.solver.simulate_multi(this.infoWithTension(tension), seq, new Int8Array(demands));
-    
+
         const ret = [];
         for (let i = 0; i < workers.length; i++) {
             const worker = workers[i];
             const offset = i * 7;
-            const batch = BatchValues.fromSteps(worker.steps, arr.slice(offset, offset + 1 + worker.steps.length)); 
+            const batch = BatchValues.fromSteps(worker.steps, arr.slice(offset, offset + 1 + worker.steps.length));
             ret.push(batch);
         }
         return ret;
@@ -307,7 +306,7 @@ export class SolverProxy {
 
         const set = WorkerSteps.toU8Array(setWorkers);
         const arr = await this.solver.solve_multi_day(info, this.config.level, banArr, set, demandArr, worker, maxTime, this.config.withCost);
-    
+
         const workers = setWorkers.map(v => v.worker);
         workers.push(worker);
 
@@ -315,18 +314,56 @@ export class SolverProxy {
     }
 
     /**
+     * 解当天的多工坊最优值
+     * @param demands 需求值
+     * @param setWorkers 已设置的工坊情况
+     * @param banList 禁用列表
+     * @param tension 干劲
+     * @param worker 当前求解的工坊数量
+     * @param maxTime 最大工序时间
+     * @returns 解，和对应已设置工坊的值
+     */
+    async solveDayDual(demands: number[], banList: number[], tension: number, worker: number, maxTime: number = 24) {
+        const banArr = new Uint8Array(banList);
+        const demandArr = new Int8Array(demands);
+        const info = this.infoWithTension(tension);
+
+        const arr = await this.solver.solve_day_dual(info, this.config.level, banArr, demandArr, worker, maxTime, this.config.withCost);
+        return BatchesValues.fromArray(arr);
+    }
+
+    /**
      * 使用指定的需求模式尝试求解本周最优
      * @param banList 禁用列表
      * @returns 
      */
-    async solveWeek(banList: number[]): Promise<BatchValues[]> 
-    {
+    async solveWeek(banList: number[]): Promise<WorkerSteps[][]> {
         const info = this.infoWithTension(0);
         const banArr = new Uint8Array(banList);
         const patternArr = new Uint8Array(this.config.demandPatterns);
 
         const arr = await this.solver.solve_week(info, this.config.level, banArr, 24, this.config.withCost, patternArr);
-        return BatchValues.fromSimulateArray(arr);
+        const batches = BatchValues.fromSimulateArray(arr);
+        let result = [];
+        for (let i = 0; i < batches.length; i++) {
+            result.push([new WorkerSteps(info.workers, batches[i].steps)]);
+        }
+        return result;
+    }
+
+    /**
+     * 使用指定的需求模式尝试求解本周最优
+     * @param banList 禁用列表
+     * @returns 
+     */
+    async solveWeekPartly(banList: number[], partID: number): Promise<[number, WorkerSteps[][]]> {
+        const info = this.infoWithTension(0);
+        const banArr = new Uint8Array(banList);
+        const patternArr = new Uint8Array(this.config.demandPatterns);
+
+        const arr = await this.solver.solve_week_part(info, this.config.level, banArr, 24, this.config.withCost, patternArr, partID);
+
+        return [arr[0], WorkerSteps.fromSolverArray(arr.slice(1))];
     }
 
     /**
@@ -525,6 +562,51 @@ export class BatchValuesWithWorker extends BatchValues {
     }
 }
 
+// 多工坊 Batch 值
+export class BatchesValues {
+    batches: BatchValuesWithWorker[] = [];
+    cost: number = 0;
+    value: number = 0;
+
+    constructor(value: number, cost: number, batches: BatchValuesWithWorker[]) {
+        this.value = value;
+        this.cost = cost;
+        this.batches = batches;
+    }
+
+    static fromArray(array: Uint16Array): BatchesValues[] {
+        let offset = 0;
+        let values = [];
+        while (offset < array.length) {
+            let batches = [];
+            const value = array[offset++];
+            const cost = array[offset++];
+            const count = array[offset++];
+            for (let i = 0; i < count; i++) {
+                const worker = array[offset++];
+                const value = array[offset++];
+                const cost = array[offset++];
+                const step = array[offset++];
+                const steps = [];
+                for (let j = 0; j < 6; j++) {
+                    steps.push(array[offset++]);
+                }
+                const values = [];
+                for (let j = 0; j < 6; j++) {
+                    values.push(array[offset++]);
+                }
+                steps.length = step;
+                values.length = step;
+                let val = new BatchValuesWithWorker(worker, 0, 0, value, cost, steps, values);
+                batches.push(val);
+            }
+            var batch = new BatchesValues(value, cost, batches);
+            values.push(batch);
+        }
+        return values;
+    }
+}
+
 export class WorkerSteps {
     worker: number = 1;
     steps: number[] = [];
@@ -557,5 +639,30 @@ export class WorkerSteps {
             steps[i].setU8Array(seq.subarray(i * 7));
         }
         return seq;
+    }
+
+    static fromSolverArray(array: Uint16Array): WorkerSteps[][] {
+        let result = [];
+        let offset = 0;
+        while (offset < array.length) {
+            let value = array[offset++];
+            let cost = array[offset++];
+            let workers = array[offset++];
+            let arr = [];
+            for (let i = 0; i < workers; i++) {
+                let worker = array[offset++];
+                let seq = array[offset++];
+                let steps = [];
+                for (let j = 0; j < 6; j++) {
+                    steps.push(array[offset++]);
+                }
+                offset += 6;
+                steps.length = seq;
+                arr.push(new WorkerSteps(worker, steps));
+            }
+            result.push(arr);
+        }
+
+        return result;
     }
 }

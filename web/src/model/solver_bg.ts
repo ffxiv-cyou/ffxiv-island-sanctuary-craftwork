@@ -107,7 +107,7 @@ export class SolverBG {
     });
   }
 
-  public solve_day(state: WorkerInfo, level: number, ban_list: Uint16Array, demands: Int8Array, time: number, with_cost: boolean) {
+  public solve_day(state: WorkerInfo, level: number, ban_list: Uint8Array, demands: Int8Array, time: number, with_cost: boolean) {
     return this.postMsg<Uint16Array>({
       type: "solve_day",
       state: this.toInfoObj(state),
@@ -119,7 +119,7 @@ export class SolverBG {
     });
   }
 
-  public solve_multi_day(state: WorkerInfo, level: number, ban_list: Uint16Array, set: Uint8Array, demands: Int8Array, worker: number, time: number, with_cost: boolean) {
+  public solve_multi_day(state: WorkerInfo, level: number, ban_list: Uint8Array, set: Uint8Array, demands: Int8Array, worker: number, time: number, with_cost: boolean) {
     return this.postMsg<Uint16Array>({
       type: "solve_multi_day",
       state: this.toInfoObj(state),
@@ -133,7 +133,20 @@ export class SolverBG {
     });
   }
 
-  public solve_week(state: WorkerInfo, level: number, ban_list: Uint16Array, time: number, with_cost: boolean, pattern: Uint8Array) {
+  public solve_day_dual(state: WorkerInfo, level: number, ban_list: Uint8Array, demands: Int8Array, worker: number, time: number, with_cost: boolean) {
+    return this.postMsg<Uint16Array>({
+      type: "solve_day_dual",
+      state: this.toInfoObj(state),
+      level: level,
+      ban_list: ban_list,
+      demands: demands,
+      worker: worker,
+      time: time,
+      with_cost: with_cost,
+    });
+  }
+  
+  public solve_week(state: WorkerInfo, level: number, ban_list: Uint8Array, time: number, with_cost: boolean, pattern: Uint8Array) {
     return this.postMsg<Uint16Array>({
       type: "solve_week",
       state: this.toInfoObj(state),
@@ -142,6 +155,19 @@ export class SolverBG {
       pattern: pattern,
       time: time,
       with_cost: with_cost,
+    });
+  }
+
+  public solve_week_part(state: WorkerInfo, level: number, ban_list: Uint8Array, time: number, with_cost: boolean, pattern: Uint8Array, part_id: number) {
+    return this.postMsg<Uint16Array>({
+      type: "solve_week_part",
+      state: this.toInfoObj(state),
+      level: level,
+      ban_list: ban_list,
+      pattern: pattern,
+      time: time,
+      with_cost: with_cost,
+      part_id: part_id
     });
   }
 

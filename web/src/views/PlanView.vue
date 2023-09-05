@@ -17,6 +17,10 @@
       :no-close="true"
     >
       <Loading />
+      <div class="solve-progress">
+        <progress :value="progress" max="100" class="progress"></progress>
+        <div class="progress-label">{{ progress }}% | 当前用时: {{ timeElapse }} | 预计剩余: {{ timeETA }}</div>
+      </div>
     </popup>
     <popup
       v-if="shareCode"
@@ -156,6 +160,37 @@ export default class PlanView extends Vue {
    * 求解整周的状态
    */
   isLoading = false;
+
+  now = 0;
+
+  progress = 0;
+
+  beginTime = 0;
+
+  lastProgressTime = 0;
+
+  get timeElapse() {
+    let sec = (this.now - this.beginTime) / 1000;
+    return this.getText(Math.floor(sec / 60)) + ":" + this.getText(Math.floor(sec % 60));
+  }
+
+  get timeETA() {
+    if (this.lastProgressTime === 0 || this.progress === 0) return "N/A";
+    let full = (this.lastProgressTime - this.beginTime) / 10 / this.progress;
+    let sec = full - (this.now - this.beginTime) / 1000;
+    return this.getText(Math.floor(sec / 60)) + ":" + this.getText(Math.floor(sec % 60));
+  }
+
+  getText(num: number) {
+    let text = String(num);
+    if (text.length < 2)
+      return "0" + text;
+    return text;
+  }
+
+  updateNow() {
+    this.now = new Date().getTime();
+  }
 
   /**
    * 为排班添加某天的内容
@@ -356,17 +391,34 @@ export default class PlanView extends Vue {
    */
   async createPlanFromSolve() {
     this.isLoading = true;
-    let batches = await this.solver.solveWeek([]);
-    let arr = [];
-    arr.push([]);
-    for (let i = 0; i < batches.length; i++) {
-      arr.push(batches[i].steps);
+    this.progress = 0;
+    this.beginTime = new Date().getTime();
+    this.lastProgressTime = 0;
+    let handler = setInterval(this.updateNow, 1000);
+
+    let maxSteps: WorkerSteps[][] = [];
+    if (this.solver.config.differentWorkers > 1) {
+      let maxValue = 0;
+      for (let i = 0; i < 30; i++) {
+        let result = await this.solver.solveWeekPartly([], i);
+        this.progress = Math.round(i / 30 * 100);
+        this.lastProgressTime = new Date().getTime();
+        if (result[0] > maxValue) {
+          maxValue = result[0];
+          maxSteps = result[1];
+        }
+      }
+    } else {
+      maxSteps = await this.solver.solveWeek([]);
     }
-    this.workerPlans.push(this.planMigrate(arr));
+
+    let empty : WorkerSteps[][] = [[]];
+    this.workerPlans.push(empty.concat(maxSteps));
     this.onStepChange();
     this.resizePlan();
 
     this.isLoading = false;
+    clearInterval(handler);
   }
 
   planMigrate(steps: number[][]): WorkerSteps[][] {
@@ -427,5 +479,15 @@ export default class PlanView extends Vue {
   .pure-button + .pure-button {
     margin-left: 5px;
   }
+}
+.solve-progress {
+  margin-top: 10px;
+  text-align: center;
+}
+.progress {
+  width: 300px;
+}
+.progress-label {
+  color: #f0f0f0;
 }
 </style>

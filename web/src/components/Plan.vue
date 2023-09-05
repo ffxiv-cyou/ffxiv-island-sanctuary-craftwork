@@ -39,6 +39,7 @@
           :key="index"
           class="plan-batch mji-info-box"
         >
+          <!--左侧信息栏-->
           <div class="plan-batch-info">
             <span>第{{ index+1 }}天</span>
             <span
@@ -50,6 +51,7 @@
               class="value"
             ><icon class="blue-coin" />{{ getDayValue(index) }}</span>
           </div>
+          <!--排班栏-->
           <div
             v-if="workerSteps[index].length == 0"
             class="plan-rest"
