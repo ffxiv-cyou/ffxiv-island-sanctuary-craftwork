@@ -307,10 +307,7 @@ export class SolverProxy {
         const set = WorkerSteps.toU8Array(setWorkers);
         const arr = await this.solver.solve_multi_day(info, this.config.level, banArr, set, demandArr, worker, maxTime, this.config.withCost);
 
-        const workers = setWorkers.map(v => v.worker);
-        workers.push(worker);
-
-        return BatchValuesWithWorker.fromWorkerArrays(arr, workers);
+        return BatchesValues.fromSingleWorkerArray(BatchValuesWithWorker.fromWorkerArrays(arr, worker));
     }
 
     /**
@@ -344,7 +341,7 @@ export class SolverProxy {
 
         const arr = await this.solver.solve_week(info, this.config.level, banArr, 24, this.config.withCost, patternArr);
         const batches = BatchValues.fromSimulateArray(arr);
-        let result = [];
+        const result = [];
         for (let i = 0; i < batches.length; i++) {
             result.push([new WorkerSteps(info.workers, batches[i].steps)]);
         }
@@ -553,10 +550,10 @@ export class BatchValuesWithWorker extends BatchValues {
         return new BatchValuesWithWorker(workers, value, cost, batch.value, batch.cost, batch.steps, batch.stepValues);
     }
 
-    static fromWorkerArrays(array: Uint16Array, workers: number[]): BatchValuesWithWorker[] {
+    static fromWorkerArrays(array: Uint16Array, workers: number): BatchValuesWithWorker[] {
         const result = [];
         for (let i = 0, j = 0; i < array.length; i += 17, j++) {
-            result.push(BatchValuesWithWorker.fromWorkerArray(array.slice(i, i + 17), workers[j]));
+            result.push(BatchValuesWithWorker.fromWorkerArray(array.slice(i, i + 17), workers));
         }
         return result;
     }
@@ -576,9 +573,9 @@ export class BatchesValues {
 
     static fromArray(array: Uint16Array): BatchesValues[] {
         let offset = 0;
-        let values = [];
+        const values = [];
         while (offset < array.length) {
-            let batches = [];
+            const batches = [];
             const value = array[offset++];
             const cost = array[offset++];
             const count = array[offset++];
@@ -597,13 +594,22 @@ export class BatchesValues {
                 }
                 steps.length = step;
                 values.length = step;
-                let val = new BatchValuesWithWorker(worker, 0, 0, value, cost, steps, values);
+                const val = new BatchValuesWithWorker(worker, 0, 0, value, cost, steps, values);
                 batches.push(val);
             }
-            var batch = new BatchesValues(value, cost, batches);
+            const batch = new BatchesValues(value, cost, batches);
             values.push(batch);
         }
         return values;
+    }
+
+    static fromSingleWorkerArray(batches: BatchValuesWithWorker[]): BatchesValues[] {
+        const arr = [];
+        for (let i = 0; i < batches.length; i++) {
+            const element = batches[i];
+            arr.push(new BatchesValues(element.value * element.workers, element.cost * element.workers, [element]));
+        }
+        return arr;
     }
 }
 
@@ -621,6 +627,10 @@ export class WorkerSteps {
         if (steps.length > 6)
             steps = steps.slice(0, 6);
         this.steps = steps;
+    }
+
+    clone(): WorkerSteps {
+        return new WorkerSteps(this.worker, this.steps.slice());
     }
 
     setU8Array(arr: Uint8Array) {
@@ -642,17 +652,17 @@ export class WorkerSteps {
     }
 
     static fromSolverArray(array: Uint16Array): WorkerSteps[][] {
-        let result = [];
+        const result = [];
         let offset = 0;
         while (offset < array.length) {
-            let value = array[offset++];
-            let cost = array[offset++];
-            let workers = array[offset++];
-            let arr = [];
+            const value = array[offset++];
+            const cost = array[offset++];
+            const workers = array[offset++];
+            const arr = [];
             for (let i = 0; i < workers; i++) {
-                let worker = array[offset++];
-                let seq = array[offset++];
-                let steps = [];
+                const worker = array[offset++];
+                const seq = array[offset++];
+                const steps = [];
                 for (let j = 0; j < 6; j++) {
                     steps.push(array[offset++]);
                 }
