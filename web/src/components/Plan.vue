@@ -4,9 +4,13 @@
     <div class="plan-header mji-info-box">
       <div class="plan-info">
         <span class="total-value">
-          收益: <icon class="blue-coin" />{{ sumVal }} 
-          (<icon class="blue-coin" />{{ -sumCost }})
-          <span v-if="solver.config.showNetValue"> = <icon class="blue-coin" />{{ netVal }}</span>
+          收益:
+          <icon class="blue-coin" />{{ sumVal }}
+          (
+          <icon class="blue-coin" />{{ -sumCost }})
+          <span v-if="solver.config.showNetValue"> =
+            <icon class="blue-coin" />{{ netVal }}
+          </span>
         </span>
         <span class="share-link">
           <a
@@ -41,75 +45,65 @@
         >
           <!--左侧信息栏-->
           <div class="plan-batch-info">
-            <span>第{{ index+1 }}天</span>
+            <span>第{{ index + 1 }}天</span>
             <span
               v-if="workerSteps[index].every(v => v.steps.length === 0)"
               class="value"
             >休息</span>
-            <span
-              v-else
-              class="value"
-            ><icon class="blue-coin" />{{ getDayValue(index) }}</span>
+            <template v-else>
+              <span class="value plan-batch-remove">
+                <a @click="del(index)">删除</a>
+              </span>
+              <span class="value">
+                <icon class="blue-coin" />{{ getDayValue(index) }}
+              </span>
+            </template>
           </div>
           <!--排班栏-->
-          <div
-            v-if="workerSteps[index].length == 0"
-            class="plan-rest"
-          >
-            <icon class="sched sched-rest" />
-          </div>
-          <div
-            v-else
-            class="plan-workers"
-          >
-            <div
-              v-for="(worker, subindex) in val"
-              :key="index * 100 + subindex"
-              class="plan-worker"
-            >
-              <div class="worker-num">
-                <input
-                  v-if="!hideBtn"
-                  type="number"
-                  min="0" 
-                  :max="maxWorker"
-                  :value="workerSteps[index][subindex].worker"
-                  @input="setWorkerNum(index, subindex, $event)"
-                >
-                <span v-else>{{ workerSteps[index][subindex].worker }}</span>&times;
-              </div>
-              <div
-                v-if="!hideBtn"
-                class="worker-btn"
+          <div class="plan-content">
+            <template v-if="workerSteps[index].length == 0">
+              <button
+                v-if="!isMax && !hideBtn"
+                class="plan-add"
+                @click="edit(index)"
               >
-                <button
-                  v-if="worker.steps.length == 0"
-                  class="sched sched-green"
-                  :disabled="(isMax && workerSteps[index].every(v => v.steps.length === 0)) || workerSteps[index][subindex].worker === 0"
-                  @click="add(index, subindex)"
-                >
-                  +
-                </button>
-                <button
-                  v-else
-                  class="sched sched-red"
-                  @click="del(index, subindex)"
-                >
-                  -
-                </button>
-              </div>
+                <icon class="sched sched-add" />
+              </button>
               <div
-                v-if="worker.steps.length == 0"
+                v-else
                 class="plan-rest"
               >
                 <icon class="sched sched-rest" />
               </div>
-              <steps-comp
-                v-else
-                :solver="solver"
-                :values="worker.stepValues"
-                :steps="worker.steps"
-              />
+            </template>
+            <div
+              v-else
+              class="plan-workers"
+            >
+              <div
+                v-for="(worker, subindex) in val"
+                :key="index * 100 + subindex"
+                class="plan-worker"
+              >
+                <div class="worker-num">
+                  <input
+                    v-if="!hideBtn"
+                    type="number"
+                    min="0"
+                    :max="maxWorker"
+                    :value="workerSteps[index][subindex].worker"
+                    @input="setWorkerNum(index, subindex, $event)"
+                  >
+                  <span v-else>{{ workerSteps[index][subindex].worker }}</span><span class="cross">&times;</span>
+                </div>
+                <steps-comp
+                  :solver="solver"
+                  :values="worker.stepValues"
+                  :steps="worker.steps"
+                  class="plan-steps"
+                  @click="edit(index)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -134,6 +128,7 @@ import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Close from "./Close.vue";
 import ingredients from "./Ingredients.vue";
 import Steps from "./Steps.vue";
+import { Utils } from "@/model/data";
 @Component({
   components: {
     StepsComp: Steps,
@@ -161,15 +156,15 @@ export default class PlanView extends Vue {
   batchValues: BatchValues[][] = [];
 
   getDayValue(day: number) {
-      let vals = this.batchValues[day];
-      let steps = this.workerSteps[day];
-      let sum = 0;
-      for (let i = 0; i < vals.length; i++) {
-        const workers = steps[i].worker;
-        const value = vals[i].value;
-        sum += workers * value;
-      }
-      return sum;
+    let vals = this.batchValues[day];
+    let steps = this.workerSteps[day];
+    let sum = 0;
+    for (let i = 0; i < vals.length; i++) {
+      const workers = steps[i].worker;
+      const value = vals[i].value;
+      sum += workers * value;
+    }
+    return sum;
   }
 
   get sumVal() {
@@ -208,7 +203,7 @@ export default class PlanView extends Vue {
     }
     return arr;
   }
-  
+
   @Watch("workerSteps", { deep: true })
   async recalculateValue() {
     await this.solver.init();
@@ -225,13 +220,13 @@ export default class PlanView extends Vue {
   onClose() {
     this.$emit("remove");
   }
-  
-  add(day: number, index: number) {
-    this.$emit("addSteps", day, index);
+
+  edit(day: number) {
+    this.$emit("editSteps", day);
   }
 
-  del(day: number, index: number) {
-    this.$emit("delSteps", day, index);
+  del(day: number) {
+    this.$emit("delSteps", day);
   }
 
   get maxWorker() {
@@ -240,34 +235,14 @@ export default class PlanView extends Vue {
 
   setWorkerNum(day: number, index: number, evt: Event) {
     let val = Number((evt.target as HTMLInputElement).value);
-    let arr = this.workerSteps[day];
-    let sumWorker = 0;
-    for (let i = 0; i < arr.length; i++) {
-      sumWorker += i == index ? val : arr[i].worker;
+    let workers = [];
+    for (let i = 0; i < this.workerSteps[day].length; i++) {
+      workers.push(this.workerSteps[day][i].worker);
     }
-
-    if (sumWorker <= this.maxWorker) {
-      this.workerSteps[day][index].worker = val;
-      return;
+    Utils.ChangeArrayVal(workers, index, val, this.maxWorker);
+    for (let i = 0; i < this.workerSteps[day].length; i++) {
+      this.workerSteps[day][i].worker = workers[i];
     }
-
-    let delta = sumWorker - this.maxWorker;
-    for (let i = 1; i < arr.length; i++) {
-      let id = (i + index) % arr.length;
-      if (arr[id].worker < delta) {
-        delta -= arr[id].worker;
-        arr[id].worker = 0;
-      } else {
-        arr[id].worker -= delta;
-        delta = 0;
-        break;
-      }
-    }
-
-    if (delta > 0) {
-      val -= delta;
-    }
-    this.workerSteps[day][index].worker = val;
   }
 
   get isMax() {
@@ -298,6 +273,7 @@ export default class PlanView extends Vue {
   display: flex;
   margin: 4px;
 }
+
 .plan-batch-info {
   display: inline-flex;
   width: 56px;
@@ -305,9 +281,15 @@ export default class PlanView extends Vue {
   align-items: center;
   justify-content: center;
   gap: 1px;
+
   .value {
     font-size: 0.9em;
   }
+}
+
+.plan-content {
+  display: inline-flex;
+  flex: 1;
 }
 
 .plan {
@@ -318,20 +300,25 @@ export default class PlanView extends Vue {
 
 .plan-header {
   padding: 4px;
+
   .plan-info {
     gap: 4px;
     display: flex;
+
     .share-link {
       flex: 1;
       text-align: right;
+
       a {
         color: inherit;
       }
     }
+
     .plan-remove {
       float: right;
     }
   }
+
   .share-link-url {
     user-select: all;
     line-break: loose;
@@ -341,16 +328,21 @@ export default class PlanView extends Vue {
 .plan-workers {
   flex: 1;
 }
+
 .plan-worker {
   width: 100%;
   display: flex;
   align-items: center;
+
   .worker-num input {
     width: 2em;
     // height: 16px;
     background: transparent;
     border: none;
     border-bottom: 1px rgb(156, 134, 115) solid;
+  }
+  .worker-num .cross {
+    font-size: 14px;
   }
 }
 
@@ -359,12 +351,14 @@ export default class PlanView extends Vue {
   overflow: hidden;
   height: auto;
 }
+
 .plan-batches {
   height: auto;
   overflow: hidden;
   position: relative;
   width: calc(100% - 160px);
 }
+
 @media (max-width: 568px) {
   .plan-batches {
     width: 100% !important;
@@ -374,6 +368,7 @@ export default class PlanView extends Vue {
 .plan-batches.is-fullwidth {
   width: 100%;
 }
+
 .plan-ingredients {
   width: 150px;
   overflow-y: auto;
@@ -382,17 +377,59 @@ export default class PlanView extends Vue {
   right: 0;
   top: 0;
 }
-.plan-rest {
+
+.plan-rest,
+.plan-add {
   flex: 1;
-  background: rgba(214, 211, 206, 0.5);
   border-radius: 5px;
   border: 1px solid rgba(131, 85, 0, 0.5);
   box-sizing: border-box;
   text-align: center;
+  min-height: 42px;
+
   icon {
     display: inline-block;
     --scale: 0.8;
   }
 }
 
+.plan-rest {
+  background: rgba(214, 211, 206, 0.5);
+}
+
+.plan-add {
+  background: rgba(214, 211, 206, 0.8);
+  cursor: pointer;
+
+  icon {
+    --scale: 0.5;
+    margin-top: 4px;
+  }
+}
+
+.plan-steps {
+  cursor: pointer;
+}
+
+.plan-steps:hover .step-item,
+button.plan-add:hover {
+  border-color: rgba(131, 85, 0, 0.9);
+  background-color: rgba(214, 211, 206, 0.95);
+}
+
+.plan-batch-remove {
+  display: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.plan-batch-info:hover {
+  .plan-batch-remove {
+    display: block;
+  }
+
+  .plan-batch-remove~span {
+    display: none;
+  }
+}
 </style>

@@ -9,7 +9,7 @@
         ref="ssolver"
         class="solver"
         :solver="solver"
-        @apply="apply"
+        @apply="applyWorkerSteps"
       />
     </popup>
     <popup
@@ -18,8 +18,14 @@
     >
       <Loading />
       <div class="solve-progress">
-        <progress :value="progress" max="100" class="progress"></progress>
-        <div class="progress-label">{{ progress }}% | 当前用时: {{ timeElapse }} | 预计剩余: {{ timeETA }}</div>
+        <progress
+          :value="progress"
+          max="100"
+          class="progress"
+        />
+        <div class="progress-label">
+          {{ progress }}% | 当前用时: {{ timeElapse }} | 预计剩余: {{ timeETA }}
+        </div>
       </div>
     </popup>
     <popup
@@ -70,8 +76,8 @@
         :worker-steps="plan"
         :removeable="true"
         @remove="removePlan(key)"
-        @add-steps="(day: number, index: number) => addStep(key, day, index)"
-        @del-steps="(day: number, index: number) => delStep(key, day, index)"
+        @edit-steps="(day: number) => editStep(key, day)"
+        @del-steps="(day: number) => delStep(key, day)"
       />
       <div class="control-buttons">
         <button
@@ -197,10 +203,9 @@ export default class PlanView extends Vue {
    * @param id 排班表Index
    * @param day 天数
    */
-  addStep(id: number, day: number, index: number) {
+  editStep(id: number, day: number) {
     this.currentPlan = id;
     this.currentDay = day;
-    this.currentIndex = index;
 
     let origDemands = this.solver.predictDemands[day];
     let demands = [];
@@ -235,19 +240,18 @@ export default class PlanView extends Vue {
 
     // 获取已有sets
     let setWorker = [...plan[day]];
-    setWorker.splice(index, 1);
 
     this.solverDialog = true;
-    (this.$refs["ssolver"] as SimpleSolver).solveBatch(demands, setWorker, plan[day][index].worker, tension);
+    (this.$refs["ssolver"] as SimpleSolver).solveBatch(demands, setWorker, tension);
   }
 
   /**
    * 应用排班表
    * @param steps 步骤
    */
-  apply(steps: number[]) {
+  applyWorkerSteps(steps: WorkerSteps[]) {
     this.close();
-    this.workerPlans[this.currentPlan][this.currentDay][this.currentIndex].steps = steps;
+    this.workerPlans[this.currentPlan][this.currentDay] = steps;
     this.onStepChange();
   }
 
@@ -263,8 +267,8 @@ export default class PlanView extends Vue {
    * @param id 排班表Index
    * @param day 天数
    */
-  delStep(id: number, day: number, index: number) {
-    this.workerPlans[id][day][index].steps = [];
+  delStep(id: number, day: number) {
+    this.workerPlans[id][day] = [];
     this.onStepChange();
   }
 
@@ -314,7 +318,7 @@ export default class PlanView extends Vue {
   /**
    * 保存当前排班表
    */
-  @Watch("workerPlans", {deep: true})
+  @Watch("workerPlans", { deep: true })
   save() {
     localStorage.setItem("MJIWorkerPlans", JSON.stringify(this.workerPlans));
   }
@@ -323,15 +327,9 @@ export default class PlanView extends Vue {
    * 新建一个排班表
    */
   createPlan() {
-    const seqNum = this.seqNum;
-    let avgWorkerNum = Math.floor(this.workerNum / seqNum);
-    let firstWorkerNum = this.workerNum - avgWorkerNum * (seqNum - 1);
     let arr = [];
     for (let i = 0; i < 7; i++) {
-      let subarr = [];
-      for (let j = 0; j < seqNum; j++) {
-        subarr.push(new WorkerSteps(j === 0 ? firstWorkerNum : avgWorkerNum, []));
-      }
+      let subarr: WorkerSteps[] = [];
       arr.push(subarr);
     }
     this.workerPlans.push(arr);
@@ -375,7 +373,7 @@ export default class PlanView extends Vue {
    */
   @Watch("shareCode")
   onShareCodeChange() {
-    if (!this.shareCode) 
+    if (!this.shareCode)
       return;
 
     let binary = FromShareCode(this.shareCode as string);
@@ -412,10 +410,10 @@ export default class PlanView extends Vue {
       maxSteps = await this.solver.solveWeek([]);
     }
 
-    let empty : WorkerSteps[][] = [[]];
+    let empty: WorkerSteps[][] = [[]];
     this.workerPlans.push(empty.concat(maxSteps));
     this.onStepChange();
-    this.resizePlan();
+    // this.resizePlan();
 
     this.isLoading = false;
     clearInterval(handler);
@@ -429,20 +427,17 @@ export default class PlanView extends Vue {
     return arr;
   }
 
-  @Watch("seqNum")
+  // @Watch("seqNum")
   resizePlan() {
     for (let i = 0; i < this.workerPlans.length; i++) {
       let plan = this.workerPlans[i];
       for (let j = 0; j < plan.length; j++) {
         const day = plan[j];
-        for (let k = 0; k < day.length && this.seqNum < day.length; k++) {
+        for (let k = 0; k < day.length; k++) {
           if (day[k].worker === 0) {
             day.splice(k, 1);
             k--;
           }
-        }
-        for (let k = day.length; k < this.seqNum; k++) {
-          day.push(new WorkerSteps(0, []));
         }
       }
     }
@@ -476,17 +471,21 @@ export default class PlanView extends Vue {
 
 .control-buttons {
   margin-top: 10px;
-  .pure-button + .pure-button {
+
+  .pure-button+.pure-button {
     margin-left: 5px;
   }
 }
+
 .solve-progress {
   margin-top: 10px;
   text-align: center;
 }
+
 .progress {
   width: 300px;
 }
+
 .progress-label {
   color: #f0f0f0;
 }

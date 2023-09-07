@@ -1,26 +1,68 @@
 <template>
   <div class="solver-view mji-wooden-plate">
     <legend class="mji-title mji-text-brown">
-      推荐队列
+      编辑工坊队列
+      <div class="solver-control">
+        <span class="multi-worker">
+          <input
+            id="enable-multi-worker"
+            v-model="enableMultiSolver"
+            type="checkbox"
+          >
+          <label
+            class="mji-text-small"
+            for="enable-multi-worker"
+          >启用多队列求解器</label>
+        </span>
+        <button
+          class="mji"
+          @click="apply"
+        >
+          应用
+        </button>
+      </div>
     </legend>
     <template v-if="hasSetWorker">
       <legend class="mji-title mji-text-orange mji-text-small">
-        已设置工坊
+        已设置队列
+        <span
+          v-if="setValues.length > 0"
+          class="worker-value mji-text-brown"
+        >
+          <icon class="blue-coin" />{{ sumVal }}
+          (
+          <icon class="blue-coin" />{{ -sumCost }})
+          <span v-if="solver.config.showNetValue"> =
+            <icon class="blue-coin" />{{ netVal }}
+          </span>
+        </span>
       </legend>
       <div class="set-workers">
         <div
-          v-for="(worker, index) in cachedSetValues"
-          :key="index+1000"
+          v-for="(worker, index) in setValues"
+          :key="index + 1000"
           class="set-worker mji-info-box"
         >
           <batch-view
-            v-if="cachedSets ? cachedSets[index].worker : 0"
             :solver="solver"
             :batch="worker"
             :patterns="patterns"
           >
+            <button
+              class="sched sched-red add-item"
+              @click="removeSet(index)"
+            >
+              -
+            </button>
             <div class="set-worker-num">
-              {{ cachedSets ? cachedSets[index].worker : 1 }}&times;
+              <input
+                type="number"
+                min="0"
+                :max="maxWorker"
+                :value="setSteps[index].worker"
+                @input="setWorkerNum(index, $event)"
+              >
+              <span class="cross">&times;</span>
             </div>
           </batch-view>
         </div>
@@ -47,31 +89,51 @@
       </div>
     </div>
     <legend class="batch-header mji-title mji-text-orange mji-text-small">
-      <span class="batch-apply">应用</span>
+      <span class="batches-value">总收益</span>
+      <span class="batch-worker-num">数量</span>
       <span class="batch-value">收益</span>
       <span>队列</span>
     </legend>
-    <div class="batches">
-      <batch-view
-        v-for="(val, key) in batches"
-        :key="key"
-        class="mji-info-box"
-        :solver="solver"
-        :batch="val"
-        :removeable="true"
-        :demands="stepDemands[key]"
-        :pops="stepPops[key]"
-        :patterns="patterns"
-        :delta-val="val.workerVal - sumSetVal"
-        @remove="addBan(key, $event)"
+    <div
+      v-if="!isFull"
+      class="batches"
+    >
+      <div
+        v-for="(batch, key1) in batches"
+        :key="key1"
+        class="mji-info-box batches-item"
+        @click="add(key1)"
       >
-        <button
-          class="sched sched-green add-item"
-          @click="apply(key)"
-        >
-          +
-        </button>
-      </batch-view>
+        <div class="batches-left">
+          <span class="bench-value">
+            <icon class="blue-coin" />{{ batch.value }}
+          </span>
+          <span class="bench-cost mji-text-small">
+            (-{{ batch.cost }})
+          </span>
+        </div>
+        <div class="batches-right">
+          <batch-view
+            v-for="(steps, key2) in batch.batches"
+            :key="key1*1000+key2"
+            :solver="solver"
+            :batch="steps"
+            :removeable="true"
+            :demands="stepDemands[key1][key2]"
+            :pops="stepPops[key1][key2]"
+            :patterns="patterns"
+            :delta-val="steps.workerVal"
+            @remove="addBan(key1, key2, $event)"
+          >
+            <div class="batch-worker-num">
+              {{ steps.workers }}<span class="cross">&times;</span>
+            </div>
+          </batch-view>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <span class="mji-text-brown mji-text-small">当前工坊已全部选择完毕</span>
     </div>
     <div
       v-if="isLoading"
@@ -82,13 +144,14 @@
   </div>
 </template>
 <script lang="ts">
-import type { WorkerSteps, BatchValues, BatchValuesWithWorker, SolverProxy } from "@/model/solver";
+import { WorkerSteps, type BatchValues, type SolverProxy, BatchesValues } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import BatchView from "@/components/BatchView.vue";
 import Close from "@/components/Close.vue";
 import { CraftworkData } from "@/data/data";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import Steps from "./Steps.vue";
+import { Utils } from "@/model/data";
 @Component({
   components: {
     StepsComp: Steps,
@@ -96,7 +159,7 @@ import Steps from "./Steps.vue";
     Close: Close,
     Loading: LoadingSpinner,
   },
-  emits: [ "apply" ]
+  emits: ["apply"]
 })
 export default class SimpleSolver extends Vue {
   @Prop()
@@ -110,7 +173,7 @@ export default class SimpleSolver extends Vue {
   /**
    * 计算结果
    */
-  batches: BatchValuesWithWorker[] = [];
+  batches: BatchesValues[] = [];
 
   /**
    * 是否计算中
@@ -121,30 +184,46 @@ export default class SimpleSolver extends Vue {
    * 是否已有其他工坊
    */
   get hasSetWorker() {
-    return this.cachedSets && this.cachedSets.some(v => v.worker > 0 && v.steps.length > 0);
+    return this.setSteps && this.setSteps.some(v => v.worker > 0 && v.steps.length > 0);
   }
 
-  get sumSetVal() {
-    if (!this.cachedSetValues || !this.cachedSets) return 0;
+  get maxWorker() {
+    return this.solver.config.workers;
+  }
 
+  get isFull() {
+    return this.remainWorker <= 0;
+  }
+
+  get sumVal() {
     let val = 0;
-    for (let i = 0; i < this.cachedSetValues.length; i++) {
-      val += this.cachedSetValues[i].value * this.cachedSets[i].worker;
+    for (let i = 0; i < this.setValues.length; i++) {
+      val += this.setValues[i].value * this.setSteps[i].worker;
     }
     return val;
   }
 
+  get sumCost() {
+    let cost = 0;
+    for (let i = 0; i < this.setValues.length; i++) {
+      cost += this.setValues[i].cost * this.setSteps[i].worker;
+    }
+    return cost;
+  }
+  get netVal() {
+    return this.sumVal - this.sumCost;
+  }
   /**
    * 添加一个禁用物品
    * @param i 第几个计算结果
    * @param j 的第几个物品
    */
-  addBan(i: number, j: number) {
-    let recipe = this.batches[i].steps[j];
+  addBan(i: number, j: number, k: number) {
+    let recipe = this.batches[i].batches[j].steps[k];
     if (this.banList.indexOf(recipe) >= 0) return;
     this.banList.push(recipe);
   }
- 
+
   /**
    * 移除一个禁用物品
    * @param index 当前禁用物品的Index
@@ -173,11 +252,11 @@ export default class SimpleSolver extends Vue {
   /**
    * 计算结果中每个物品的需求值
    */
-  stepDemands: number[][] = [];
+  stepDemands: number[][][] = [];
   /**
    * 计算结果中每个物品的欢迎度
    */
-  stepPops: number[][] = [];
+  stepPops: number[][][] = [];
 
   /**
    * 求解时各个物品的需求值
@@ -190,25 +269,72 @@ export default class SimpleSolver extends Vue {
   /**
    * 求解时已有的工坊列表
    */
-  cachedSets?: WorkerSteps[];
+  setSteps: WorkerSteps[] = [];
   /**
    * 求解得到的取值
    */
-  cachedSetValues?: BatchValues[];
+  setValues: BatchValues[] = [];
   /**
-   * 求解时的工坊数量
+   * 启用多队列求解
    */
-  cachedWorker?: number;
+  enableMultiSolver: boolean = true;
+
+  /**
+   * 获取剩余可用的工坊数量
+   */
+  get remainWorker() {
+    let currentWorker = 0;
+    for (let i = 0; i < this.setSteps.length; i++) {
+      currentWorker += this.setSteps[i].worker;
+    }
+    return this.maxWorker - currentWorker;
+  }
+
+  setWorkerNum(index: number, evt: Event) {
+    let val = Number((evt.target as HTMLInputElement).value);
+    if (val == 0) {
+      this.removeSet(index);
+      return;
+    }
+
+    let workers = [];
+    for (let i = 0; i < this.setSteps.length; i++) {
+      workers.push(this.setSteps[i].worker);
+    }
+    Utils.ChangeArrayVal(workers, index, val, this.maxWorker);
+    for (let i = 0; i < this.setSteps.length; i++) {
+      this.setSteps[i].worker = workers[i];
+    }
+    this.solve();
+  }
+
+  removeSet(index: number) {
+    this.setSteps.splice(index, 1);
+    this.setValues.splice(index, 1);
+    this.solve();
+  }
+
+  @Watch("enableMultiSolver")
+  async switchMode() {
+    if (this.setSteps.length === 0) {
+      await this.solve();
+    }
+  }
 
   /**
    * 根据当前需求值和干劲求解推荐队列
    */
   @Watch("banList", { deep: true })
   async solve() {
-    if (this.cachedDemands === undefined || 
-      this.cachedtension === undefined || 
-      this.cachedSets === undefined ||
-      this.cachedWorker === undefined)
+    if (this.cachedDemands === undefined ||
+      this.cachedtension === undefined ||
+      this.setSteps === undefined)
+      return;
+
+    // 更新当前值
+    this.setValues = await this.solver.simulateMulti(this.setSteps, this.cachedDemands, this.cachedtension);
+
+    if (this.isFull)
       return;
 
     this.isLoading = true;
@@ -216,45 +342,72 @@ export default class SimpleSolver extends Vue {
     this.stepPops = [];
     this.batches = [];
 
-    this.cachedSetValues = await this.solver.simulateMulti(this.cachedSets, this.cachedDemands, this.cachedtension);
-    let batches = await this.solver.solveMultiDay(this.cachedDemands, this.cachedSets, this.banList, this.cachedtension, this.cachedWorker);
-    
+    let worker = this.remainWorker < 1 ? 1 : this.remainWorker;
+    let batches: BatchesValues[] = [];
+    if (this.setSteps.length === 0 && this.enableMultiSolver) {
+      batches = await this.solver.solveDayDual(this.cachedDemands, this.banList, this.cachedtension, worker);
+    } else {
+      if (this.setSteps.length === 0) worker = 1;
+      batches = await this.solver.solveMultiDay(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, worker);
+    }
+    batches.forEach(b => b.batches.forEach(c => { if (c.workerVal != 0) c.workerVal -= this.sumVal; }));
+
     this.isLoading = false;
 
     // 计算各个队列步骤对应的需求值和欢迎度，用于显示
     this.batches = batches.slice(0, 100);
     for (let b = 0; b < this.batches.length; b++) {
-      let steps = this.batches[b].steps;
       this.stepDemands.push([]);
       this.stepPops.push([]);
+      let batchWorkers = this.batches[b].batches;
 
-      let endTime = 0;
-      for (let i = 0; i < steps.length; i++) {
-        let step = steps[i];
-        endTime += this.solver.data.GetRecipe(step).Time;
-        
-        let demand = this.cachedDemands[step];
-        // 计算本配方的叠箱
-        for (let j = 0; j < i; j++) {
-          if (steps[j] == step) {
-            demand -= (j === 0 ? 1 : 2) * this.cachedWorker;
-          }
+      for (let c = 0; c < batchWorkers.length; c++) {
+        let steps = batchWorkers[c].steps;
+
+        // 当前同时工作的其他工坊
+        let setSteps: number[][] = [];
+        let setWorkers: number[] = [];
+        for (let j = 0; j < batchWorkers.length; j++) {
+          if (j == c) continue;
+          setSteps.push(batchWorkers[j].steps);
+          setWorkers.push(batchWorkers[j].workers);
         }
-        // 计算其他配方的叠箱
-        for (let j = 0; j < this.cachedSets.length; j++) {
-          let set = this.cachedSets[j];
-          let time = 0;
-          for (let k = 0; k < set.steps.length; k++) {
-            let setStep = set.steps[k];
-            time += this.solver.data.GetRecipe(setStep).Time;
-            if (time >= endTime) break;
-            if (setStep == step) {
-              demand -= (k === 0 ? 1 : 2) * set.worker;
+        for (let j = 0; j < this.setSteps.length; j++) {
+          setSteps.push(this.setSteps[j].steps);
+          setWorkers.push(this.setSteps[j].worker);
+        }
+
+        this.stepDemands[b].push([]);
+        this.stepPops[b].push([]);
+
+        let endTime = 0;
+        for (let i = 0; i < steps.length; i++) {
+          let step = steps[i];
+          endTime += this.solver.data.GetRecipe(step).Time;
+
+          let demand = this.cachedDemands[step];
+          // 计算本配方的叠箱
+          for (let j = 0; j < i; j++) {
+            if (steps[j] == step) {
+              demand -= (j === 0 ? 1 : 2) * this.remainWorker;
             }
           }
+          // 计算其他配方的叠箱
+          for (let j = 0; j < setSteps.length; j++) {
+            let time = 0;
+            let steps = setSteps[j];
+            for (let k = 0; k < steps.length; k++) {
+              let setStep = steps[k];
+              time += this.solver.data.GetRecipe(setStep).Time;
+              if (time >= endTime) break;
+              if (setStep == step) {
+                demand -= (k === 0 ? 1 : 2) * setWorkers[j];
+              }
+            }
+          }
+          this.stepDemands[b][c].push(demand);
+          this.stepPops[b][c].push(this.solver.Popularity[this.solver.popPattern][step]);
         }
-        this.stepDemands[b].push(demand);
-        this.stepPops[b].push(this.solver.Popularity[this.solver.popPattern][step]);
       }
     }
   }
@@ -264,21 +417,32 @@ export default class SimpleSolver extends Vue {
    * @param demands 各个物品的需求值
    * @param tension 当前干劲
    */
-  public solveBatch(demands: number[], sets: WorkerSteps[], worker: number, tension: number) {
+  public solveBatch(demands: number[], sets: WorkerSteps[], tension: number) {
     this.cachedDemands = demands;
     this.cachedtension = tension;
-    this.cachedSets = sets;
-    this.cachedWorker = worker;
+    this.setSteps = [];
+    sets.forEach(ele => {
+      this.setSteps.push(ele.clone());
+    });
+    this.isLoading = false;
+    this.setValues = [];
     this.banList = [];
     this.solve();
   }
 
+  add(index: number) {
+    let batch = this.batches[index];
+    batch.batches.forEach(b => {
+      this.setSteps.push(new WorkerSteps(b.workers, b.steps));
+      this.setValues.push(b);
+    });
+    this.solve();
+  }
   /**
-   * 选择指定队列
-   * @param index 队列索引
+   * 应用变更
    */
-  apply(index: number) {
-    this.$emit("apply", this.batches[index].steps);
+  apply() {
+    this.$emit("apply", this.setSteps);
   }
 
   iconPath(id: number) {
@@ -295,19 +459,54 @@ export default class SimpleSolver extends Vue {
   flex-direction: column;
 }
 
+.solver-control {
+  float: right;
+
+  .multi-worker {
+    margin-right: 1em;
+    user-select: none;
+
+    input+label {
+      margin-left: 0.2em;
+    }
+  }
+}
+
 .batch-header {
   span {
     display: inline-block;
   }
+
   .batch-apply {
-    width: 48px;
+    width: 36px;
     text-align: center;
   }
 }
 
 .set-worker-num {
-  width: 41.6px;
+  width: 60px;
   text-align: center;
+
+  input {
+    width: 2em;
+    // height: 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px rgb(156, 134, 115) solid;
+  }
+}
+
+.worker-value {
+  margin-left: 0.5em;
+}
+
+.batch-worker-num {
+  width: 2em;
+  text-align: center;
+
+  .cross {
+    font-size: 14px;
+  }
 }
 
 .ban-list {
@@ -334,11 +533,43 @@ export default class SimpleSolver extends Vue {
 }
 
 .add-item {
-  --scale: 0.65 !important;
+  --scale: 0.5 !important;
 }
+
 .batches {
   overflow-y: auto;
 }
+
+.batches-item {
+  display: grid;
+  grid-template-columns: 60px auto;
+  cursor: pointer;
+
+  .batches-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+  }
+}
+
+.batches-value {
+  width: 60px;
+}
+
+legend.mji-text-small {
+  padding-left: 6px;
+}
+
+.batches-item:hover {
+  border-color: rgba(222, 206, 181, 0.95);
+  background-color: rgba(0, 0, 0, 0.15);
+
+  .mji-step-box {
+    background-color: rgba(214, 211, 206, 0.95);
+  }
+}
+
 .loading {
   flex: 1;
   display: flex;

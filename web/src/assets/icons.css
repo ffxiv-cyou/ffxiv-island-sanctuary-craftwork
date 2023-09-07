@@ -120,3 +120,8 @@ button.sched {
     height: calc(var(--scale) * 46px);
     background-position: calc(var(--scale) * -150px) calc(var(--scale) * -160px);
 }
+.sched.sched-add {
+    width: calc(var(--scale) * 46px);
+    height: calc(var(--scale) * 46px);
+    background-position: calc(var(--scale) * 0px) calc(var(--scale) * -96px);
+}

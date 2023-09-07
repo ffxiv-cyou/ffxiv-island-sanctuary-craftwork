@@ -1,19 +1,19 @@
-export const PatternNames: string[] = 
-[
-    "未知",
-    "2强",
-    "2弱",
-    "3强",
-    "3弱",
-    "4强",
-    "4弱",
-    "5强",
-    "5弱",
-    "6强",
-    "6弱",
-    "7强",
-    "7弱",
-];
+export const PatternNames: string[] =
+    [
+        "未知",
+        "2强",
+        "2弱",
+        "3强",
+        "3弱",
+        "4强",
+        "4弱",
+        "5强",
+        "5弱",
+        "6强",
+        "6弱",
+        "7强",
+        "7弱",
+    ];
 
 export class Utils {
     public static Hex2U8Array(text: string): Uint8Array {
@@ -22,6 +22,44 @@ export class Utils {
             array[i / 2] = parseInt(text.substring(i, i + 2), 16);
         }
         return array;
+    }
+
+    /**
+     * 修改指定Array的指定Index的值，保持Array的总和不超过Max
+     * @param array 
+     * @param index 
+     * @param val 
+     * @param max 
+     * @returns 
+     */
+    public static ChangeArrayVal(array: number[], index: number, val: number, max: number) {
+        let sumWorker = 0;
+        for (let i = 0; i < array.length; i++) {
+            sumWorker += i == index ? val : array[i];
+        }
+
+        if (sumWorker <= max) {
+            array[index] = val;
+            return;
+        }
+
+        let delta = sumWorker - max;
+        for (let i = 1; i < array.length; i++) {
+            const id = (i + index) % array.length;
+            if (array[id] < delta) {
+                delta -= array[id];
+                array[id] = 0;
+            } else {
+                array[id] -= delta;
+                delta = 0;
+                break;
+            }
+        }
+
+        if (delta > 0) {
+            val -= delta;
+        }
+        array[index] = val;
     }
 }
 

@@ -9,10 +9,10 @@
         <icon class="blue-coin" />{{ batch.value }}
       </span>
       <span class="bench-cost mji-text-small">
-        (-{{ batch.cost }}<span v-if="deltaVal">, {{ deltaVal > 0 ? "+": "" }}{{ deltaVal }}</span>)
+        (-{{ batch.cost }}<span v-if="deltaVal">, {{ deltaVal > 0 ? "+" : "" }}{{ deltaVal }}</span>)
       </span>
     </div>
-    <steps 
+    <steps
       :solver="solver"
       :steps="batch.steps"
       :values="batch.stepValues"
@@ -73,13 +73,14 @@ export default class BatchView extends Vue {
 .batch-value {
   width: 80px;
   text-align: center;
+}
 
-  .bench-value,
-  .bench-cost {
-    display: block;
-  }
-  .bench-cost {
-    color: #333;
-  }
+.bench-value,
+.bench-cost {
+  display: block;
+}
+
+.bench-cost {
+  color: #333;
 }
 </style>
