@@ -108,8 +108,18 @@ export default class Steps extends Vue {
 
 @media (max-width: 568px) {
   .steps .step-item {
-    width: 42px;
+    width: 34px;
+    height: 34px;
+    margin: 4px 0;
     margin-left: 0px;
+    .item-img {
+      height: 32px;
+      icon.item {
+        width: 32px;
+        height: 32px;
+        background-size: 32px 32px;
+      }
+    }
   }
 }
 </style>

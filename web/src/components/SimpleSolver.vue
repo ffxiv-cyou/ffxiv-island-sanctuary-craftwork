@@ -89,7 +89,7 @@
       </div>
     </div>
     <legend class="batch-header mji-title mji-text-orange mji-text-small">
-      <span class="batches-value">总收益</span>
+      <span class="batches-value hide-xs">总收益</span>
       <span class="batch-worker-num">数量</span>
       <span class="batch-value">收益</span>
       <span>队列</span>
@@ -104,7 +104,7 @@
         class="mji-info-box batches-item"
         @click="add(key1)"
       >
-        <div class="batches-left">
+        <div class="batches-left hide-xs">
           <span class="bench-value">
             <icon class="blue-coin" />{{ batch.value }}
           </span>
@@ -184,7 +184,7 @@ export default class SimpleSolver extends Vue {
    * 是否已有其他工坊
    */
   get hasSetWorker() {
-    return this.setSteps && this.setSteps.some(v => v.worker > 0 && v.steps.length > 0);
+    return this.setSteps.length > 0;
   }
 
   get maxWorker() {
@@ -292,11 +292,6 @@ export default class SimpleSolver extends Vue {
 
   setWorkerNum(index: number, evt: Event) {
     let val = Number((evt.target as HTMLInputElement).value);
-    if (val == 0) {
-      this.removeSet(index);
-      return;
-    }
-
     let workers = [];
     for (let i = 0; i < this.setSteps.length; i++) {
       workers.push(this.setSteps[i].worker);
@@ -347,7 +342,7 @@ export default class SimpleSolver extends Vue {
     if (this.setSteps.length === 0 && this.enableMultiSolver) {
       batches = await this.solver.solveDayDual(this.cachedDemands, this.banList, this.cachedtension, worker);
     } else {
-      if (this.setSteps.length === 0) worker = 1;
+      if (this.setSteps.length === 0 && worker > 3) worker = 3;
       batches = await this.solver.solveMultiDay(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, worker);
     }
     batches.forEach(b => b.batches.forEach(c => { if (c.workerVal != 0) c.workerVal -= this.sumVal; }));
@@ -389,7 +384,7 @@ export default class SimpleSolver extends Vue {
           // 计算本配方的叠箱
           for (let j = 0; j < i; j++) {
             if (steps[j] == step) {
-              demand -= (j === 0 ? 1 : 2) * this.remainWorker;
+              demand -= (j === 0 ? 1 : 2) * batchWorkers[c].workers;
             }
           }
           // 计算其他配方的叠箱
@@ -487,6 +482,9 @@ export default class SimpleSolver extends Vue {
   width: 60px;
   text-align: center;
 
+  .cross {
+    font-size: 14px;
+  }
   input {
     width: 2em;
     // height: 16px;
@@ -555,6 +553,22 @@ export default class SimpleSolver extends Vue {
 
 .batches-value {
   width: 60px;
+}
+
+@media (max-width: 568px) {
+  .batches-item {
+    grid-template-columns: auto;
+  }
+  .set-workers .batch-value {
+    width: 52px;
+    font-size: 0.9em;
+  }
+  .set-worker-num {
+    width: 46px;
+    input {
+      width: 1.75em;
+    }
+  }
 }
 
 legend.mji-text-small {

@@ -6,10 +6,8 @@
       使用本工具需要了解如何得到物品的“欢迎度”、“需求值”、“需求趋势”参数，并了解这些参数对最终收益的影响。
     </p>
     <p>
-      若您对上述概念尚有疑问，请先阅读<a
-        href="https://nga.178.com/read.php?tid=33443333"
-        target="_blank"
-      >什锦笔筒的《浅析无人岛工坊售价影响因素与冲分路线安排》</a>，了解具体的求解原理。
+      若您对上述概念尚有疑问，请先阅读<a href="https://nga.178.com/read.php?tid=33443333"
+        target="_blank">蜡笔筒的《浅析无人岛工坊售价影响因素与冲分路线安排》</a>，了解具体的求解原理。
     </p>
     <h2>配置基础参数</h2>
     <p>求解器默认配置为国服，且开拓等级和工坊为满级。若您的无人岛状态与此配置不一致，请访问设置页面修改为正确的值。</p>
@@ -69,7 +67,7 @@
       “覆盖趋势”会修改所有趋势，而“更新趋势”则不会修改已确定的趋势。
     </p>
     <p>
-      此模块在信息有限（如只有第一天的数据）的情况下可能无法得到较好的结果，且没有考虑本周制作对需求变动的影响。
+      此模块在信息有限（如只有第一天的数据）的情况下可能无法得到较好的结果。
       在这些情况下，模块可能会预测错误，请务必在使用后检查需求趋势是否正确。
     </p>
     <p>
@@ -79,8 +77,8 @@
     <p>排班表用于计算并规划本周的排班。</p>
     <ul>
       <li>新建排班表：新建一个空白排班表</li>
-      <li>手气不错：让求解器自动推荐本周的排班表。注意自动推荐的方案很可能不是最优的，请自行调整优化。</li>
-      <li>总收益：本周预计总收益</li>
+      <li>手气不错：让求解器自动推荐本周的排班表。注意自动推荐的方案很可能不是最优的，请自行调整优化。在工坊配方类型数量大于1时，其计算时间会显著变长，请耐心等待。</li>
+      <li>收益：本周预计总收益</li>
       <li>分享链接：将本排班表分享给他人的链接。注意排班表分享链接不带有需求趋势设定，若要使他人复现结果，请在分享时一并分享趋势设定。</li>
       <li>导入：将他人分享的排班表导入本地。</li>
       <li>
@@ -88,33 +86,33 @@
         <icon class="blue-coin" />1234: 表示当前排班方案的日期与单间工坊的预计收益。
       </li>
       <li>
-        <button class="sched sched-red">
-          -
-        </button>: 删除当前日期的排班方案。
-      </li>
-      <li>
-        <button class="sched sched-green">
-          +
+        <button class="sched sched-add">
         </button>: 为当前日期添加排班方案。点击后会弹出推荐队列选择。
       </li>
+      <li>删除：位于第x天下方，可以删除当前日期的排班方案。</li>
+      <li>3&times;：此方案的工坊数量</li>
       <li>
-        <step
-          :value="52"
-          :step="demoStep"
-        />:
+        <step :value="52" :step="demoStep" />:
         <span>表示每一步的产品、耗时和预测收入。</span>
       </li>
     </ul>
-    <h3>推荐队列选择</h3>
-    <p>推荐队列选择会根据需求与趋势表自动生成推荐方案。</p>
+    <h3>编辑工坊队列</h3>
+    <p>在编辑工坊队列中，可以根据需求与趋势表自动生成推荐方案。</p>
     <ul>
       <li>
-        <button class="sched sched-green">
-          +
-        </button>: 将此队列设置为当日的排班方案。
+        点击对应队列可将此队列添加至当日的排班方案中。
       </li>
       <li>
-        <icon class="blue-coin" />1234: 根据当日排班方案计算得出的当日每间工坊的收益。
+        <input type="checkbox" />启用多队列求解器：启用后，如果当前没有设置任何排班方案，则会尝试使用多种队列的组合尝试。
+      </li>
+      <li>
+        应用：保存当前编辑的队列到排班表。
+      </li>
+      <li>
+        已设置队列 <icon class="blue-coin" />1234 (<icon class="blue-coin" />-123)：当前已设置的方案计算得到的总收益和成本。
+      </li>
+      <li>
+        收益：<icon class="blue-coin" />1234: 根据当日排班方案计算得出的当日每间工坊的收益。
       </li>
       <li>
         (-123, +45):
@@ -123,15 +121,9 @@
           <li>+45: 应用当前方案后，已设置的方案收益的变动情况</li>
         </ul>
       </li>
+      <li>总收益：此方案的总收益</li>
       <li>
-        <step
-          :value="52"
-          :step="demoStep"
-          :pop="2"
-          :demand="10"
-          :pattern="1"
-          :removeable="true"
-        />
+        <step :value="52" :step="demoStep" :pop="2" :demand="10" :pattern="1" :removeable="true" />
         <ul>
           <li>
             <icon class="mji mji-popular-2" />: 物品的欢迎度。
@@ -160,10 +152,8 @@
     <p>ACT插件搭配悬浮窗可以自动填入每日的参数数据。</p>
     <ol>
       <li>
-        访问<a
-          href="https://github.com/ffxiv-cyou/island-craftwork-act-plugin/releases/latest/"
-          target="_blank"
-        >Github</a>下载ACT插件；
+        访问<a href="https://github.com/ffxiv-cyou/island-craftwork-act-plugin/releases/latest/"
+          target="_blank">Github</a>下载ACT插件；
       </li>
       <li>使用ACT载入插件，然后重新加载悬浮窗（OverlayPlugin或NGLD）插件；</li>
       <li>在悬浮窗插件设置中，点击左下角的新建按钮，预设选择无人岛工坊助手，点击确定按钮添加悬浮窗；</li>
@@ -173,18 +163,9 @@
     <p>构建时间：{{ build }} | 数据版本：国服 6.3 / 国际服 6.4</p>
     <p>
       &copy; 2022-{{ year }}
-      <a
-        href="https://ffxiv.cyou"
-        target="_blank"
-      >狒狒西柚</a> |
-      <a
-        href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork"
-        target="_blank"
-      >Github</a> |
-      <a
-        href="https://nga.178.com/read.php?tid=34882091"
-        target="_blank"
-      >问题反馈</a> |
+      <a href="https://ffxiv.cyou" target="_blank">狒狒西柚</a> |
+      <a href="https://github.com/ffxiv-cyou/ffxiv-island-sanctuary-craftwork" target="_blank">Github</a> |
+      <a href="https://nga.178.com/read.php?tid=34882091" target="_blank">问题反馈</a> |
       ALL FINAL FANTASY XIV CONTENT IS PROPERTY OF SQUARE ENIX CO., LTD
     </p>
   </div>
