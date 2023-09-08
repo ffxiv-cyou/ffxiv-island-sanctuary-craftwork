@@ -168,5 +168,8 @@ select {
   .hide-xs {
     display: none !important;
   }
+  .body {
+    padding: 40px 10px 20px 10px;
+  }
 }
 </style>

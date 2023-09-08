@@ -84,7 +84,7 @@ export default class ingredients extends Vue {
   .ingridient-count {
     float: right;
     .cross {
-      font-size: 9px;
+      font-size: 14px;
     }
   }
   &.category-0,

@@ -23,8 +23,9 @@ import { Component, Vue } from "vue-facing-decorator";
   ]
 })
 export default class Close extends Vue {
-  close() {
+  close(event: MouseEvent) {
     this.$emit("close");
+    event.stopPropagation();
   }
 }
 </script>
