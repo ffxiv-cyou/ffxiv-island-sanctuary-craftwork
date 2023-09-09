@@ -9,23 +9,23 @@ use super::{
     Batch, SolverCtx, SolverSingle,
 };
 
-pub struct AdvancedSimplifySolver<'a, U>
+pub struct AdvancedSimplifySolver<U>
 where
     U: SolverSingle,
 {
-    solver: &'a mut U,
+    solver: U,
 }
 
-impl<'a, U> AdvancedSimplifySolver<'a, U>
+impl<U> AdvancedSimplifySolver<U>
 where
     U: SolverSingle,
 {
-    pub fn new(solver: &'a mut U) -> Self {
+    pub fn new(solver: U) -> Self {
         Self { solver }
     }
 }
 
-impl<'a, U> SolverDual for AdvancedSimplifySolver<'a, U>
+impl<U> SolverDual for AdvancedSimplifySolver<U>
 where
     U: SolverSingle,
 {
@@ -75,7 +75,6 @@ where
         // println!(
         //     "candidates: {}, max_val: {}",
         //     candidates.len(),
-        //     max_batch_val
         // );
 
         // 模拟计算

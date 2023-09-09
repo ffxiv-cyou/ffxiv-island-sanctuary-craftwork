@@ -15,8 +15,8 @@ fn predition_benchmark(c: &mut Criterion) {
     let (repo, info, limit) = make_config(1, &[]);
     let ctx = SolverCtx::new(&repo, info, limit);
 
-    let mut solver = BFSolver::new();
-    let mut adv_solver = AdvancedSimplifySolver::new(&mut solver);
+    let solver = BFSolver::new();
+    let mut adv_solver = AdvancedSimplifySolver::new(solver);
     let mut sim_solver = SimplifySolver::new();
     let mut solver = BFSolver::new();
 

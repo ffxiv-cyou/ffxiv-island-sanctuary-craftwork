@@ -205,8 +205,8 @@ fn test_solver_simp_adv() {
 
     println!("demands: {:?}", demands);
 
-    let mut solver = BFSolver::new();
-    let mut solver = AdvancedSimplifySolver::new(&mut solver);
+    let solver = BFSolver::new();
+    let mut solver = AdvancedSimplifySolver::new(solver);
 
     // let result = SolverDual::solve_unordered(&mut solver, &ctx, &demands, 4);
     // println!("solve space: {}", result.len());
@@ -225,10 +225,10 @@ fn test_solver_simp_loop() {
     for pop in 1..99 {
         let (repo, info, limit) = make_config(pop, &empty);
         let ctx = SolverCtx::new(&repo, info, limit);
-        let mut solver = BFSolver::new();
-        let mut solver = AdvancedSimplifySolver::new(&mut solver);
+        let solver = BFSolver::new();
+        let mut solver = AdvancedSimplifySolver::new(solver);
 
-        let result = SolverDual::solve_unordered(&mut solver, &ctx, &demands, 4);
-        println!("pop {} solve space: {}", pop, result.len());
+        println!("pop {}", pop);
+        let result = SolverDual::solve_best(&mut solver, &ctx, &demands, 4);
     }
 }

@@ -21,10 +21,10 @@
         <div class="progress-bar">
           <progress
             :value="progress"
-            max="100"
+            :max="totalProgress"
             class="progress"
           />
-          <span class="progress-percent">{{ progress }}%</span>
+          <span class="progress-percent">{{ progressText }}%</span>
         </div>
         <div class="progress-label">
           已经过时间: {{ timeElapse }} / 预计计算时间: {{ timeEstimate }}
@@ -170,29 +170,55 @@ export default class PlanView extends Vue {
    */
   isLoading = false;
 
+  /**
+   * 当前时间
+   */
   now = 0;
 
+  /**
+   * 当前求解进度
+   */
   progress = 0;
 
+  /**
+   * 总进度
+   */
+  totalProgress = 1;
+
+  get progressText() {
+    return Math.round(this.progress / this.totalProgress * 100);
+  }
+
+  /**
+   * 开始求解时间
+   */
   beginTime = 0;
 
+  /**
+   * 上次求解进度更新时间
+   */
   lastProgressTime = 0;
 
+  /**
+   * 已经过时间
+   */
   get timeElapse() {
     if (this.now === 0) return "0:00";
     let sec = (this.now - this.beginTime) / 1000;
     return Math.floor(sec / 60) + ":" + this.getText(Math.floor(sec % 60));
   }
-
+  /**
+   * 预计求解时间
+   */
   get timeEstimate() {
     if (this.lastProgressTime === 0 || this.progress === 0) {
       let sec = (this.now - this.beginTime) / 1000;
       if (sec < 0) return "N/A";
-      sec *= 30;
+      sec *= this.totalProgress;
       let min = Math.ceil(sec / 300) * 5;
       return min + "分钟以内";
     };
-    let full = (this.lastProgressTime - this.beginTime) / 10 / this.progress;
+    let full = (this.lastProgressTime - this.beginTime) / 1000 / (this.progress / this.totalProgress);
     return Math.floor(full / 60) + "分钟";
   }
 
@@ -401,14 +427,16 @@ export default class PlanView extends Vue {
     this.progress = 0;
     this.beginTime = new Date().getTime();
     this.lastProgressTime = 0;
+    this.updateNow();
     let handler = setInterval(this.updateNow, 1000);
 
     let maxSteps: WorkerSteps[][] = [];
     if (this.solver.config.differentWorkers > 1) {
       let maxValue = 0;
+      this.totalProgress = 30;
       for (let i = 0; i < 30; i++) {
         let result = await this.solver.solveWeekPartly([], i);
-        this.progress = Math.round(i / 30 * 100);
+        this.progress = i;
         this.lastProgressTime = new Date().getTime();
         if (result[0] > maxValue) {
           maxValue = result[0];
@@ -416,6 +444,7 @@ export default class PlanView extends Vue {
         }
       }
     } else {
+      this.totalProgress = 1;
       maxSteps = await this.solver.solveWeek([]);
     }
 
@@ -491,6 +520,7 @@ export default class PlanView extends Vue {
   margin-top: 10px;
   text-align: center;
   color: #f0f0f0;
+  text-shadow: 0px 0px 2px black;
 
   .progress-bar {
     display: grid;
