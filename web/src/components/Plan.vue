@@ -171,7 +171,7 @@ export default class PlanView extends Vue {
     let sum = 0;
     for (let i = 0; i < this.batchValues.length; i++) {
       for (let j = 0; j < this.batchValues[i].length; j++) {
-        sum += this.batchValues[i][j].value * this.workerSteps[i][j].worker;
+        sum += this.batchValues[i][j].value * this.workerSteps[i][j]?.worker ?? 0;
       }
     }
     return sum;
@@ -181,7 +181,7 @@ export default class PlanView extends Vue {
     let sum = 0;
     for (let i = 0; i < this.batchValues.length; i++) {
       for (let j = 0; j < this.batchValues[i].length; j++) {
-        sum += this.batchValues[i][j].cost * this.workerSteps[i][j].worker;
+        sum += this.batchValues[i][j].cost * this.workerSteps[i][j]?.worker ?? 0;
       }
     }
     return sum;
@@ -341,6 +341,7 @@ export default class PlanView extends Vue {
     border: none;
     border-bottom: 1px rgb(156, 134, 115) solid;
   }
+
   .worker-num .cross {
     font-size: 14px;
   }
