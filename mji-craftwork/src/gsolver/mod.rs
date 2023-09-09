@@ -1,7 +1,8 @@
 use crate::{
+    data::IDataRepo,
     predition::DemandPattern,
     simulator::Batch,
-    solver::{Batches, SolveLimit},
+    solver::{Batches, SolverCtx},
 };
 
 mod mild;
@@ -13,26 +14,37 @@ pub use mild_multi::MildMulitSolver;
 
 /// Global Solver 整周排班求解器
 pub trait GSolver {
-    fn solve(&self, limit: &SolveLimit, pat: &[DemandPattern]) -> [Option<Batch>; 6];
+    fn solve<'a, T>(&mut self, ctx: &SolverCtx<'a, T>, pat: &[DemandPattern]) -> [Option<Batch>; 6]
+    where
+        T: IDataRepo;
 }
 
 /// Global Multi Solver 整周多工房排班求解器
 pub trait GMultiSolver {
-    fn solve_part(
+    fn solve_part<'a, T>(
         &mut self,
-        limit: &SolveLimit,
+        ctx: &SolverCtx<'a, T>,
         pat: &[DemandPattern],
         part_id: usize,
-    ) -> ([Option<Batches>; 6], u16);
-    
+    ) -> ([Option<Batches>; 6], u16)
+    where
+        T: IDataRepo;
+
     fn parts() -> usize;
 
-    fn solve(&mut self, limit: &SolveLimit, pat: &[DemandPattern]) -> [Option<Batches>; 6] {
+    fn solve<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        pat: &[DemandPattern],
+    ) -> [Option<Batches>; 6]
+    where
+        T: IDataRepo,
+    {
         let mut max_result = [None; 6];
         let mut max_value = 0;
 
         for id in 0..Self::parts() {
-            let (result, value) = self.solve_part(limit, pat, id);
+            let (result, value) = self.solve_part(ctx, pat, id);
             if value > max_value {
                 max_value = value;
                 max_result = result;

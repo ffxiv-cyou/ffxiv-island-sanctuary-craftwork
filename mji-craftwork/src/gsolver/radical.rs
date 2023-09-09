@@ -1,8 +1,8 @@
 use crate::{
-    data::{CraftworkInfo, IDataRepo, RecipeState},
+    data::{IDataRepo, RecipeState},
     predition::{get_demands, DemandPattern},
     simulator::{simulate, simulate_batch_seq, Batch},
-    solver::{BFSolver, SolverSingle},
+    solver::{BFSolver, SolverCtx, SolverSingle},
 };
 
 use super::GSolver;
@@ -13,28 +13,22 @@ use super::GSolver;
 /// 对这些可能解做排列组合，最终得到最高的可能解。
 ///
 /// 此方法较为激进，部分情况下可能不会得到较好的结果。
-pub struct RadicalSolver<'a, T>
-where
-    T: IDataRepo,
-{
-    info: CraftworkInfo,
-    data: &'a T,
-}
+pub struct RadicalSolver {}
 
-impl<'a, T> GSolver for RadicalSolver<'a, T>
-where
-    T: IDataRepo,
-{
-    fn solve(
-        &self,
-        limit: &crate::solver::SolveLimit,
+impl GSolver for RadicalSolver {
+    fn solve<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         pat: &[crate::predition::DemandPattern],
-    ) -> [Option<Batch>; 6] {
+    ) -> [Option<Batch>; 6]
+    where
+        T: IDataRepo,
+    {
         // D2-D7 收益最高cadidates
         let mut candi_recipe = vec![];
         for i in 1..7 {
             let demands = get_demands(pat, i);
-            let ids = self.get_top_value(5, &demands);
+            let ids = self.get_top_value(ctx, 5, &demands);
             candi_recipe.push(ids);
         }
 
@@ -53,9 +47,9 @@ where
                 item_count.push(n)
             }
 
-            let solver = BFSolver::new(self.data, self.info);
+            let mut solver = BFSolver::new();
             let mut batch = vec![];
-            let results = solver.solve(limit, &demands, 0);
+            let results = solver.solve(ctx, &demands, 0);
             for r in &results {
                 for j in 0..m {
                     if item_count[j] == 0 {
@@ -88,7 +82,7 @@ where
             let mut _indexes = [0; 5]; // 每天步骤的index
             let mut pos = 4; // 当前天数的位置
 
-            let mut infos = [self.info; 5];
+            let mut infos = [ctx.info; 5];
             let mut demand_subs = [vec![], vec![], vec![], vec![], vec![]];
             let mut batches = [None; 6];
             let mut sum_val = 0;
@@ -107,6 +101,7 @@ where
 
                 // 更新求解信息
                 let rs = self.get_recipe_state(
+                    ctx,
                     pat,
                     day as u8 + 1,
                     &candi_batch[day][0],
@@ -117,12 +112,12 @@ where
 
                 // 更新需求变动表
                 let mut demand_sub = demand_subs[p].clone();
-                self.update_demand_sub(&batch, &mut demand_sub);
+                self.update_demand_sub(ctx.info.workers, &batch, &mut demand_sub);
                 demand_subs[p + 1] = demand_sub;
 
                 // 更新求解值
                 batches[day] = Some(batch);
-                let val = match limit.with_cost {
+                let val = match ctx.limit.with_cost {
                     true => batch.value - batch.cost,
                     false => batch.value,
                 };
@@ -138,6 +133,7 @@ where
                 // 游标在末尾，计算当前序列的值
                 if pos >= 4 {
                     let rs = self.get_recipe_state(
+                        ctx,
                         pat,
                         _day as u8 + 1,
                         &candi_batch[_day][_indexes[pos]],
@@ -146,7 +142,7 @@ where
                     let (batch, _) = simulate_batch_seq(&infos[pos], &rs);
 
                     let calc_val = sum_val
-                        + match limit.with_cost {
+                        + match ctx.limit.with_cost {
                             true => batch.value - batch.cost,
                             false => batch.value,
                         };
@@ -183,6 +179,7 @@ where
                         };
 
                         let rs = self.get_recipe_state(
+                            ctx,
                             pat,
                             day as u8 + 1,
                             &candi_batch[day][_indexes[pos]],
@@ -194,7 +191,7 @@ where
                         batches[day] = Some(batch);
 
                         demand_subs[pos + 1] = demand_subs[pos].clone();
-                        self.update_demand_sub(&batch, &mut demand_subs[pos + 1]);
+                        self.update_demand_sub(ctx.info.workers, &batch, &mut demand_subs[pos + 1]);
 
                         pos += 1;
                     }
@@ -209,7 +206,7 @@ where
                         match batches[day] {
                             None => (),
                             Some(batch) => {
-                                sum_val += match limit.with_cost {
+                                sum_val += match ctx.limit.with_cost {
                                     true => batch.value - batch.cost,
                                     false => batch.value,
                                 };
@@ -224,21 +221,26 @@ where
     }
 }
 
-impl<'a, T> RadicalSolver<'a, T>
-where
-    T: IDataRepo,
-{
-    pub fn new(data: &'a T, info: CraftworkInfo) -> Self {
-        Self { info, data }
+impl RadicalSolver {
+    pub fn new() -> Self {
+        Self {}
     }
 
     /// 获取当前最大配方
-    fn get_top_value(&self, size: usize, demands: &[i8]) -> Vec<usize> {
+    fn get_top_value<'a, T>(
+        &self,
+        ctx: &SolverCtx<'a, T>,
+        size: usize,
+        demands: &[i8],
+    ) -> Vec<usize>
+    where
+        T: IDataRepo,
+    {
         let mut vec = vec![];
-        for i in 0..self.data.recipe_len() {
-            let r = self.data.recipe(i);
-            let state = self.data.state(i, demands[i]);
-            let val = simulate(&self.info, &state, 0);
+        for i in 0..ctx.repo.recipe_len() {
+            let r = ctx.repo.recipe(i);
+            let state = ctx.repo.state(i, demands[i]);
+            let val = simulate(&ctx.info, &state, 0);
             vec.push((i, val as f32 / r.craft_time as f32, val));
         }
 
@@ -253,13 +255,17 @@ where
         return result;
     }
 
-    fn get_recipe_state(
+    fn get_recipe_state<'a, T>(
         &self,
+        ctx: &SolverCtx<'a, T>,
         pat: &[DemandPattern],
         day: u8,
         batch: &[u8; 6],
         demand_sub: &[i8],
-    ) -> Vec<RecipeState> {
+    ) -> Vec<RecipeState>
+    where
+        T: IDataRepo,
+    {
         let demand = get_demands(pat, day);
         let mut recipe = vec![];
         for i in 0..6 {
@@ -267,18 +273,18 @@ where
             if id == 0 {
                 break;
             }
-            recipe.push(self.data.state(id, demand[id] - demand_sub[id]))
+            recipe.push(ctx.repo.state(id, demand[id] - demand_sub[id]))
         }
         recipe
     }
 
-    fn update_demand_sub(&self, batch: &Batch, dst: &mut [i8]) {
+    fn update_demand_sub(&self, workers: u8, batch: &Batch, dst: &mut [i8]) {
         for i in 0..batch.seq as usize {
             let id = batch.steps[i] as usize;
             let produce = match i {
                 0 => 1,
                 _ => 2,
-            } * self.info.workers as i8;
+            } * workers as i8;
             dst[id] += produce;
         }
     }

@@ -1,19 +1,19 @@
 mod bruce_force;
 mod simplify;
+mod simplify_adv;
+mod solver_multi;
 mod solver_single;
 mod solver_with_batch;
-mod solver_multi;
-mod simplify_adv;
 
+use super::data::{CraftworkInfo, IDataRepo, Recipe};
 use super::simulator::Batch;
+
 pub use bruce_force::BFSolver;
 pub use simplify::SimplifySolver;
+pub use simplify_adv::AdvancedSimplifySolver;
+pub use solver_multi::{Batches, SolverDual};
 pub use solver_single::SolverSingle;
 pub use solver_with_batch::{BatchWithBatch, SolverWithBatch};
-pub use solver_multi::{Batches, SolverDual};
-pub use simplify_adv::AdvancedSimplifySolver;
-
-use crate::data::Recipe;
 
 /// 求解器限制
 #[derive(Debug, Clone, Copy)]
@@ -43,5 +43,24 @@ impl<'a> SolveLimit<'a> {
 
     pub fn check(&self, recipe: &Recipe) -> bool {
         return recipe.level <= self.level && !self.ban_list.contains(&recipe.id);
+    }
+}
+
+/// 求解器的上下文
+pub struct SolverCtx<'a, T>
+where
+    T: IDataRepo,
+{
+    pub repo: &'a T,
+    pub info: CraftworkInfo,
+    pub limit: SolveLimit<'a>,
+}
+
+impl<'a, T> SolverCtx<'a, T>
+where
+    T: IDataRepo,
+{
+    pub fn new(repo: &'a T, info: CraftworkInfo, limit: SolveLimit<'a>) -> Self {
+        Self { repo, info, limit }
     }
 }
