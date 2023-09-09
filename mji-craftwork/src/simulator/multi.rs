@@ -76,9 +76,7 @@ pub fn simulate_multi_batch(
             let recipe = &recipes[i].1[j];
             if let Some(r) = recipe {
                 let val = simulate(&info, r, produces[r.id() as usize]);
-                batches[i].1 = batches[i]
-                    .1
-                    .push(r.id(), val, r.cost(), r.craft_time());
+                batches[i].1 = batches[i].1.push(r.id(), val, r.cost(), r.craft_time());
                 // println!("{}({},{}): {} | tension {}", r.id(), i, j, val, info.tension);
             }
         }

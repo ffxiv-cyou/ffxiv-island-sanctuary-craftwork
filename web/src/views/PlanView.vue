@@ -1,14 +1,29 @@
 <template>
   <div class="plan-view">
     <h1>排班表</h1>
-    <popup v-show="solverDialog" @close="close">
-      <simple-solver ref="ssolver" class="solver" :solver="solver" @apply="applyWorkerSteps" />
+    <popup
+      v-show="solverDialog"
+      @close="close"
+    >
+      <simple-solver
+        ref="ssolver"
+        class="solver"
+        :solver="solver"
+        @apply="applyWorkerSteps"
+      />
     </popup>
-    <popup v-show="isLoading" :no-close="true">
+    <popup
+      v-show="isLoading"
+      :no-close="true"
+    >
       <Loading />
       <div class="solve-progress">
         <div class="progress-bar">
-          <progress :value="progress" max="100" class="progress" />
+          <progress
+            :value="progress"
+            max="100"
+            class="progress"
+          />
           <span class="progress-percent">{{ progress }}%</span>
         </div>
         <div class="progress-label">
@@ -16,9 +31,18 @@
         </div>
       </div>
     </popup>
-    <popup v-if="shareCode" :no-close="true">
+    <popup
+      v-if="shareCode"
+      :no-close="true"
+    >
       <div class="plan-share-view">
-        <plan v-if="shareCode" :solver="solver" :worker-steps="shareSteps" :hide-share="true" :hide-btn="true">
+        <plan
+          v-if="shareCode"
+          :solver="solver"
+          :worker-steps="shareSteps"
+          :hide-share="true"
+          :hide-btn="true"
+        >
           <template #header>
             <div class="mji-title">
               <span class="mji-text-brown">
@@ -32,8 +56,14 @@
             </div>
           </template>
           <template #footer>
-            <div class="mji-footer" style="text-align: right;">
-              <button class="mji mji-text-brown" @click="importPlan">
+            <div
+              class="mji-footer"
+              style="text-align: right;"
+            >
+              <button
+                class="mji mji-text-brown"
+                @click="importPlan"
+              >
                 导入
               </button>
             </div>
@@ -42,14 +72,29 @@
       </div>
     </popup>
     <div>
-      <plan v-for="(plan, key) in workerPlans" :key="key" :solver="solver" :worker-steps="plan" :removeable="true"
-        @remove="removePlan(key)" @edit-steps="(day: number) => editStep(key, day)"
-        @del-steps="(day: number) => delStep(key, day)" />
+      <plan
+        v-for="(plan, key) in workerPlans"
+        :key="key"
+        :solver="solver"
+        :worker-steps="plan"
+        :removeable="true"
+        @remove="removePlan(key)"
+        @edit-steps="(day: number) => editStep(key, day)"
+        @del-steps="(day: number) => delStep(key, day)"
+      />
       <div class="control-buttons">
-        <button class="pure-button" style="width: 70%" @click="createPlan">
+        <button
+          class="pure-button"
+          style="width: 70%"
+          @click="createPlan"
+        >
           新建排班表
         </button>
-        <button class="pure-button" style="width: calc(30% - 5px)" @click="createPlanFromSolve">
+        <button
+          class="pure-button"
+          style="width: calc(30% - 5px)"
+          @click="createPlanFromSolve"
+        >
           手气不错
         </button>
       </div>
