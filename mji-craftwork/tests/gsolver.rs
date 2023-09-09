@@ -112,10 +112,12 @@ fn test_gsolver_compare() {
 #[test]
 fn test_gsolver_mild_multi() {
     let limit = make_limit(&[]);
+    // let limit = SolveLimit::new(12, &[], 24, false);
 
     let (repo, mut info, pat) = from_pattern_code(b"QVBGh7oanMZyE7uYaTJSIXq3xFZKyVg8QYtTmshkMhu3qFnBIwcAAAAA");
+    // let (repo, mut info, pat) = from_pattern_code(b"AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     info.workers = 4;
-    let solver = MildMulitSolver::new(&repo, info);
+    let mut solver = MildMulitSolver::new(&repo, info);
 
     let result = solver.solve(&limit, &pat);
     println!("code: {}", to_plan_code(&result));
