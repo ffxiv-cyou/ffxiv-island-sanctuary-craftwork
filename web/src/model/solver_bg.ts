@@ -1,4 +1,4 @@
-import SolveWorker from './worker?worker';
+import SolveWorker from './workerv2?worker';
 
 /**
 * 工坊当前状态
@@ -107,6 +107,10 @@ export class SolverBG {
     });
   }
 
+  /**
+   * 解单日最优
+   * @deprecated 请使用 solve_multi_day
+   */
   public solve_day(state: WorkerInfo, level: number, ban_list: Uint8Array, demands: Int8Array, time: number, with_cost: boolean) {
     return this.postMsg<Uint16Array>({
       type: "solve_day",
@@ -171,6 +175,9 @@ export class SolverBG {
     });
   }
 
+  /**
+   * @deprecated 请使用 simulate_multi
+   */
   public simulate(state: WorkerInfo, seq: Uint8Array, demands: Int8Array) {
     return this.postMsg<Uint16Array>({
       type: "simulate",
@@ -189,6 +196,9 @@ export class SolverBG {
     });
   }
 
+  /**
+   * @deprecated 使用 pattern_predict_adv
+   */
   public pattern_predict(array: Uint8Array, demands: number) {
     return this.postMsg<Uint8Array>({
       type: "pattern_predict",

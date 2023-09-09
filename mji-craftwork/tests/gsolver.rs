@@ -5,7 +5,7 @@ use mji_craftwork::{
     },
     predition::DemandPattern,
     simulator::Batch,
-    solver::{SolveLimit, SolverCtx},
+    solver::{AdvancedSimplifySolver, BFSolver, SolveLimit, SolverCtx},
 };
 use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
@@ -123,7 +123,7 @@ fn test_gsolver_mild_multi() {
         from_pattern_code(b"QVBGh7oanMZyE7uYaTJSIXq3xFZKyVg8QYtTmshkMhu3qFnBIwcAAAAA");
     // let (repo, mut info, pat) = from_pattern_code(b"AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     info.workers = 4;
-    let mut solver = MildMulitSolver::new();
+    let mut solver = MildMulitSolver::new(AdvancedSimplifySolver::new(BFSolver::new()));
     let ctx = SolverCtx::new(&repo, info, limit);
 
     let result = solver.solve(&ctx, &pat);

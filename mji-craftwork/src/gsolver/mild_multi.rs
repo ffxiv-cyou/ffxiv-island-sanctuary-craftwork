@@ -4,7 +4,7 @@ use crate::{
     data::IDataRepo,
     predition::get_demands,
     simulator::simulate_multi_batch,
-    solver::{AdvancedSimplifySolver, BFSolver, Batches, SolverDual},
+    solver::{Batches, SolverDual},
 };
 
 use super::{GMultiSolver, SolverCtx};
@@ -15,11 +15,18 @@ use super::{GMultiSolver, SolverCtx};
 ///
 /// 通过对求解顺序做简单的排列组合，辅以整周的需求变动算法，使其能部分考虑到物品需求对后续求解的影响。
 /// 求解时还会估计当前天的干劲对后续求解的影响，使其更准确。
-pub struct MildMulitSolver {
+pub struct MildMulitSolver<S>
+where
+    S: SolverDual,
+{
+    solver: S,
     cache: HashMap<u64, Batches>,
 }
 
-impl GMultiSolver for MildMulitSolver {
+impl<S> GMultiSolver for MildMulitSolver<S>
+where
+    S: SolverDual,
+{
     fn solve_part<'a, T>(
         &mut self,
         ctx: &SolverCtx<'a, T>,
@@ -70,10 +77,14 @@ impl GMultiSolver for MildMulitSolver {
     }
 }
 
-impl MildMulitSolver {
-    pub fn new() -> Self {
+impl<S> MildMulitSolver<S>
+where
+    S: SolverDual,
+{
+    pub fn new(solver: S) -> Self {
         Self {
             cache: HashMap::new(),
+            solver,
         }
     }
 
@@ -166,8 +177,6 @@ impl MildMulitSolver {
         // 计算需求值
         let mut info = ctx.info;
         info.tension = tension;
-        let mut solver = BFSolver::new();
-        let mut solver = AdvancedSimplifySolver::new(&mut solver);
 
         let mut demand = get_demands(pat, i as u8 + 1);
         for i in 0..demand.len().min(demand_sub.len()) {
@@ -180,9 +189,11 @@ impl MildMulitSolver {
             true => self.cache[&hash],
             false => {
                 // 计算最佳
-                let batch = solver.solve_best_fn(ctx, &demand, info.workers, |v, b| {
-                    return v + tension_delta[(b.tension_add() / ctx.info.workers) as usize];
-                });
+                let batch = self
+                    .solver
+                    .solve_best_fn(ctx, &demand, info.workers, |v, b| {
+                        return v + tension_delta[(b.tension_add() / ctx.info.workers) as usize];
+                    });
                 self.cache.insert(hash, batch);
                 batch
             }

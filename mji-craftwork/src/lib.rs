@@ -1,3 +1,4 @@
+mod apiv2;
 pub mod data;
 pub mod gsolver;
 pub mod predition;
@@ -362,8 +363,8 @@ pub fn solve_day_dual(
     time: u8,
     with_cost: bool,
 ) -> Vec<u16> {
-    let mut solver = BFSolver::new();
-    let mut solver = AdvancedSimplifySolver::new(&mut solver);
+    let solver = BFSolver::new();
+    let mut solver = AdvancedSimplifySolver::new(solver);
     let limit = SolveLimit::new(level, ban_list, time, with_cost);
     let ctx = SolverCtx::new(repo, state.clone(), limit);
 
@@ -422,7 +423,7 @@ pub fn solve_week_part(
     part_id: u16,
 ) -> Vec<u16> {
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let mut solver = MildMulitSolver::new();
+    let mut solver = MildMulitSolver::new(AdvancedSimplifySolver::new(BFSolver::new()));
 
     let vec = DemandPattern::from_u8(pattern);
     let ctx = SolverCtx::new(repo, state.clone(), limit);
