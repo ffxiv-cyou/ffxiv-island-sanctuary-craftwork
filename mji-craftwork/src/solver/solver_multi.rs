@@ -1,4 +1,6 @@
-use super::SolveLimit;
+use crate::data::IDataRepo;
+
+use super::SolverCtx;
 
 use core::fmt;
 use std::collections::BinaryHeap;
@@ -122,26 +124,44 @@ pub trait SolverDual {
     /// - limit: 求解限制
     /// - demands: 需求
     /// - workers: 工坊数量
-    fn solve_fn(&self, limit: &SolveLimit, demands: &[i8], workers: u8, cb: impl FnMut(&Batches));
+    fn solve_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        demands: &[i8],
+        workers: u8,
+        cb: impl FnMut(&Batches),
+    ) where
+        T: IDataRepo;
 
-    fn solve_unordered(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batches> {
+    fn solve_unordered<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        demands: &[i8],
+        workers: u8,
+    ) -> Vec<Batches>
+    where
+        T: IDataRepo,
+    {
         let mut result = vec![];
-        self.solve_fn(limit, demands, workers, |steps: &Batches| {
+        self.solve_fn(ctx, demands, workers, |steps: &Batches| {
             result.push(*steps);
         });
         result
     }
 
-    fn solve(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Vec<Batches> {
+    fn solve<'a, T>(&mut self, ctx: &SolverCtx<'a, T>, demands: &[i8], workers: u8) -> Vec<Batches>
+    where
+        T: IDataRepo,
+    {
         let mut heap = BinaryHeap::new();
-        self.solve_fn(limit, demands, workers, |bathces|{
+        self.solve_fn(ctx, demands, workers, |bathces| {
             let mut item = *bathces;
-            item.cmp_value = match limit.with_cost {
+            item.cmp_value = match ctx.limit.with_cost {
                 true => item.value - item.cost,
                 false => item.value,
             };
             heap.push(item);
-            if heap.len() > limit.max_result {
+            if heap.len() > ctx.limit.max_result {
                 heap.pop();
             }
         });
@@ -149,11 +169,14 @@ pub trait SolverDual {
     }
 
     /// 解唯一最优
-    fn solve_best(&self, limit: &SolveLimit, demands: &[i8], workers: u8) -> Batches {
+    fn solve_best<'a, T>(&mut self, ctx: &SolverCtx<'a, T>, demands: &[i8], workers: u8) -> Batches
+    where
+        T: IDataRepo,
+    {
         let mut max_val = 0;
         let mut max_batch = Batches::new();
-        self.solve_fn(limit, demands, workers, |item| {
-            let val = match limit.with_cost {
+        self.solve_fn(ctx, demands, workers, |item| {
+            let val = match ctx.limit.with_cost {
                 true => item.value - item.cost,
                 false => item.value,
             };
@@ -166,17 +189,20 @@ pub trait SolverDual {
     }
 
     /// 使用指定函数解唯一最优
-    fn solve_best_fn(
-        &self,
-        limit: &SolveLimit,
+    fn solve_best_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         demands: &[i8],
         workers: u8,
         sort_val: impl Fn(u16, &Batches) -> u16,
-    ) -> Batches {
+    ) -> Batches
+    where
+        T: IDataRepo,
+    {
         let mut max_val = 0;
         let mut max_batch = Batches::new();
-        self.solve_fn(limit, demands, workers, |item| {
-            let val = match limit.with_cost {
+        self.solve_fn(ctx, demands, workers, |item| {
+            let val = match ctx.limit.with_cost {
                 true => item.value - item.cost,
                 false => item.value,
             };

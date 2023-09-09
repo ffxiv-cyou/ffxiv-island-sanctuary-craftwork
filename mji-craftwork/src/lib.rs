@@ -9,7 +9,8 @@ use data::{Demand, DemandChange, GameDataRepo, IDataRepo, Recipe, RecipeState};
 use gsolver::{GMultiSolver, GSolver, MildMulitSolver, MildSolver};
 use predition::{get_demands, predict_adv, predict_all, DemandPattern};
 use solver::{
-    AdvancedSimplifySolver, BFSolver, SolveLimit, SolverDual, SolverSingle, SolverWithBatch,
+    AdvancedSimplifySolver, BFSolver, SolveLimit, SolverCtx, SolverDual, SolverSingle,
+    SolverWithBatch,
 };
 use wasm_bindgen::prelude::*;
 
@@ -102,9 +103,10 @@ pub fn solve_singleday(
     time: u8,
     with_cost: bool,
 ) -> Vec<u16> {
-    let solver = BFSolver::new(repo, state.clone());
+    let mut solver = BFSolver::new();
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let batches = SolverSingle::solve(&solver, &limit, demands, 0);
+    let ctx = SolverCtx::new(repo, state.clone(), limit);
+    let batches = SolverSingle::solve(&mut solver, &ctx, demands, 0);
 
     let mut ret = vec![];
     for b in batches {
@@ -214,10 +216,11 @@ pub fn solve_week(
     pattern: &[u8],
 ) -> Vec<u16> {
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let solver = MildSolver::new(repo, state.clone());
+    let mut solver = MildSolver::new();
+    let ctx = SolverCtx::new(repo, state.clone(), limit);
 
     let vec = DemandPattern::from_u8(pattern);
-    let batches = solver.solve(&limit, &vec);
+    let batches = solver.solve(&ctx, &vec);
 
     let mut ret = vec![];
     for b in batches {
@@ -301,8 +304,9 @@ pub fn solve_multi_day(
     time: u8,
     with_cost: bool,
 ) -> Vec<u16> {
-    let solver = BFSolver::new(repo, state.clone());
+    let mut solver = BFSolver::new();
     let limit = SolveLimit::new(level, ban_list, time, with_cost);
+    let ctx = SolverCtx::new(repo, state.clone(), limit);
 
     let mut sets = vec![];
     for i in (0..set.len()).step_by(7) {
@@ -318,7 +322,7 @@ pub fn solve_multi_day(
             ],
         ))
     }
-    let batches = SolverWithBatch::solve(&solver, &limit, &sets, demands, worker);
+    let batches = SolverWithBatch::solve(&mut solver, &ctx, &sets, demands, worker);
 
     let mut ret = vec![];
     for b in batches {
@@ -358,11 +362,12 @@ pub fn solve_day_dual(
     time: u8,
     with_cost: bool,
 ) -> Vec<u16> {
-    let solver = BFSolver::new(repo, state.clone());
-    let solver = AdvancedSimplifySolver::new(repo, &solver, state.clone());
+    let mut solver = BFSolver::new();
+    let mut solver = AdvancedSimplifySolver::new(&mut solver);
     let limit = SolveLimit::new(level, ban_list, time, with_cost);
+    let ctx = SolverCtx::new(repo, state.clone(), limit);
 
-    let results = SolverDual::solve(&solver, &limit, demands, worker);
+    let results = SolverDual::solve(&mut solver, &ctx, demands, worker);
     let mut ret = vec![];
     for b in results {
         ret.push(b.value);
@@ -417,10 +422,11 @@ pub fn solve_week_part(
     part_id: u16,
 ) -> Vec<u16> {
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let mut solver = MildMulitSolver::new(repo, state.clone());
+    let mut solver = MildMulitSolver::new();
 
     let vec = DemandPattern::from_u8(pattern);
-    let (batches, val) = solver.solve_part(&limit, &vec, part_id as usize);
+    let ctx = SolverCtx::new(repo, state.clone(), limit);
+    let (batches, val) = solver.solve_part(&ctx, &vec, part_id as usize);
 
     let mut ret = vec![val];
     for b in batches {

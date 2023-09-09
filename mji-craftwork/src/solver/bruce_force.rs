@@ -3,72 +3,63 @@ use crate::{
     simulator::{simulate, simulate_multi_batch},
 };
 
-use super::{Batch, BatchWithBatch, SolveLimit, SolverSingle, SolverWithBatch};
+use super::{Batch, BatchWithBatch, SolverCtx, SolverSingle, SolverWithBatch};
 
 /// Bruce Force 暴力搜索
 ///
 /// 此方法通过对解空间做暴力遍历，得到所有情况的收益值。故其解一定正确。
-pub struct BFSolver<'a, T>
-where
-    T: IDataRepo,
-{
-    info: CraftworkInfo,
-    data: &'a T,
-}
+pub struct BFSolver {}
 
-impl<'a, T> SolverSingle for BFSolver<'a, T>
-where
-    T: IDataRepo,
-{
-    fn solve_fn(&self, limit: &SolveLimit, demands: &[i8], workers: u8, mut cb: impl FnMut(&Batch)) {
-        let mut info = self.info.clone();
+impl SolverSingle for BFSolver {
+    fn solve_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        demands: &[i8],
+        workers: u8,
+        mut cb: impl FnMut(&Batch),
+    ) where
+        T: IDataRepo,
+    {
+        let mut info = ctx.info.clone();
         if workers != 0 {
             info.workers = workers;
         }
 
-        self.solve_sub(limit, demands, Batch::new(), info, &mut cb);
-    }
-
-    fn update_info(&mut self, info: CraftworkInfo) {
-        self.info = info
+        self.solve_sub(ctx, demands, Batch::new(), info, &mut cb);
     }
 }
 
-impl<'a, T> BFSolver<'a, T>
-where
-    T: IDataRepo,
-{
+impl BFSolver {
     /// 新建一个暴力搜索
-    pub fn new(data: &'a T, info: CraftworkInfo) -> Self {
-        Self {
-            info: info,
-            data: data,
-        }
+    pub fn new() -> Self {
+        Self {}
     }
 
-    fn solve_sub(
-        &self,
-        limit: &SolveLimit,
+    fn solve_sub<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         demands: &[i8],
         current: Batch,
         mut info: CraftworkInfo,
-        cb: &mut impl FnMut(&Batch)
-    ) {
+        cb: &mut impl FnMut(&Batch),
+    ) where
+        T: IDataRepo,
+    {
         let last = current.last();
         let first_batch = last == 0;
-        let last = self.data.recipe(last as usize);
-        let remain = limit.time - current.get_time();
+        let last = ctx.repo.recipe(last as usize);
+        let remain = ctx.limit.time - current.get_time();
 
         // 连击开始后即增加干劲
         if !first_batch {
             info = info.next()
         }
 
-        self.data.foreach(|r| {
+        ctx.repo.foreach(|r| {
             if r.craft_time == 0 || remain < r.craft_time {
                 return;
             }
-            if !limit.check(r) || last.id == r.id {
+            if !ctx.limit.check(r) || last.id == r.id {
                 return;
             }
             // 连击过滤
@@ -81,33 +72,32 @@ where
             }
 
             let id = r.id as usize;
-            let s = self.data.state(id, demands[id]);
+            let s = ctx.repo.state(id, demands[id]);
             let demand_sub = current.get_produce(s.id()) * info.workers;
             let val = simulate(&info, &s, demand_sub);
             let current = current.push(r.id, val, r.cost, r.craft_time);
 
-            if current.get_time() > limit.time - 4 {
+            if current.get_time() > ctx.limit.time - 4 {
                 // 当前工序结束
                 cb(&current);
             } else {
-                self.solve_sub(limit, demands, current, info, cb)
+                self.solve_sub(ctx, demands, current, info, cb)
             }
         });
     }
 }
 
-impl<'a, T> SolverWithBatch for BFSolver<'a, T>
-where
-    T: IDataRepo,
-{
-    fn solve_fn(
-        &self,
-        limit: &SolveLimit,
+impl SolverWithBatch for BFSolver {
+    fn solve_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
-        mut cb: impl FnMut(&BatchWithBatch)
-    ) {
+        mut cb: impl FnMut(&BatchWithBatch),
+    ) where
+        T: IDataRepo,
+    {
         // 准备计算状态
         let mut recipes = vec![];
         for (num, seq) in set {
@@ -116,7 +106,7 @@ where
                 let id = seq[i] as usize;
                 arr[i] = match id {
                     0 => None,
-                    _ => Some(self.data.state(id, demands[id])),
+                    _ => Some(ctx.repo.state(id, demands[id])),
                 }
             }
             recipes.push((num.clone(), arr));
@@ -134,15 +124,15 @@ where
                     Some(r) => r.id() as usize,
                 };
 
-                sum_time -= self.data.recipe(curr_id).craft_time;
+                sum_time -= ctx.repo.recipe(curr_id).craft_time;
 
-                while curr_id < self.data.recipe_len() {
+                while curr_id < ctx.repo.recipe_len() {
                     curr_id += 1;
-                    if curr_id >= self.data.recipe_len() {
+                    if curr_id >= ctx.repo.recipe_len() {
                         break;
                     }
 
-                    let r = self.data.recipe(curr_id);
+                    let r = ctx.repo.recipe(curr_id);
                     // println!("recp: {}", r.id);
 
                     let last = match pos {
@@ -152,13 +142,13 @@ where
                             Some(r) => r.id() as usize,
                         },
                     };
-                    let last = self.data.recipe(last);
+                    let last = ctx.repo.recipe(last);
 
                     // 时间过滤
-                    if r.craft_time == 0 || sum_time + r.craft_time > limit.time as u8 {
+                    if r.craft_time == 0 || sum_time + r.craft_time > ctx.limit.time as u8 {
                         continue;
                     }
-                    if !limit.check(r) || last.id == r.id {
+                    if !ctx.limit.check(r) || last.id == r.id {
                         continue;
                     }
                     // 连击过滤
@@ -173,12 +163,12 @@ where
                     }
 
                     sum_time += r.craft_time;
-                    recipe[pos] = Some(self.data.state(curr_id, demands[curr_id]));
+                    recipe[pos] = Some(ctx.repo.state(curr_id, demands[curr_id]));
                     break;
                 }
 
                 // 当前如果在末尾，说明本循环结束，返回上一级
-                if curr_id >= self.data.recipe_len() {
+                if curr_id >= ctx.repo.recipe_len() {
                     if pos == 0 {
                         break; // 完全结束了
                     }
@@ -191,14 +181,14 @@ where
             // if 当前时间结束了 -> calc
             // else 进入下一个地方
             // 快速判断是否还能插入新的步骤
-            if sum_time + 4 <= limit.time as u8 && pos < 6 - 1 {
+            if sum_time + 4 <= ctx.limit.time as u8 && pos < 6 - 1 {
                 // 还可以，继续插入！
                 pos += 1;
                 continue;
             }
 
             // 不行了，直接计算当前值
-            let (result, _) = simulate_multi_batch(&self.info, &recipes);
+            let (result, _) = simulate_multi_batch(&ctx.info, &recipes);
             let mut b2b = BatchWithBatch::from_batch(result[result.len() - 1].1);
             for i in 0..result.len() - 1 {
                 let (workers, batch) = result[i];

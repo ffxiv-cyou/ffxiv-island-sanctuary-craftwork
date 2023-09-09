@@ -3,7 +3,7 @@ use crate::{
     simulator::simulate,
 };
 
-use super::{Batch, SolveLimit, SolverSingle};
+use super::{Batch, SolverCtx, SolverSingle};
 
 /// Simplify 简易剪枝
 ///
@@ -15,75 +15,60 @@ use super::{Batch, SolveLimit, SolverSingle};
 /// 此方法不保证所有解一定正确，仅能尽量保证最高几个的解是正确的。
 ///
 /// 69%是通过实测得出的，对于其他配方可能不适用。
-pub struct SimplifySolver<'a, T>
-where
-    T: IDataRepo,
-{
-    info: CraftworkInfo,
-    data: &'a T,
-}
+pub struct SimplifySolver {}
 
-impl<'a, T> SolverSingle for SimplifySolver<'a, T>
-where
-    T: IDataRepo,
-{
-    fn solve_fn(
-        &self,
-        limit: &SolveLimit,
+impl SolverSingle for SimplifySolver {
+    fn solve_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         demands: &[i8],
         workers: u8,
         mut cb: impl FnMut(&Batch),
-    ) {
+    ) where
+        T: IDataRepo,
+    {
         let mut avg = 0;
-        let mut info = self.info.clone();
+        let mut info = ctx.info.clone();
         if workers != 0 {
             info.workers = workers;
         }
 
-        self.solve_sub(limit, demands, Batch::new(), info, &mut avg, &mut cb);
-    }
-
-    fn update_info(&mut self, info: CraftworkInfo) {
-        self.info = info
+        self.solve_sub(ctx, demands, Batch::new(), info, &mut avg, &mut cb);
     }
 }
 
-impl<'a, T> SimplifySolver<'a, T>
-where
-    T: IDataRepo,
-{
+impl SimplifySolver {
     /// 新建一个暴力搜索
-    pub fn new(data: &'a T, info: CraftworkInfo) -> Self {
-        Self {
-            info: info,
-            data: data,
-        }
+    pub fn new() -> Self {
+        Self {}
     }
 
-    fn solve_sub(
-        &self,
-        limit: &SolveLimit,
+    fn solve_sub<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         demands: &[i8],
         current: Batch,
         mut info: CraftworkInfo,
         max: &mut u16,
         cb: &mut impl FnMut(&Batch),
-    ) {
+    ) where
+        T: IDataRepo,
+    {
         let last = current.last();
         let first_batch = last == 0;
-        let last = self.data.recipe(last as usize);
-        let remain = limit.time - current.get_time();
+        let last = ctx.repo.recipe(last as usize);
+        let remain = ctx.limit.time - current.get_time();
 
         // 连击开始后即增加干劲
         if !first_batch {
             info = info.next()
         }
 
-        self.data.foreach(|r| {
+        ctx.repo.foreach(|r| {
             if r.craft_time == 0 || remain < r.craft_time {
                 return;
             }
-            if !limit.check(r) || last.id == r.id {
+            if !ctx.limit.check(r) || last.id == r.id {
                 return;
             }
             // 连击过滤
@@ -96,7 +81,7 @@ where
             }
 
             let id = r.id as usize;
-            let s = self.data.state(id, demands[id]);
+            let s = ctx.repo.state(id, demands[id]);
             let demand_sub = current.get_produce(s.id()) * info.workers;
             let val = simulate(&info, &s, demand_sub);
             let current = current.push(r.id, val, r.cost, r.craft_time);
@@ -110,16 +95,16 @@ where
                 }
             }
 
-            if current.get_time() > limit.time - 4 {
+            if current.get_time() > ctx.limit.time - 4 {
                 // 当前工序结束
                 cb(&current);
 
-                let avg = current.value / limit.time as u16;
+                let avg = current.value / ctx.limit.time as u16;
                 if avg > *max {
                     *max = avg;
                 }
             } else {
-                self.solve_sub(limit, demands, current, info, max, cb)
+                self.solve_sub(ctx, demands, current, info, max, cb)
             }
         });
     }

@@ -1,13 +1,15 @@
 use mji_craftwork::{
     data::CraftworkInfo,
-    gsolver::{GSolver, MildSolver, RadicalSolver, MildMulitSolver, GMultiSolver, print_week_result},
+    gsolver::{
+        print_week_result, GMultiSolver, GSolver, MildMulitSolver, MildSolver, RadicalSolver,
+    },
     predition::DemandPattern,
     simulator::Batch,
-    solver::SolveLimit,
+    solver::{SolveLimit, SolverCtx},
 };
-use test_data::{new_repo,from_pattern_code, to_pattern_code, to_plan_code, make_limit};
 use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
+use test_data::{from_pattern_code, make_limit, new_repo, to_pattern_code, to_plan_code};
 
 fn new_limit<'a>() -> SolveLimit<'a> {
     let mut limit = SolveLimit::new(10, &[], 24, false);
@@ -34,9 +36,10 @@ fn test_gsolver_mild() {
     let code = b"DTCyaMw1lSFijBrKtXSxNppEaKkXeXuMSzUCAAAAAAAAAAAAAA";
     let (repo, info, pat) = from_pattern_code(code);
 
-    let solver = MildSolver::new(&repo, info);
+    let mut solver = MildSolver::new();
+    let ctx = SolverCtx::new(&repo, info, limit);
 
-    let result = solver.solve(&limit, &pat);
+    let result = solver.solve(&ctx, &pat);
     let sum_val = batch_value(&result);
     println!("total: {}, {:?}", sum_val * info.workers as u16, result)
 }
@@ -48,9 +51,10 @@ fn test_gsolver_radical() {
     let code = b"SJByzIRRxbqHJzZmScUxUrO5qTSBS2ocorcIAAAAAAA";
     let (repo, info, pat) = from_pattern_code(code);
 
-    let solver = RadicalSolver::new(&repo, info);
+    let mut solver = RadicalSolver::new();
+    let ctx = SolverCtx::new(&repo, info, limit);
 
-    let result = solver.solve(&limit, &pat);
+    let result = solver.solve(&ctx, &pat);
     let sum_val = batch_value(&result);
 
     println!("total: {}, {:?}", sum_val * info.workers as u16, result)
@@ -82,12 +86,13 @@ fn test_gsolver_compare() {
         let sli = &mut rand[1..51];
         sli.shuffle(&mut rng);
         let pat = DemandPattern::from_u8(&rand);
+        let ctx = SolverCtx::new(&repo, info, limit);
 
-        let mild = MildSolver::new(&repo, info);
-        let radical = RadicalSolver::new(&repo, info);
+        let mut mild = MildSolver::new();
+        let mut radical = RadicalSolver::new();
 
-        let mild_batch = mild.solve(&limit, &pat);
-        let radical_batch = radical.solve(&limit, &pat);
+        let mild_batch = mild.solve(&ctx, &pat);
+        let radical_batch = radical.solve(&ctx, &pat);
 
         let mild_val = batch_value(&mild_batch);
         let radical_val = batch_value(&radical_batch);
@@ -114,12 +119,14 @@ fn test_gsolver_mild_multi() {
     let limit = make_limit(&[]);
     // let limit = SolveLimit::new(12, &[], 24, false);
 
-    let (repo, mut info, pat) = from_pattern_code(b"QVBGh7oanMZyE7uYaTJSIXq3xFZKyVg8QYtTmshkMhu3qFnBIwcAAAAA");
+    let (repo, mut info, pat) =
+        from_pattern_code(b"QVBGh7oanMZyE7uYaTJSIXq3xFZKyVg8QYtTmshkMhu3qFnBIwcAAAAA");
     // let (repo, mut info, pat) = from_pattern_code(b"AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     info.workers = 4;
-    let mut solver = MildMulitSolver::new(&repo, info);
+    let mut solver = MildMulitSolver::new();
+    let ctx = SolverCtx::new(&repo, info, limit);
 
-    let result = solver.solve(&limit, &pat);
+    let result = solver.solve(&ctx, &pat);
     println!("code: {}", to_plan_code(&result));
     print_week_result(&result);
 }

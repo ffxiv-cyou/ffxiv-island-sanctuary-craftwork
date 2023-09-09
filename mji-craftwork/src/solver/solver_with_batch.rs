@@ -1,4 +1,6 @@
-use super::SolveLimit;
+use crate::data::IDataRepo;
+
+use super::SolverCtx;
 
 use std::collections::BinaryHeap;
 
@@ -53,14 +55,15 @@ impl Eq for BatchWithBatch {}
 
 /// 带已设置排班的当日求解器
 pub trait SolverWithBatch {
-    fn solve_fn(
-        &self,
-        limit: &SolveLimit,
+    fn solve_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
         cb: impl FnMut(&BatchWithBatch),
-    );
+    ) where
+        T: IDataRepo;
 
     /// 解最优
     ///
@@ -70,33 +73,39 @@ pub trait SolverWithBatch {
     /// - n: 当前排班的工房数量
     ///
     /// 返回数组，第一项为已设定排班的收益，第二项为当前排班收益
-    fn solve_unordered(
-        &self,
-        limit: &SolveLimit,
+    fn solve_unordered<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
-    ) -> Vec<BatchWithBatch> {
+    ) -> Vec<BatchWithBatch>
+    where
+        T: IDataRepo,
+    {
         let mut result = vec![];
-        self.solve_fn(limit, set, demands, workers, |steps| {
+        self.solve_fn(ctx, set, demands, workers, |steps| {
             result.push(*steps);
         });
         result
     }
 
     /// 解最优后对结果排序
-    fn solve(
-        &self,
-        limit: &SolveLimit,
+    fn solve<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
-    ) -> Vec<BatchWithBatch> {
+    ) -> Vec<BatchWithBatch>
+    where
+        T: IDataRepo,
+    {
         // 结果排序
         let mut heap = BinaryHeap::new();
-        self.solve_fn(limit, set, demands, workers, |item| {
+        self.solve_fn(ctx, set, demands, workers, |item| {
             let mut item = *item;
-            item.cmp_value = match limit.with_cost {
+            item.cmp_value = match ctx.limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
                         + (item.value - item.cost)
@@ -104,7 +113,7 @@ pub trait SolverWithBatch {
                 false => (item.batch.value) * workers as u16 + (item.value),
             };
             heap.push(item);
-            if heap.len() > limit.max_result {
+            if heap.len() > ctx.limit.max_result {
                 heap.pop();
             }
         });
@@ -112,17 +121,20 @@ pub trait SolverWithBatch {
     }
 
     /// 解唯一最优
-    fn solve_best(
-        &self,
-        limit: &SolveLimit,
+    fn solve_best<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
-    ) -> BatchWithBatch {
+    ) -> BatchWithBatch
+    where
+        T: IDataRepo,
+    {
         let mut max_val = 0;
         let mut max_batch = BatchWithBatch::from_batch(Batch::new());
-        self.solve_fn(limit, set, demands, workers, |item| {
-            let val = match limit.with_cost {
+        self.solve_fn(ctx, set, demands, workers, |item| {
+            let val = match ctx.limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
                         + (item.value - item.cost)
@@ -138,18 +150,21 @@ pub trait SolverWithBatch {
     }
 
     /// 使用指定函数解唯一最优
-    fn solve_best_fn(
-        &self,
-        limit: &SolveLimit,
+    fn solve_best_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
         sort_val: impl Fn(u16, &BatchWithBatch) -> u16,
-    ) -> BatchWithBatch {
+    ) -> BatchWithBatch
+    where
+        T: IDataRepo,
+    {
         let mut max_val = 0;
         let mut max_batch = BatchWithBatch::from_batch(Batch::new());
-        self.solve_fn(limit, set, demands, workers, |item| {
-            let val = match limit.with_cost {
+        self.solve_fn(ctx, set, demands, workers, |item| {
+            let val = match ctx.limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
                         + (item.value - item.cost)
