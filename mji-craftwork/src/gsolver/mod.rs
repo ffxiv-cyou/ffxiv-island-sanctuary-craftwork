@@ -19,7 +19,7 @@ pub trait GSolver {
 /// Global Multi Solver 整周多工房排班求解器
 pub trait GMultiSolver {
     fn solve_part(
-        &self,
+        &mut self,
         limit: &SolveLimit,
         pat: &[DemandPattern],
         part_id: usize,
@@ -27,7 +27,7 @@ pub trait GMultiSolver {
     
     fn parts() -> usize;
 
-    fn solve(&self, limit: &SolveLimit, pat: &[DemandPattern]) -> [Option<Batches>; 6] {
+    fn solve(&mut self, limit: &SolveLimit, pat: &[DemandPattern]) -> [Option<Batches>; 6] {
         let mut max_result = [None; 6];
         let mut max_value = 0;
 

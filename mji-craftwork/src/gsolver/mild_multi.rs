@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     data::{CraftworkInfo, IDataRepo},
     predition::get_demands,
@@ -19,6 +21,7 @@ where
 {
     info: CraftworkInfo,
     data: &'a T,
+    cache: HashMap<u64, Batches>,
 }
 
 impl<'a, T> GMultiSolver for MildMulitSolver<'a, T>
@@ -26,7 +29,7 @@ where
     T: IDataRepo,
 {
     fn solve_part(
-        &self,
+        &mut self,
         limit: &crate::solver::SolveLimit,
         pat: &[crate::predition::DemandPattern],
         part_id: usize,
@@ -41,7 +44,7 @@ where
         let id2 = part_id % 5; // 第二天位置
         let id2 = match id2 >= id1 {
             true => id2 + 1,
-            false => id2,          
+            false => id2,
         };
         // 更新seq用于调试
         seq[0] = id1 as u8 + 2;
@@ -77,11 +80,15 @@ where
     T: IDataRepo,
 {
     pub fn new(data: &'a T, info: CraftworkInfo) -> Self {
-        Self { info, data }
+        Self {
+            info,
+            data,
+            cache: HashMap::new(),
+        }
     }
 
     fn dfs(
-        &self,
+        &mut self,
         limit: &crate::solver::SolveLimit,
         pat: &[crate::predition::DemandPattern],
         demand_sub: &mut [i8],
@@ -140,7 +147,7 @@ where
     }
 
     fn add_at(
-        &self,
+        &mut self,
         limit: &crate::solver::SolveLimit,
         pat: &[crate::predition::DemandPattern],
         demand_sub: &mut [i8],
@@ -181,10 +188,20 @@ where
             demand[i] -= demand_sub[i];
         }
 
-        // 计算最佳
-        let batch = solver.solve_best_fn(limit, &demand, info.workers, |v, b| {
-            return v + tension_delta[(b.tension_add() / self.info.workers) as usize];
-        });
+        let hash = fnv_hash(tension, &demand);
+        // print!("hash: {:#016x} ", hash);
+        let batch = match self.cache.contains_key(&hash) {
+            true => self.cache[&hash],
+            false => {
+                // 计算最佳
+                let batch = solver.solve_best_fn(limit, &demand, info.workers, |v, b| {
+                    return v + tension_delta[(b.tension_add() / self.info.workers) as usize];
+                });
+                self.cache.insert(hash, batch);
+                batch
+            }
+        };
+
         current[i] = Some(batch);
         batch
     }
@@ -247,4 +264,24 @@ where
 
         (result, val, cost)
     }
+}
+
+const INITIAL_STATE: u64 = 0xcbf29ce484222325;
+const PRIME: u64 = 0x100000001b3;
+
+#[inline]
+const fn fnv_hash_next(hash: u64, data: u64) -> u64 {
+    (hash ^ data).wrapping_mul(PRIME)
+}
+
+#[inline]
+pub const fn fnv_hash(tension: u8, demands: &[i8]) -> u64 {
+    let mut hash = fnv_hash_next(INITIAL_STATE, tension as u64);
+    let mut i = 0;
+    while i < demands.len() {
+        hash = hash ^ (demands[i] as u64);
+        hash = hash.wrapping_mul(PRIME);
+        i += 1;
+    }
+    hash
 }

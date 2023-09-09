@@ -417,7 +417,7 @@ pub fn solve_week_part(
     part_id: u16,
 ) -> Vec<u16> {
     let limit = SolveLimit::new(level, &ban_list, time, with_cost);
-    let solver = MildMulitSolver::new(repo, state.clone());
+    let mut solver = MildMulitSolver::new(repo, state.clone());
 
     let vec = DemandPattern::from_u8(pattern);
     let (batches, val) = solver.solve_part(&limit, &vec, part_id as usize);
@@ -429,7 +429,7 @@ pub fn solve_week_part(
                 ret.push(0); // value
                 ret.push(0); // cost
                 ret.push(0); // worker types
-            },
+            }
             Some(batch) => {
                 ret.push(batch.value);
                 ret.push(batch.cost);
