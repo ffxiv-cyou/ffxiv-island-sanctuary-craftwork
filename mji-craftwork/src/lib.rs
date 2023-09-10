@@ -55,6 +55,7 @@ pub fn init_repo(recipes: Vec<u16>, pop_pattern: Vec<u8>, pop_pattern_row: usize
 /// 设置当前人气状况
 ///
 /// 传入由数据包解析的人气状况模式ID
+#[deprecated = "Use APIv2"]
 #[wasm_bindgen]
 pub fn set_pattern(repo: &mut GameDataRepo, pattern: usize) {
     repo.set_popular_pattern(pattern)
@@ -66,6 +67,7 @@ pub fn set_pattern(repo: &mut GameDataRepo, pattern: usize) {
 ///
 /// 传出的数据结构如下：
 /// cost value[6]
+#[deprecated = "Use simulate_multi"]
 #[wasm_bindgen]
 pub fn simulate(
     repo: &GameDataRepo,
@@ -95,6 +97,7 @@ pub fn simulate(
 /// - steps[6] 每一步的物品ID
 /// - values[6] 每一步的价格
 #[wasm_bindgen]
+#[deprecated = "Use solve_multi_day"]
 pub fn solve_singleday(
     repo: &GameDataRepo,
     state: &CraftworkInfo,
@@ -133,6 +136,7 @@ pub fn solve_singleday(
 /// - 2: 2弱
 /// - 3: 3强
 /// - 以此类推
+#[deprecated = "Use pattern_predict_adv"]
 #[wasm_bindgen]
 pub fn pattern_predict(array: &[u8], days: usize) -> Vec<u8> {
     let mut seqs = vec![];

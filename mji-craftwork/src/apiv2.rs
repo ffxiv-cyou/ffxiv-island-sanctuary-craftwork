@@ -203,6 +203,11 @@ impl APIv2 {
         ret
     }
 
+    /// 清理求解器的缓存
+    pub fn solver_clear_cache(&mut self) {
+        self.week_solver_dual.clear_cache();
+    }
+
     /// 在每日工房使用至多两种物品的情况下，尝试求解整周
     ///
     /// - pattern: 需求趋势模式数组
@@ -218,7 +223,6 @@ impl APIv2 {
     ///     - seq
     ///     - steps[]
     ///     - values[]
-    #[wasm_bindgen]
     pub fn solve_week_part(
         &mut self,
         state: &CraftworkInfo,

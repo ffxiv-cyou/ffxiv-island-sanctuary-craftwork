@@ -364,6 +364,14 @@ export class SolverProxy {
     }
 
     /**
+     * 清理求解缓存
+     * @returns 
+     */
+    solveCacheClear(): Promise<void> {
+        return this.solver.solve_cache_clear();
+    }
+
+    /**
      * 从已有的历史数据包推测变化模式
      * @param packets 数据包
      * @returns 变化模式

@@ -434,6 +434,7 @@ export default class PlanView extends Vue {
     if (this.solver.config.differentWorkers > 1) {
       let maxValue = 0;
       this.totalProgress = 30;
+      await this.solver.solveCacheClear();
       for (let i = 0; i < 30; i++) {
         let result = await this.solver.solveWeekPartly([], i);
         this.progress = i;

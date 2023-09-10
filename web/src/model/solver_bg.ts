@@ -175,6 +175,12 @@ export class SolverBG {
     });
   }
 
+  public solve_cache_clear() {
+    return this.postMsg<void>({
+      type: "solve_cache_clear"
+    });
+  }
+
   /**
    * @deprecated 请使用 simulate_multi
    */

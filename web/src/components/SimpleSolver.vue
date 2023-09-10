@@ -37,11 +37,11 @@
           </span>
         </span>
       </legend>
-      <div class="set-workers">
+      <div class="set-workers mji-info-box">
         <div
           v-for="(worker, index) in setValues"
           :key="index + 1000"
-          class="set-worker mji-info-box"
+          class="set-worker"
         >
           <batch-view
             :solver="solver"
