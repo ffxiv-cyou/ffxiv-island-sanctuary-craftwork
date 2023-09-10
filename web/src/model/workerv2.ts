@@ -113,6 +113,13 @@ async function init_worker() {
         self.postMessage(result, [result.buffer]);
         break;
       }
+      case "solve_cache_clear": {
+        repo.solver_clear_cache();
+        self.postMessage({
+          type: "solve_cache_clear"
+        });
+        break;
+      }
       case "simulate_multi": {
         const state = get_craft_info(data.state);
         const result = repo.simulate(state, data.seq, data.demands);

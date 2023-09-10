@@ -87,6 +87,9 @@ where
             solver,
         }
     }
+    pub fn clear_cache(&mut self) {
+        self.cache.clear()
+    }
 
     fn dfs<'a, T>(
         &mut self,
