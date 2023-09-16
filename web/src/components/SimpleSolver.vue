@@ -12,7 +12,7 @@
           <label
             class="mji-text-small"
             for="enable-multi-worker"
-          >启用多队列求解器</label>
+          >启用多队列求解器（实验性）</label>
         </span>
         <button
           class="mji"
@@ -277,7 +277,7 @@ export default class SimpleSolver extends Vue {
   /**
    * 启用多队列求解
    */
-  enableMultiSolver: boolean = true;
+  enableMultiSolver: boolean = false;
 
   /**
    * 获取剩余可用的工坊数量
