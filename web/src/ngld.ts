@@ -1,3 +1,4 @@
+import { Config } from "./model/config.js";
 import "./ngld/common.js";
 
 const element = document.getElementById('token');
@@ -8,6 +9,13 @@ if (clostBtn != null) {
     return false;
   };
 }
+const versionBtn = document.getElementById('version');
+if (versionBtn != null) {
+  versionBtn.onclick = () => {
+    toggleVersion();
+    return false;
+  }
+}
 
 const basePath = document.location.protocol + "//" + document.location.host;
 const link = document.getElementById('link');
@@ -17,7 +25,7 @@ if (link != null) {
 
 function setContent(content: string) {
   if (element != null) {
-    element.setAttribute('href', basePath + "/#/pred/" + content)
+    element.setAttribute('href', basePath + "/#/pred/" + content);
     element.innerText = "解析";
   }
 }
@@ -51,6 +59,31 @@ function toggleText() {
   }
 }
 
+let config = new Config(0);
+let version = config.region;
+
+const versionText = ["6.4", "6.3"];
+const packetLen = [88, 80];
+
+function toggleVersion() {
+  version = (version + 1) % packetLen.length;
+  updateVersionText();
+  setVersion();
+}
+
+function updateVersionText() {
+  if (versionBtn != null) {
+    versionBtn.innerText = versionText[version];
+  }
+}
+
+function setVersion() {
+  callOverlayHandler({
+    call: "RequestMJIZoneState",
+    packetLen: packetLen[version]
+  });
+}
+
 // 添加数据处理
 addOverlayListener('onMJICraftworkData', (data) => {
   setContent(data.data);
@@ -62,8 +95,12 @@ addOverlayListener('onMJIZoneChanged', (data) => {
 
 // 注册完毕，启动悬浮窗事件
 startOverlayEvents();
+updateVersionText();
 
-callOverlayHandler({ call: "RequestMJIZoneState" }).then((val) => {
+callOverlayHandler({
+  call: "RequestMJIZoneState",
+  packetLen: packetLen[version]
+}).then((val) => {
   const ele = document.getElementById("not-inited");
   if (ele != null) {
     ele.classList.add("hide");
