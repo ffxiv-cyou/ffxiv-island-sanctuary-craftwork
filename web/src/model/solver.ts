@@ -343,7 +343,11 @@ export class SolverProxy {
         const batches = BatchValues.fromSimulateArray(arr);
         const result = [];
         for (let i = 0; i < batches.length; i++) {
-            result.push([new WorkerSteps(info.workers, batches[i].steps)]);
+            if (batches[i].steps.length > 0) {
+                result.push([new WorkerSteps(info.workers, batches[i].steps)]);
+            } else {
+                result.push([]);
+            }
         }
         return result;
     }

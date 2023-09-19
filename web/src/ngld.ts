@@ -62,8 +62,8 @@ function toggleText() {
 let config = new Config(0);
 let version = config.region;
 
-const versionText = ["6.4", "6.3"];
-const packetLen = [88, 80];
+const versionText = ["6.4", "6.4", "6.3"];
+const packetLen = [88, 88, 80];
 
 function toggleVersion() {
   version = (version + 1) % packetLen.length;

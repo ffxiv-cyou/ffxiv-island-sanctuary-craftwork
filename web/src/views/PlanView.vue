@@ -473,7 +473,7 @@ export default class PlanView extends Vue {
       for (let j = 0; j < plan.length; j++) {
         const day = plan[j];
         for (let k = 0; k < day.length; k++) {
-          if (day[k].worker === 0) {
+          if (day[k].worker === 0 || day[k].steps.length === 0) {
             day.splice(k, 1);
             k--;
           }
