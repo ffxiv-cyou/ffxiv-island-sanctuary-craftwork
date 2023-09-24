@@ -59,7 +59,7 @@ function toggleText() {
   }
 }
 
-let config = new Config(0);
+const config = new Config(0);
 let version = config.region;
 
 const versionText = ["6.4", "6.4", "6.3"];

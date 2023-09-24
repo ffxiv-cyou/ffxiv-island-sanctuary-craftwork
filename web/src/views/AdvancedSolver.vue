@@ -4,24 +4,37 @@
       <form class="pure-form">
         <legend>设置</legend>
         <div class="solve-sitting pure-control-group">
-          <label for="tension">当前干劲</label>
-          <input
-            id="tension"
-            v-model="tension"
-            type="number"
-            min="0"
-            max="35"
-            placeholder=""
-          >
-          <label for="maxTime">工序时间</label>
-          <input
-            id="maxTime"
-            v-model="maxTime"
-            type="number"
-            min="4"
-            max="24"
-            placeholder=""
-          >
+          <div>
+            <label for="tension">干劲</label>
+            <label for="maxTime">时间</label>
+            <label for="currentWorker">求解工坊数</label>
+          </div>
+          <div>
+            <input
+              id="tension"
+              v-model="tension"
+              type="number"
+              min="0"
+              max="35"
+              placeholder=""
+            >
+            <input
+              id="maxTime"
+              v-model="maxTime"
+              type="number"
+              min="4"
+              max="24"
+              placeholder=""
+            >
+            <input
+              id="currentWorker"
+              v-model="currentWorker"
+              type="number"
+              min="1"
+              :max="maxWorker"
+              placeholder=""
+            >
+          </div>
         </div>
       </form>
       <div class="pure-form pure-form-stacked pure-g">
@@ -74,27 +87,94 @@
       <p v-if="batches.length == 0">
         首次使用？请先查看帮助页面了解详细使用说明。
       </p>
+      <div
+        v-if="setValues.length > 0"
+        class="set-workers mji-info-box"
+      >
+        <div>
+          <span
+            v-if="setValues.length > 0"
+            class="worker-value"
+          >
+            总收益：
+            <icon class="blue-coin" />{{ sumVal }}
+            (
+            <icon class="blue-coin" />{{ -sumCost }})
+            <span v-if="solver.config.showNetValue"> =
+              <icon class="blue-coin" />{{ netVal }}
+            </span>
+          </span>
+        </div>
+        <div
+          v-for="(worker, index) in setValues"
+          :key="index + 1000"
+          class="set-worker"
+        >
+          <batch-view
+            :solver="solver"
+            :batch="worker"
+          >
+            <button
+              class="sched sched-red add-item"
+              @click="removeSet(index)"
+            >
+              -
+            </button>
+            <div class="set-worker-num">
+              <input
+                type="number"
+                min="0"
+                :max="maxWorker"
+                :value="setSteps[index].worker"
+                @input="setWorkerNum(index, $event)"
+              >
+              <span class="cross">&times;</span>
+            </div>
+          </batch-view>
+        </div>
+      </div>
       <button
         class="pure-button"
-        @click="load"
+        @click="solve"
       >
         解最优
       </button>
       <div>
-        <batch-view
-          v-for="(val, key) in batches"
-          :key="key"
-          class="mji-info-box"
-          :solver="solver"
-          :batch="val"
-        />
+        <div
+          v-for="(batch, key1) in batches"
+          :key="key1"
+          class="mji-info-box batches-item"
+          @click="add(key1)"
+        >
+          <div class="batches-left hide-xs">
+            <span class="bench-value">
+              <icon class="blue-coin" />{{ batch.value }}
+            </span>
+            <span class="bench-cost mji-text-small">
+              (-{{ batch.cost }})
+            </span>
+          </div>
+          <div class="batches-right">
+            <batch-view
+              v-for="(steps, key2) in batch.batches"
+              :key="key1 * 1000 + key2"
+              :solver="solver"
+              :batch="steps"
+              :delta-val="steps.workerVal"
+            >
+              <div class="batch-worker-num">
+                {{ steps.workers }}<span class="cross">&times;</span>
+              </div>
+            </batch-view>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
-import type { SolverProxy, BatchValues } from "@/model/solver"
+import { type SolverProxy, type BatchesValues, type BatchValues, WorkerSteps } from "@/model/solver"
 import { DemandUtils } from "@/model/data";
 import { CraftworkData } from "@/data/data";
 import BatchView from "@/components/BatchView.vue";
@@ -112,12 +192,20 @@ export default class AdvancedSolver extends Vue {
   @Prop()
   solver!: SolverProxy;
 
-  batches: BatchValues[] = [];
+  batches: BatchesValues[] = [];
 
   tension: number = 0;
   maxTime: number = 24;
   demands: number[] = [];
   banList: boolean[] = [];
+  /**
+   * 求解时已有的工坊列表
+   */
+  setSteps: WorkerSteps[] = [];
+  /**
+   * 求解得到的取值
+   */
+  setValues: BatchValues[] = [];
 
   get banArr() {
     const banArr = [];
@@ -129,8 +217,11 @@ export default class AdvancedSolver extends Vue {
     return banArr;
   }
 
-  async load() {
-    let batches = await this.solver.solveDayDetail(this.demands, this.banArr, this.tension, this.maxTime);
+  currentWorker = 3;
+
+  async solve() {
+    let batches = await this.solver.solveMultiDay(this.demands, this.setSteps, this.banArr, this.tension, this.currentWorker, this.maxTime);
+    batches.forEach(b => b.batches.forEach(c => { if (c.workerVal != 0) c.workerVal -= this.sumVal; }));
     this.batches = batches.slice(0, 100);
   }
 
@@ -142,6 +233,27 @@ export default class AdvancedSolver extends Vue {
     return this.solver.Recipes.filter((v) => v.Name);
   }
 
+  get maxWorker() {
+    return this.solver.config.workers;
+  }
+  get sumVal() {
+    let val = 0;
+    for (let i = 0; i < this.setValues.length; i++) {
+      val += this.setValues[i].value * this.setSteps[i].worker;
+    }
+    return val;
+  }
+
+  get sumCost() {
+    let cost = 0;
+    for (let i = 0; i < this.setValues.length; i++) {
+      cost += this.setValues[i].cost * this.setSteps[i].worker;
+    }
+    return cost;
+  }
+  get netVal() {
+    return this.sumVal - this.sumCost;
+  }
   date: number = 0;
   get customDemand() {
     return this.date === 0;
@@ -180,7 +292,41 @@ export default class AdvancedSolver extends Vue {
     let current = DemandUtils.GetDemand(this.demands[id]);
     let next = (current + 1) % 5;
     this.demands[id] = DemandUtils.FromDemand(next);
+
+    this.simulateSet();
+    this.solve();
   }
+
+  add(index: number) {
+    let batch = this.batches[index];
+    batch.batches.forEach(b => {
+      this.setSteps.push(new WorkerSteps(b.workers, b.steps));
+      this.setValues.push(b);
+    });
+    this.simulateSet();
+    this.solve();
+  }
+
+  removeSet(index: number) {
+    this.setSteps.splice(index, 1);
+    this.setValues.splice(index, 1);
+    this.simulateSet();
+    this.solve();
+  }
+
+  @Watch("demands", { deep: true })
+  @Watch("tension")
+  async simulateSet() {
+    this.setValues = await this.solver.simulateMulti(this.setSteps, this.demands, this.tension);
+  }
+
+  setWorkerNum(index: number, evt: Event) {
+    let val = Number((evt.target as HTMLInputElement).value);
+    this.setSteps[index].worker = val;
+    this.simulateSet();
+    this.solve();
+  }
+
 }
 </script>
 <style lang="scss">
@@ -234,8 +380,16 @@ export default class AdvancedSolver extends Vue {
     width: 100%;
   }
 
-  .solve-sitting input {
-    width: 5em;
+  .solve-sitting {
+    input, label {
+      width: 33%;
+    }
+    label {
+      display: inline-block;
+    }
+    input {
+      padding: 0.2em 0.5em !important;
+    }
   }
 
   .objects {
