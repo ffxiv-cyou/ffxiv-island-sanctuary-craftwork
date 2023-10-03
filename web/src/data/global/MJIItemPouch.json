@@ -550,5 +550,107 @@
     "Name": "Island Zucchini",
     "Icon": 25212,
     "Category": 4
+  },
+  {
+    "Id": 92,
+    "Name": "Island Durium Sand",
+    "Icon": 21242,
+    "Category": 1
+  },
+  {
+    "Id": 93,
+    "Name": "Island Yellow Copper Ore",
+    "Icon": 21207,
+    "Category": 1
+  },
+  {
+    "Id": 94,
+    "Name": "Island Gold Ore",
+    "Icon": 21212,
+    "Category": 1
+  },
+  {
+    "Id": 95,
+    "Name": "Island Hawk's Eye Sand",
+    "Icon": 21229,
+    "Category": 1
+  },
+  {
+    "Id": 96,
+    "Name": "Island Crystal Formation",
+    "Icon": 21488,
+    "Category": 1
+  },
+  {
+    "Id": 97,
+    "Name": "Island Watermelon Seeds",
+    "Icon": 23740,
+    "Category": 3
+  },
+  {
+    "Id": 98,
+    "Name": "Island Sweet Popoto Set",
+    "Icon": 23741,
+    "Category": 3
+  },
+  {
+    "Id": 99,
+    "Name": "Island Broccoli Seeds",
+    "Icon": 23738,
+    "Category": 3
+  },
+  {
+    "Id": 100,
+    "Name": "Island Buffalo Bean Seeds",
+    "Icon": 23745,
+    "Category": 3
+  },
+  {
+    "Id": 101,
+    "Name": "Island Watermelon",
+    "Icon": 25328,
+    "Category": 4
+  },
+  {
+    "Id": 102,
+    "Name": "Island Sweet Popoto",
+    "Icon": 25236,
+    "Category": 4
+  },
+  {
+    "Id": 103,
+    "Name": "Island Broccoli",
+    "Icon": 25237,
+    "Category": 4
+  },
+  {
+    "Id": 104,
+    "Name": "Island Buffalo Beans",
+    "Icon": 25353,
+    "Category": 4
+  },
+  {
+    "Id": 105,
+    "Name": "Flawless Net",
+    "Icon": 23742,
+    "Category": 7
+  },
+  {
+    "Id": 106,
+    "Name": "Flawless Restraints",
+    "Icon": 23737,
+    "Category": 7
+  },
+  {
+    "Id": 107,
+    "Name": "Flawless Soporifics",
+    "Icon": 23736,
+    "Category": 7
+  },
+  {
+    "Id": 108,
+    "Name": "Felicitous Token",
+    "Icon": 65104,
+    "Category": 10
   }
 ]

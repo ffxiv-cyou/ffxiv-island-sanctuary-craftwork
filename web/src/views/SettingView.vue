@@ -38,10 +38,10 @@
             v-model="level"
             type="number"
             min="1"
-            max="16"
-            placeholder="1-16"
+            max="20"
+            placeholder="1-20"
           >
-          <span class="pure-form-message-inline">当前开拓等级（1-16），大于此等级的配方不会被求解。</span>
+          <span class="pure-form-message-inline">当前开拓等级（1-20），大于此等级的配方不会被求解。</span>
         </div>
         <div class="pure-control-group">
           <label for="craft-level">工坊等级</label>
@@ -50,10 +50,10 @@
             v-model="craft_level"
             type="number"
             min="1"
-            max="4"
-            placeholder="1-4"
+            max="5"
+            placeholder="1-5"
           >
-          <span class="pure-form-message-inline">当前工坊等级（1-4），影响产品价格。</span>
+          <span class="pure-form-message-inline">当前工坊等级（1-5），影响产品价格。</span>
         </div>
         <div class="pure-control-group">
           <label for="max-tension">干劲上限</label>

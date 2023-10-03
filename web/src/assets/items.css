@@ -1,164 +1,218 @@
 icon.item {
-  width: 40px;
-  height: 40px;
-  vertical-align: bottom;
-  display: inline-block;
-}
-icon.item-22257 {
-  background-image: url("./items/022257.png");
-}
-icon.item-22604 {
-  background-image: url("./items/022604.png");
-}
-icon.item-24089 {
-  background-image: url("./items/024089.png");
-}
-icon.item-25306 {
-  background-image: url("./items/025306.png");
-}
-icon.item-25352 {
-  background-image: url("./items/025352.png");
-}
-icon.item-24096 {
-  background-image: url("./items/024096.png");
-}
-icon.item-52462 {
-  background-image: url("./items/052462.png");
-}
-icon.item-25213 {
-  background-image: url("./items/025213.png");
-}
-icon.item-21211 {
-  background-image: url("./items/021211.png");
-}
-icon.item-22206 {
-  background-image: url("./items/022206.png");
-}
-icon.item-20601 {
-  background-image: url("./items/020601.png");
-}
-icon.item-54912 {
-  background-image: url("./items/054912.png");
-}
-icon.item-32665 {
-  background-image: url("./items/032665.png");
-}
-icon.item-22410 {
-  background-image: url("./items/022410.png");
-}
-icon.item-29657 {
-  background-image: url("./items/029657.png");
-}
-icon.item-25215 {
-  background-image: url("./items/025215.png");
-}
-icon.item-40008 {
-  background-image: url("./items/040008.png");
-}
-icon.item-52002 {
-  background-image: url("./items/052002.png");
-}
-icon.item-23711 {
-  background-image: url("./items/023711.png");
-}
-icon.item-23721 {
-  background-image: url("./items/023721.png");
-}
-icon.item-52453 {
-  background-image: url("./items/052453.png");
-}
-icon.item-23715 {
-  background-image: url("./items/023715.png");
-}
-icon.item-29012 {
-  background-image: url("./items/029012.png");
-}
-icon.item-22407 {
-  background-image: url("./items/022407.png");
-}
-icon.item-21672 {
-  background-image: url("./items/021672.png");
-}
-icon.item-21652 {
-  background-image: url("./items/021652.png");
-}
-icon.item-22303 {
-  background-image: url("./items/022303.png");
-}
-icon.item-24155 {
-  background-image: url("./items/024155.png");
-}
-icon.item-54411 {
-  background-image: url("./items/054411.png");
+			width: 40px;
+			height: 40px;
+			vertical-align: bottom;
+			display: inline-block;
+		  }
+icon.item-22416 {
+  background-image: url("./items/022416.png");
 }
 icon.item-29060 {
   background-image: url("./items/029060.png");
 }
-icon.item-25010 {
-  background-image: url("./items/025010.png");
+icon.item-22627 {
+  background-image: url("./items/022627.png");
 }
-icon.item-25209 {
-  background-image: url("./items/025209.png");
+icon.item-29026 {
+  background-image: url("./items/029026.png");
 }
-icon.item-22301 {
-  background-image: url("./items/022301.png");
+icon.item-25203 {
+  background-image: url("./items/025203.png");
 }
-icon.item-21908 {
-  background-image: url("./items/021908.png");
+icon.item-25251 {
+  background-image: url("./items/025251.png");
 }
-icon.item-22452 {
-  background-image: url("./items/022452.png");
+icon.item-24075 {
+  background-image: url("./items/024075.png");
 }
-icon.item-20019 {
-  background-image: url("./items/020019.png");
+icon.item-40900 {
+  background-image: url("./items/040900.png");
 }
-icon.item-21655 {
-  background-image: url("./items/021655.png");
+icon.item-21456 {
+  background-image: url("./items/021456.png");
 }
-icon.item-23708 {
-  background-image: url("./items/023708.png");
+icon.item-25306 {
+  background-image: url("./items/025306.png");
 }
-icon.item-31007 {
-  background-image: url("./items/031007.png");
+icon.item-23721 {
+  background-image: url("./items/023721.png");
 }
-icon.item-24154 {
-  background-image: url("./items/024154.png");
+icon.item-24111 {
+  background-image: url("./items/024111.png");
 }
-icon.item-25061 {
-  background-image: url("./items/025061.png");
+icon.item-22407 {
+  background-image: url("./items/022407.png");
 }
-icon.item-23710 {
-  background-image: url("./items/023710.png");
+icon.item-23704 {
+  background-image: url("./items/023704.png");
 }
-icon.item-23719 {
-  background-image: url("./items/023719.png");
+icon.item-23701 {
+  background-image: url("./items/023701.png");
+}
+icon.item-24124 {
+  background-image: url("./items/024124.png");
+}
+icon.item-38158 {
+  background-image: url("./items/038158.png");
+}
+icon.item-21451 {
+  background-image: url("./items/021451.png");
+}
+icon.item-21652 {
+  background-image: url("./items/021652.png");
+}
+icon.item-22206 {
+  background-image: url("./items/022206.png");
+}
+icon.item-22638 {
+  background-image: url("./items/022638.png");
+}
+icon.item-22651 {
+  background-image: url("./items/022651.png");
+}
+icon.item-26105 {
+  background-image: url("./items/026105.png");
+}
+icon.item-29657 {
+  background-image: url("./items/029657.png");
+}
+icon.item-21207 {
+  background-image: url("./items/021207.png");
+}
+icon.item-23738 {
+  background-image: url("./items/023738.png");
 }
 icon.item-20705 {
   background-image: url("./items/020705.png");
 }
-icon.item-22416 {
-  background-image: url("./items/022416.png");
+icon.item-24099 {
+  background-image: url("./items/024099.png");
+}
+icon.item-24225 {
+  background-image: url("./items/024225.png");
+}
+icon.item-21488 {
+  background-image: url("./items/021488.png");
+}
+icon.item-26038 {
+  background-image: url("./items/026038.png");
+}
+icon.item-24037 {
+  background-image: url("./items/024037.png");
+}
+icon.item-24413 {
+  background-image: url("./items/024413.png");
+}
+icon.item-24123 {
+  background-image: url("./items/024123.png");
+}
+icon.item-24169 {
+  background-image: url("./items/024169.png");
+}
+icon.item-22257 {
+  background-image: url("./items/022257.png");
+}
+icon.item-25212 {
+  background-image: url("./items/025212.png");
+}
+icon.item-42169 {
+  background-image: url("./items/042169.png");
+}
+icon.item-31007 {
+  background-image: url("./items/031007.png");
+}
+icon.item-54918 {
+  background-image: url("./items/054918.png");
+}
+icon.item-52002 {
+  background-image: url("./items/052002.png");
+}
+icon.item-21672 {
+  background-image: url("./items/021672.png");
+}
+icon.item-25213 {
+  background-image: url("./items/025213.png");
+}
+icon.item-23705 {
+  background-image: url("./items/023705.png");
+}
+icon.item-21624 {
+  background-image: url("./items/021624.png");
+}
+icon.item-20601 {
+  background-image: url("./items/020601.png");
 }
 icon.item-24167 {
   background-image: url("./items/024167.png");
 }
-icon.item-30243 {
-  background-image: url("./items/030243.png");
+icon.item-23741 {
+  background-image: url("./items/023741.png");
 }
-icon.item-24168 {
-  background-image: url("./items/024168.png");
+icon.item-23710 {
+  background-image: url("./items/023710.png");
 }
-icon.item-48387 {
-  background-image: url("./items/048387.png");
+icon.item-21477 {
+  background-image: url("./items/021477.png");
 }
-icon.item-29031 {
-  background-image: url("./items/029031.png");
+icon.item-25234 {
+  background-image: url("./items/025234.png");
 }
-icon.item-23709 {
-  background-image: url("./items/023709.png");
+icon.item-41129 {
+  background-image: url("./items/041129.png");
 }
-icon.item-54434 {
-  background-image: url("./items/054434.png");
+icon.item-21464 {
+  background-image: url("./items/021464.png");
+}
+icon.item-25010 {
+  background-image: url("./items/025010.png");
+}
+icon.item-22636 {
+  background-image: url("./items/022636.png");
+}
+icon.item-25101 {
+  background-image: url("./items/025101.png");
+}
+icon.item-24171 {
+  background-image: url("./items/024171.png");
+}
+icon.item-25026 {
+  background-image: url("./items/025026.png");
+}
+icon.item-25204 {
+  background-image: url("./items/025204.png");
+}
+icon.item-25208 {
+  background-image: url("./items/025208.png");
+}
+icon.item-25353 {
+  background-image: url("./items/025353.png");
+}
+icon.item-23736 {
+  background-image: url("./items/023736.png");
+}
+icon.item-24315 {
+  background-image: url("./items/024315.png");
+}
+icon.item-26593 {
+  background-image: url("./items/026593.png");
+}
+icon.item-22642 {
+  background-image: url("./items/022642.png");
+}
+icon.item-22617 {
+  background-image: url("./items/022617.png");
+}
+icon.item-29012 {
+  background-image: url("./items/029012.png");
+}
+icon.item-21228 {
+  background-image: url("./items/021228.png");
+}
+icon.item-23728 {
+  background-image: url("./items/023728.png");
+}
+icon.item-23740 {
+  background-image: url("./items/023740.png");
 }
 icon.item-35751 {
   background-image: url("./items/035751.png");
@@ -166,258 +220,357 @@ icon.item-35751 {
 icon.item-24255 {
   background-image: url("./items/024255.png");
 }
-icon.item-54918 {
-  background-image: url("./items/054918.png");
-}
-icon.item-25110 {
-  background-image: url("./items/025110.png");
-}
-icon.item-21464 {
-  background-image: url("./items/021464.png");
-}
-icon.item-21204 {
-  background-image: url("./items/021204.png");
-}
-icon.item-23704 {
-  background-image: url("./items/023704.png");
-}
-icon.item-23714 {
-  background-image: url("./items/023714.png");
-}
-icon.item-25251 {
-  background-image: url("./items/025251.png");
-}
-icon.item-25052 {
-  background-image: url("./items/025052.png");
-}
-icon.item-22664 {
-  background-image: url("./items/022664.png");
-}
-icon.item-25060 {
-  background-image: url("./items/025060.png");
-}
-icon.item-55233 {
-  background-image: url("./items/055233.png");
-}
-icon.item-24315 {
-  background-image: url("./items/024315.png");
-}
-icon.item-24075 {
-  background-image: url("./items/024075.png");
-}
-icon.item-38158 {
-  background-image: url("./items/038158.png");
-}
-icon.item-22642 {
-  background-image: url("./items/022642.png");
-}
-icon.item-23706 {
-  background-image: url("./items/023706.png");
-}
-icon.item-25231 {
-  background-image: url("./items/025231.png");
-}
-icon.item-25232 {
-  background-image: url("./items/025232.png");
-}
-icon.item-25101 {
-  background-image: url("./items/025101.png");
-}
-icon.item-22413 {
-  background-image: url("./items/022413.png");
+icon.item-24044 {
+  background-image: url("./items/024044.png");
 }
 icon.item-23703 {
   background-image: url("./items/023703.png");
 }
-icon.item-21624 {
-  background-image: url("./items/021624.png");
-}
-icon.item-53188 {
-  background-image: url("./items/053188.png");
-}
-icon.item-25225 {
-  background-image: url("./items/025225.png");
-}
-icon.item-29177 {
-  background-image: url("./items/029177.png");
-}
-icon.item-26103 {
-  background-image: url("./items/026103.png");
-}
-icon.item-25308 {
-  background-image: url("./items/025308.png");
-}
 icon.item-23717 {
   background-image: url("./items/023717.png");
 }
-icon.item-36748 {
-  background-image: url("./items/036748.png");
+icon.item-21208 {
+  background-image: url("./items/021208.png");
 }
-icon.item-55439 {
-  background-image: url("./items/055439.png");
+icon.item-23733 {
+  background-image: url("./items/023733.png");
 }
-icon.item-22634 {
-  background-image: url("./items/022634.png");
-}
-icon.item-41129 {
-  background-image: url("./items/041129.png");
-}
-icon.item-25026 {
-  background-image: url("./items/025026.png");
-}
-icon.item-23702 {
-  background-image: url("./items/023702.png");
-}
-icon.item-24413 {
-  background-image: url("./items/024413.png");
-}
-icon.item-21209 {
-  background-image: url("./items/021209.png");
-}
-icon.item-23701 {
-  background-image: url("./items/023701.png");
-}
-icon.item-24453 {
-  background-image: url("./items/024453.png");
-}
-icon.item-27555 {
-  background-image: url("./items/027555.png");
-}
-icon.item-42169 {
-  background-image: url("./items/042169.png");
-}
-icon.item-22636 {
-  background-image: url("./items/022636.png");
-}
-icon.item-26038 {
-  background-image: url("./items/026038.png");
-}
-icon.item-22627 {
-  background-image: url("./items/022627.png");
-}
-icon.item-23707 {
-  background-image: url("./items/023707.png");
-}
-icon.item-25204 {
-  background-image: url("./items/025204.png");
-}
-icon.item-24332 {
-  background-image: url("./items/024332.png");
-}
-icon.item-30417 {
-  background-image: url("./items/030417.png");
-}
-icon.item-22615 {
-  background-image: url("./items/022615.png");
-}
-icon.item-25357 {
-  background-image: url("./items/025357.png");
-}
-icon.item-51695 {
-  background-image: url("./items/051695.png");
-}
-icon.item-21456 {
-  background-image: url("./items/021456.png");
-}
-icon.item-23705 {
-  background-image: url("./items/023705.png");
-}
-icon.item-23720 {
-  background-image: url("./items/023720.png");
-}
-icon.item-31402 {
-  background-image: url("./items/031402.png");
-}
-icon.item-22617 {
-  background-image: url("./items/022617.png");
-}
-icon.item-25208 {
-  background-image: url("./items/025208.png");
-}
-icon.item-21451 {
-  background-image: url("./items/021451.png");
-}
-icon.item-21251 {
-  background-image: url("./items/021251.png");
-}
-icon.item-25203 {
-  background-image: url("./items/025203.png");
-}
-icon.item-24124 {
-  background-image: url("./items/024124.png");
-}
-icon.item-24052 {
-  background-image: url("./items/024052.png");
-}
-icon.item-29026 {
-  background-image: url("./items/029026.png");
-}
-icon.item-21202 {
-  background-image: url("./items/021202.png");
-}
-icon.item-23725 {
-  background-image: url("./items/023725.png");
-}
-icon.item-53440 {
-  background-image: url("./items/053440.png");
-}
-icon.item-25102 {
-  background-image: url("./items/025102.png");
-}
-icon.item-21276 {
-  background-image: url("./items/021276.png");
-}
-icon.item-23726 {
-  background-image: url("./items/023726.png");
-}
-icon.item-22648 {
-  background-image: url("./items/022648.png");
-}
-icon.item-24104 {
-  background-image: url("./items/024104.png");
-}
-icon.item-24037 {
-  background-image: url("./items/024037.png");
-}
-icon.item-24164 {
-  background-image: url("./items/024164.png");
-}
-icon.item-25107 {
-  background-image: url("./items/025107.png");
-}
-icon.item-26593 {
-  background-image: url("./items/026593.png");
-}
-icon.item-53285 {
-  background-image: url("./items/053285.png");
-}
-icon.item-22616 {
-  background-image: url("./items/022616.png");
-}
-icon.item-24111 {
-  background-image: url("./items/024111.png");
-}
-icon.item-23731 {
-  background-image: url("./items/023731.png");
-}
-icon.item-52445 {
-  background-image: url("./items/052445.png");
-}
-icon.item-40900 {
-  background-image: url("./items/040900.png");
-}
-icon.item-22651 {
-  background-image: url("./items/022651.png");
-}
-icon.item-24152 {
-  background-image: url("./items/024152.png");
-}
-icon.item-24123 {
-  background-image: url("./items/024123.png");
+icon.item-23719 {
+  background-image: url("./items/023719.png");
 }
 icon.item-24162 {
   background-image: url("./items/024162.png");
 }
-icon.item-24169 {
-  background-image: url("./items/024169.png");
+icon.item-36268 {
+  background-image: url("./items/036268.png");
+}
+icon.item-22615 {
+  background-image: url("./items/022615.png");
+}
+icon.item-21487 {
+  background-image: url("./items/021487.png");
+}
+icon.item-22678 {
+  background-image: url("./items/022678.png");
+}
+icon.item-29404 {
+  background-image: url("./items/029404.png");
+}
+icon.item-24104 {
+  background-image: url("./items/024104.png");
+}
+icon.item-24164 {
+  background-image: url("./items/024164.png");
+}
+icon.item-48387 {
+  background-image: url("./items/048387.png");
+}
+icon.item-25107 {
+  background-image: url("./items/025107.png");
+}
+icon.item-53285 {
+  background-image: url("./items/053285.png");
+}
+icon.item-25225 {
+  background-image: url("./items/025225.png");
+}
+icon.item-22410 {
+  background-image: url("./items/022410.png");
+}
+icon.item-22452 {
+  background-image: url("./items/022452.png");
+}
+icon.item-30417 {
+  background-image: url("./items/030417.png");
+}
+icon.item-25357 {
+  background-image: url("./items/025357.png");
+}
+icon.item-25237 {
+  background-image: url("./items/025237.png");
+}
+icon.item-23702 {
+  background-image: url("./items/023702.png");
+}
+icon.item-23708 {
+  background-image: url("./items/023708.png");
+}
+icon.item-52462 {
+  background-image: url("./items/052462.png");
+}
+icon.item-53440 {
+  background-image: url("./items/053440.png");
+}
+icon.item-52445 {
+  background-image: url("./items/052445.png");
+}
+icon.item-23714 {
+  background-image: url("./items/023714.png");
+}
+icon.item-25233 {
+  background-image: url("./items/025233.png");
+}
+icon.item-23737 {
+  background-image: url("./items/023737.png");
+}
+icon.item-25052 {
+  background-image: url("./items/025052.png");
+}
+icon.item-26103 {
+  background-image: url("./items/026103.png");
+}
+icon.item-22616 {
+  background-image: url("./items/022616.png");
+}
+icon.item-23706 {
+  background-image: url("./items/023706.png");
+}
+icon.item-22303 {
+  background-image: url("./items/022303.png");
+}
+icon.item-65104 {
+  background-image: url("./items/065104.png");
+}
+icon.item-51695 {
+  background-image: url("./items/051695.png");
+}
+icon.item-23725 {
+  background-image: url("./items/023725.png");
+}
+icon.item-54411 {
+  background-image: url("./items/054411.png");
+}
+icon.item-29177 {
+  background-image: url("./items/029177.png");
+}
+icon.item-23711 {
+  background-image: url("./items/023711.png");
+}
+icon.item-23720 {
+  background-image: url("./items/023720.png");
+}
+icon.item-22611 {
+  background-image: url("./items/022611.png");
+}
+icon.item-25412 {
+  background-image: url("./items/025412.png");
+}
+icon.item-52453 {
+  background-image: url("./items/052453.png");
+}
+icon.item-25110 {
+  background-image: url("./items/025110.png");
+}
+icon.item-53188 {
+  background-image: url("./items/053188.png");
+}
+icon.item-23744 {
+  background-image: url("./items/023744.png");
+}
+icon.item-23709 {
+  background-image: url("./items/023709.png");
+}
+icon.item-25328 {
+  background-image: url("./items/025328.png");
+}
+icon.item-25236 {
+  background-image: url("./items/025236.png");
+}
+icon.item-40008 {
+  background-image: url("./items/040008.png");
+}
+icon.item-24154 {
+  background-image: url("./items/024154.png");
+}
+icon.item-24453 {
+  background-image: url("./items/024453.png");
+}
+icon.item-23732 {
+  background-image: url("./items/023732.png");
+}
+icon.item-31402 {
+  background-image: url("./items/031402.png");
+}
+icon.item-25232 {
+  background-image: url("./items/025232.png");
+}
+icon.item-22634 {
+  background-image: url("./items/022634.png");
+}
+icon.item-21204 {
+  background-image: url("./items/021204.png");
+}
+icon.item-25205 {
+  background-image: url("./items/025205.png");
+}
+icon.item-21242 {
+  background-image: url("./items/021242.png");
+}
+icon.item-23742 {
+  background-image: url("./items/023742.png");
+}
+icon.item-23731 {
+  background-image: url("./items/023731.png");
+}
+icon.item-35357 {
+  background-image: url("./items/035357.png");
+}
+icon.item-25018 {
+  background-image: url("./items/025018.png");
+}
+icon.item-23743 {
+  background-image: url("./items/023743.png");
+}
+icon.item-21209 {
+  background-image: url("./items/021209.png");
+}
+icon.item-36748 {
+  background-image: url("./items/036748.png");
+}
+icon.item-25215 {
+  background-image: url("./items/025215.png");
+}
+icon.item-21908 {
+  background-image: url("./items/021908.png");
+}
+icon.item-27555 {
+  background-image: url("./items/027555.png");
+}
+icon.item-54434 {
+  background-image: url("./items/054434.png");
+}
+icon.item-23715 {
+  background-image: url("./items/023715.png");
+}
+icon.item-21212 {
+  background-image: url("./items/021212.png");
+}
+icon.item-24152 {
+  background-image: url("./items/024152.png");
+}
+icon.item-25352 {
+  background-image: url("./items/025352.png");
+}
+icon.item-25323 {
+  background-image: url("./items/025323.png");
+}
+icon.item-23745 {
+  background-image: url("./items/023745.png");
+}
+icon.item-24155 {
+  background-image: url("./items/024155.png");
+}
+icon.item-24168 {
+  background-image: url("./items/024168.png");
+}
+icon.item-23707 {
+  background-image: url("./items/023707.png");
+}
+icon.item-25209 {
+  background-image: url("./items/025209.png");
+}
+icon.item-22301 {
+  background-image: url("./items/022301.png");
+}
+icon.item-54912 {
+  background-image: url("./items/054912.png");
+}
+icon.item-25061 {
+  background-image: url("./items/025061.png");
+}
+icon.item-21655 {
+  background-image: url("./items/021655.png");
+}
+icon.item-23726 {
+  background-image: url("./items/023726.png");
+}
+icon.item-23735 {
+  background-image: url("./items/023735.png");
+}
+icon.item-24096 {
+  background-image: url("./items/024096.png");
+}
+icon.item-24052 {
+  background-image: url("./items/024052.png");
+}
+icon.item-32665 {
+  background-image: url("./items/032665.png");
+}
+icon.item-25102 {
+  background-image: url("./items/025102.png");
+}
+icon.item-22664 {
+  background-image: url("./items/022664.png");
+}
+icon.item-55439 {
+  background-image: url("./items/055439.png");
+}
+icon.item-21251 {
+  background-image: url("./items/021251.png");
+}
+icon.item-22413 {
+  background-image: url("./items/022413.png");
+}
+icon.item-23729 {
+  background-image: url("./items/023729.png");
+}
+icon.item-30243 {
+  background-image: url("./items/030243.png");
+}
+icon.item-20019 {
+  background-image: url("./items/020019.png");
+}
+icon.item-21276 {
+  background-image: url("./items/021276.png");
+}
+icon.item-22648 {
+  background-image: url("./items/022648.png");
+}
+icon.item-29031 {
+  background-image: url("./items/029031.png");
+}
+icon.item-25216 {
+  background-image: url("./items/025216.png");
+}
+icon.item-23730 {
+  background-image: url("./items/023730.png");
+}
+icon.item-55233 {
+  background-image: url("./items/055233.png");
+}
+icon.item-24089 {
+  background-image: url("./items/024089.png");
+}
+icon.item-21211 {
+  background-image: url("./items/021211.png");
+}
+icon.item-21462 {
+  background-image: url("./items/021462.png");
+}
+icon.item-25231 {
+  background-image: url("./items/025231.png");
+}
+icon.item-21229 {
+  background-image: url("./items/021229.png");
+}
+icon.item-25308 {
+  background-image: url("./items/025308.png");
+}
+icon.item-21202 {
+  background-image: url("./items/021202.png");
+}
+icon.item-25060 {
+  background-image: url("./items/025060.png");
+}
+icon.item-23727 {
+  background-image: url("./items/023727.png");
+}
+icon.item-21455 {
+  background-image: url("./items/021455.png");
+}
+icon.item-22604 {
+  background-image: url("./items/022604.png");
+}
+icon.item-24332 {
+  background-image: url("./items/024332.png");
 }
