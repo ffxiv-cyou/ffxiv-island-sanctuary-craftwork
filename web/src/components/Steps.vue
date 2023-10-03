@@ -3,6 +3,7 @@
     <step
       v-for="(val, index) in steps"
       :key="index"
+      :solver="solver"
       :class="getClassName(val)"
       :step="getStep(val)"
       :value="values[index]"

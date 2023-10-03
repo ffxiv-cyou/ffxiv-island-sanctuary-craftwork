@@ -1,5 +1,9 @@
 <template>
-  <div class="step-item mji-step-box">
+  <div
+    class="step-item mji-step-box"
+    @mouseenter="onMouseIn"
+    @mouseleave="onMouseOut"
+  >
     <div class="item-img">
       <icon
         class="item"
@@ -16,7 +20,9 @@
         <span class="item-name">{{ name }}</span>
       </div>
       <div class="item-desc">
-        <span class="step-value text"><icon class="blue-coin" />{{ value }}</span>
+        <span class="step-value text">
+          <icon class="blue-coin" />{{ value }}
+        </span>
         <span class="step-time text">{{ time }}h</span>
         <span
           v-if="pattern"
@@ -48,6 +54,7 @@ import "@/assets/items.css";
 import Close from "./Close.vue";
 import { CraftworkData, type CraftworkObject } from "@/data/data";
 import MjiBox from "./MjiBox.vue";
+import type { SolverProxy } from "@/model/solver";
 
 @Component({
   components: {
@@ -57,6 +64,9 @@ import MjiBox from "./MjiBox.vue";
   emits: ["remove"]
 })
 export default class Step extends Vue {
+  @Prop()
+  solver?: SolverProxy;
+
   @Prop()
   step!: CraftworkObject;
 
@@ -99,6 +109,15 @@ export default class Step extends Vue {
   onClose() {
     this.$emit("remove");
   }
+
+  onMouseIn(evt: MouseEvent) {
+    if (this.solver)
+      this.solver.event.onHoverEnter(this.step.Id, evt.clientX, evt.clientY);
+  }
+  onMouseOut() {
+    if (this.solver)
+      this.solver.event.onHoverExit(this.step.Id);
+  }
 }
 </script>
   
@@ -107,32 +126,40 @@ export default class Step extends Vue {
   height: 42px;
   display: inline-flex !important;
   align-items: center;
+  position: relative;
   gap: 5px;
+
   .item-img {
     height: 40px;
   }
+
   .item-text {
     flex: 1;
     padding: 0 2px 4px 0;
     width: calc(100% - 44px);
+
     .item-primary {
       line-height: 1.5;
+
       .item-remove {
         float: right;
         margin-top: 2px;
       }
     }
+
     .item-name,
     .item-desc {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .item-name {
       display: block;
       max-width: 100%;
     }
-    .item-remove + .item-name {
+
+    .item-remove+.item-name {
       max-width: calc(100% - 20px);
     }
 
@@ -140,14 +167,17 @@ export default class Step extends Vue {
       color: #666;
       font-size: 14px;
       width: 100%;
+
       icon.mji,
       icon.blue-coin {
         --scale: 0.4;
       }
+
       .mji-box+.mji-box {
         margin-left: -10px !important;
       }
-      span.text + span.text::before {
+
+      span.text+span.text::before {
         content: ",";
       }
     }

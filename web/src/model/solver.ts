@@ -3,6 +3,35 @@ import { Config } from "./config";
 import { SolverBG, WorkerInfo } from "./solver_bg";
 import { ToShareCode } from "./share";
 
+export class EventBus {
+    hoverRecipeID: number = 0;
+    hoverPositionX: number = 0;
+    hoverPositionY: number = 0;
+
+    public get HoverRecipeID() {
+        return this.hoverRecipeID;
+    }
+
+    public get HoverPosX() {
+        return this.hoverPositionX;
+    }
+
+    public get HoverPosY() {
+        return this.hoverPositionY;
+    }
+
+    public onHoverEnter(id: number, x: number, y: number) {
+        this.hoverRecipeID = id;
+        this.hoverPositionX = x;
+        this.hoverPositionY = y;
+    }
+    public onHoverExit(id: number) {
+        if (id === this.hoverRecipeID) {
+            this.hoverRecipeID = 0;
+        }
+    }
+}
+
 export class SolverProxy {
     solver: SolverBG = new SolverBG();
 
@@ -15,6 +44,11 @@ export class SolverProxy {
      * 配置
      */
     public config!: Config;
+
+    /**
+     * 事件Bus
+     */
+    public event!: EventBus;
 
     inited = false;
 
@@ -41,6 +75,7 @@ export class SolverProxy {
         this.data = new CraftworkData(Region.Global);
         this.config = Config.load(this.Recipes.length);
         this.data.SetRegion(this.config.region);
+        this.event = new EventBus();
     }
 
     async init() {

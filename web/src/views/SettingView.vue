@@ -140,6 +140,17 @@
           </label>
           <span class="pure-form-message-inline">在排班表中不显示当前排班表原材料的使用量。</span>
         </div>
+        <div class="pure-control-group">
+          <label for="show-item-popup">
+            <input
+              id="show-item-popup"
+              v-model="config.showItemPopup"
+              type="checkbox"
+            >
+            显示详细信息弹窗
+          </label>
+          <span class="pure-form-message-inline">指向排班表或求解器上的指定配方时，显示配方的详细信息。</span>
+        </div>
       </fieldset>
     </div>
   </div>

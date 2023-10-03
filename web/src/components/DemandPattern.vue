@@ -45,6 +45,7 @@
     </div>
     <div class="recipes">
       <div class="recipe-header">
+        <span class="recipe-icon" />
         <span class="recipe-name">
           <sort-label
             :active="sortMethod === 1"
@@ -91,6 +92,12 @@
         :key="index"
         class="recipe-item"
       >
+        <span class="recipe-icon">
+          <icon
+            class="item"
+            :class="'item-'+item.Icon"
+          />
+        </span>
         <span class="recipe-name">{{ trimName(item.Name) }}</span>
         <span class="recipe-pop">
           <icon
@@ -378,6 +385,14 @@ export default class DemandPattern extends Vue {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.recipe-icon {
+  width: 22px;
+}
+.recipe-icon icon {
+  scale: 50%;
+  margin: -2px -10px;
 }
 
 .recipe-header {

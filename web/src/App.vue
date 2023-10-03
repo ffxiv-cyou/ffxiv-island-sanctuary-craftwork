@@ -40,6 +40,12 @@
       <p>若长时间加载不成功请刷新页面</p>
     </div>
   </div>
+  <ItemDetail
+    v-if="solver.config.showItemPopup"
+    :id="hoverID"
+    :data="solver.data"
+    :style="{ 'top': top + 'px', 'left': left + 'px' }"
+  />
 </template>
 
 <script lang="ts">
@@ -49,10 +55,12 @@ import "purecss";
 import "@/assets/icons.css";
 import "@/assets/mji.css";
 import LoadingSpinner from "./components/LoadingSpinner.vue";
+import ItemDetailComponent from "./components/ItemDetail.vue";
 
 @Component({
   components: {
-    Loading: LoadingSpinner
+    Loading: LoadingSpinner,
+    ItemDetail: ItemDetailComponent
   }
 })
 export default class App extends Vue {
@@ -71,6 +79,18 @@ export default class App extends Vue {
 
   get style() {
     return this.solver.config.styleStepWidth ? "monospace": "";
+  }
+
+  get top() {
+    return this.solver.event.HoverPosY;
+  }
+
+  get left() {
+    return this.solver.event.HoverPosX;
+  }
+
+  get hoverID() {
+    return this.solver.event.HoverRecipeID;
   }
 }
 </script>

@@ -1,9 +1,11 @@
 import CraftObjectsCN from "./cn/MJICraftworksObject.json";
 import ItemPouchCN from "./cn/MJIItemPouch.json";
 import PopularityCN from "@/data/cn/MJICraftworksPopularity.json";
+import ObjectThemesCN from "./cn/MJICraftworksObjectTheme.json";
 import CraftObjectsGlobal from "./global/MJICraftworksObject.json";
 import ItemPouchGlobal from "./global/MJIItemPouch.json";
 import PopularityGlobal from "@/data/global/MJICraftworksPopularity.json";
+import ObjectThemesGlobal from "./global/MJICraftworksObjectTheme.json";
 
 export class CraftworkObject {
     Id!: number;
@@ -118,6 +120,17 @@ export class CraftworkData {
         }
     }
 
+    get Themes(): string[] {
+        switch (this.region) {
+            case Region.CN:
+                return ObjectThemesCN;
+            case Region.Global:
+                return ObjectThemesGlobal;
+            default:
+                return [];
+        }
+    }
+
     /**
      * 获取指定ID的配方
      * @param global 区域
@@ -153,5 +166,14 @@ export class CraftworkData {
      */
     public GetItem(id: number): ItemName {
         return this.Items[id];
+    }
+
+    /**
+     * 获取分类
+     * @param id 
+     * @returns 
+     */
+    public GetTheme(id: number): string {
+        return this.Themes[id];
     }
 }

@@ -15,6 +15,7 @@ export class Config {
   _totalDemand: boolean = false;
   _hideIngredients: boolean = false;
   _showNetValue: boolean = false;
+  _showItemPopup: boolean = true;
   _differentWorkers: number = 1;
 
   /**
@@ -148,6 +149,18 @@ export class Config {
   }
 
   /**
+   * 是否显示详细弹窗
+   */
+  public get showItemPopup() {
+    return this._showItemPopup;
+  }
+
+  public set showItemPopup(val: boolean) {
+    this._showItemPopup = val;
+    this.save();
+  }
+
+  /**
    * 每一天不同类型的工坊的数量
    */
   public get differentWorkers() {
@@ -188,6 +201,7 @@ export class Config {
     cfg._totalDemand = obj._totalDemand ?? false;
     cfg._hideIngredients = obj._hideIngredients ?? false;
     cfg._showNetValue = obj._showNetValue ?? false;
+    cfg._showItemPopup = obj._showItemPopup ?? true;
     cfg._differentWorkers = obj._differentWorkers ?? 1;
     return cfg;
   }
