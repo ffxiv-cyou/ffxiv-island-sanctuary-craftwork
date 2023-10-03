@@ -118,6 +118,10 @@ export default class Step extends Vue {
     if (this.solver)
       this.solver.event.onHoverExit(this.step.Id);
   }
+
+  unmounted() {
+    this.onMouseOut();
+  }
 }
 </script>
   

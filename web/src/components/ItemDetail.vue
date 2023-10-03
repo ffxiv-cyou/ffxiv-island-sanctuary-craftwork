@@ -82,7 +82,7 @@ export default class ItemDetailComponent extends Vue {
 </script>
 <style>
 .item-detail {
-  position: absolute;
+  position: fixed;
   z-index: 200;
   pointer-events: none;
   width: 240px;
@@ -120,7 +120,7 @@ export default class ItemDetailComponent extends Vue {
         padding-bottom: 2px;
       }
       icon {
-        --scale: 0.4;
+        --scale: 0.4 !important;
       }
     }
   }
