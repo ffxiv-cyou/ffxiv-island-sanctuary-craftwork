@@ -42,6 +42,7 @@
   </div>
   <ItemDetail
     v-if="solver.config.showItemPopup"
+    ref="detail"
     :id="hoverID"
     :data="solver.data"
     :style="{ 'top': top + 'px', 'left': left + 'px' }"
@@ -82,7 +83,13 @@ export default class App extends Vue {
   }
 
   get top() {
-    return this.solver.event.HoverPosY;
+    let y = this.solver.event.HoverPosY;
+    let h = ((this.$refs['detail'] as ItemDetailComponent)?.$el as HTMLElement)?.offsetHeight ?? 0;
+    let maxY = document.documentElement.clientHeight - 30;
+    if (y + h > maxY) {
+      y = maxY - h;
+    }
+    return y;
   }
 
   get left() {

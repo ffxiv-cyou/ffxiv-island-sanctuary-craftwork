@@ -98,7 +98,7 @@
             :class="'item-'+item.Icon"
           />
         </span>
-        <span class="recipe-name">{{ trimName(item.Name) }}</span>
+        <span class="recipe-name" @mouseenter="(evt) => onMouseIn(item.Id, evt)" @mouseleave="onMouseOut(item.Id)">{{ trimName(item.Name) }}</span>
         <span class="recipe-pop">
           <icon
             class="mji"
@@ -322,6 +322,13 @@ export default class DemandPattern extends Vue {
       });
     }
     catch { }
+  }
+
+  onMouseIn(id: number, evt: MouseEvent) {
+    this.solver.event.onHoverEnter(id, evt.clientX, evt.clientY);
+  }
+  onMouseOut(id: number) {
+    this.solver.event.onHoverExit(id);
   }
 }
 </script>

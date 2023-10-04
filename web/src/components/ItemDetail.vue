@@ -28,7 +28,7 @@
       <div class="item-detail-col">
         {{ theme0 }}
       </div>
-      <div class="item-detail-col">
+      <div class="item-detail-col" v-if="theme1">
         {{ theme1 }}
       </div>
       <div class="mji-title mji-text-orange">
@@ -80,12 +80,12 @@ export default class ItemDetailComponent extends Vue {
   }
 }
 </script>
-<style>
+<style lang="scss">
 .item-detail {
   position: fixed;
   z-index: 200;
   pointer-events: none;
-  width: 240px;
+  width: 260px;
 
   span+span {
     margin-left: 0.75em;
