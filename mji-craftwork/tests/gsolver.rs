@@ -120,7 +120,7 @@ fn test_gsolver_mild_multi() {
     // let limit = SolveLimit::new(12, &[], 24, false);
 
     let (repo, mut info, pat) =
-        from_pattern_code(b"QVBGh7oanMZyE7uYaTJSIXq3xFZKyVg8QYtTmshkMhu3qFnBIwcAAAAA");
+        from_pattern_code(b"HSB6FbMWlLuFwTJsJ4RWaZSqw7J8R1GjyLmotsU4EnQZoyWUeAwAAAAA");
     // let (repo, mut info, pat) = from_pattern_code(b"AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     info.workers = 4;
     let mut solver = MildMulitSolver::new(AdvancedSimplifySolver::new(BFSolver::new()));

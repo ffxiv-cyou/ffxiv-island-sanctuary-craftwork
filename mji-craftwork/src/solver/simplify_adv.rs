@@ -75,6 +75,7 @@ where
         // println!(
         //     "candidates: {}, max_val: {}",
         //     candidates.len(),
+        //     max_batch_val
         // );
 
         // 模拟计算

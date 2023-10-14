@@ -26,39 +26,39 @@ fn predition_benchmark(c: &mut Criterion) {
     let ctx1 = SolverCtx::new(&repo, info, limit1);
 
     let demands = vec![9; 82];
-    let mut group = c.benchmark_group("predition");
+    let mut group = c.benchmark_group("solver");
     // 暴力搜索，排序前100
-    group.bench_function(BenchmarkId::new("BFSolver", 100), |b| {
+    group.bench_function(BenchmarkId::new("SingleSortBF", 100), |b| {
         b.iter(|| SolverSingle::solve(&mut solver, black_box(&ctx), black_box(&demands), 0))
     });
     // 暴力搜索，排序前1
-    group.bench_function(BenchmarkId::new("BFSolver", 1), |b| {
+    group.bench_function(BenchmarkId::new("SingleSortBF", 1), |b| {
         b.iter(|| SolverSingle::solve(&mut solver, black_box(&ctx1), black_box(&demands), 0))
     });
     // 暴力搜索，不排序
-    group.bench_function(BenchmarkId::new("BFSolverUnorder", 1), |b| {
+    group.bench_function(BenchmarkId::new("SingleUnorderBF", 1), |b| {
         b.iter(|| {
             SolverSingle::solve_unordered(&mut solver, black_box(&ctx), black_box(&demands), 0)
         })
     });
     // 暴力搜索，取最优
-    group.bench_function(BenchmarkId::new("BFSolverBest", 1), |b| {
+    group.bench_function(BenchmarkId::new("SingleBestBF", 1), |b| {
         b.iter(|| SolverSingle::solve_best(&mut solver, black_box(&ctx), black_box(&demands), 0))
     });
     // 剪枝搜索，不排序
-    group.bench_function(BenchmarkId::new("SimplifySolverUnorder", 1), |b| {
+    group.bench_function(BenchmarkId::new("SingleUnorderSimplify", 1), |b| {
         b.iter(|| {
             SolverSingle::solve_unordered(&mut sim_solver, black_box(&ctx), black_box(&demands), 0)
         })
     });
     // 剪枝多工坊搜索，不排序
-    group.bench_function(BenchmarkId::new("AdvSimSolverUnorder", 1), |b| {
+    group.bench_function(BenchmarkId::new("DualUnorderAdvSimp", 1), |b| {
         b.iter(|| {
             SolverDual::solve_unordered(&mut adv_solver, black_box(&ctx), black_box(&demands), 4)
         })
     });
     // 剪枝多工坊搜索，不排序
-    group.bench_function(BenchmarkId::new("AdvSimSolverBest", 1), |b| {
+    group.bench_function(BenchmarkId::new("DualBestAdvSimp", 1), |b| {
         b.iter(|| SolverDual::solve_best(&mut adv_solver, black_box(&ctx), black_box(&demands), 4))
     });
     group.finish();
@@ -76,13 +76,13 @@ fn gsolver_benchmark(c: &mut Criterion) {
     let mut radical_solver = RadicalSolver::new();
 
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
-        c.benchmark_group("gpred");
+        c.benchmark_group("gsolver");
     // Mild 版本，剪枝+求解排列组合
-    group.bench_function(BenchmarkId::new("Mild_GSolver", 1), |b| {
+    group.bench_function(BenchmarkId::new("SingleMild", 1), |b| {
         b.iter(|| GSolver::solve(&mut mild_solver, black_box(&ctx), black_box(&pat)))
     });
     // Radical 版本，对最高可能队列排列组合
-    group.bench_function(BenchmarkId::new("Radical_GSolver", 1), |b| {
+    group.bench_function(BenchmarkId::new("SingleRadical", 1), |b| {
         b.iter(|| GSolver::solve(&mut radical_solver, black_box(&ctx), black_box(&pat)))
     });
     group.finish()
@@ -146,17 +146,29 @@ fn solver_multi_benchmark(c: &mut Criterion) {
     for s in [14, 49, 14, 49] {
         recipe.push(repo.state(s, 9));
     }
-    let mut solver = BFSolver::new();
+    let mut solver_bf = BFSolver::new();
+    let mut solver_sim = SimplifySolver::new();
     let set = [(3, [14, 49, 14, 49, 0, 0])];
 
     let mut group: criterion::BenchmarkGroup<criterion::measurement::WallTime> =
-        c.benchmark_group("solver_multi");
+        c.benchmark_group("bsolver");
 
     // 多种类，不排序
-    group.bench_function(BenchmarkId::new("solver", 1), |b| {
+    group.bench_function(BenchmarkId::new("BestBF", 1), |b| {
         b.iter(|| {
-            SolverWithBatch::solve_unordered(
-                &mut solver,
+            SolverWithBatch::solve_best(
+                &mut solver_bf,
+                &ctx,
+                black_box(&set),
+                black_box(&demands),
+                2,
+            )
+        })
+    });
+    group.bench_function(BenchmarkId::new("BestSimplify", 1), |b| {
+        b.iter(|| {
+            SolverWithBatch::solve_best(
+                &mut solver_sim,
                 &ctx,
                 black_box(&set),
                 black_box(&demands),

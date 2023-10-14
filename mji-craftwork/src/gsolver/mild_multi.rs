@@ -4,7 +4,7 @@ use crate::{
     data::IDataRepo,
     predition::get_demands,
     simulator::simulate_multi_batch,
-    solver::{Batches, SolverDual},
+    solver::{Batches, SolverDual}, gsolver::print_week_result,
 };
 
 use super::{GMultiSolver, SolverCtx};
@@ -166,16 +166,21 @@ where
         }
 
         // 计算当前干劲可能为后续带来的收益增加量
-        let mut tension_delta = [0; 6];
+        let mut tension_delta = [0; 21];
         if tension < ctx.info.max_tension {
             for j in 0..tension_delta.len() {
-                let tension = tension + (j as u8) * ctx.info.workers;
-                let tension = tension.min(ctx.info.max_tension);
+                let tension = (tension + j as u8).min(ctx.info.max_tension);
 
                 let (_, value, _) = self.calc_value(ctx, pat, current, i + 1, tension);
                 tension_delta[j] = value;
             }
         }
+        for j in 1..tension_delta.len() {
+            tension_delta[j] -= tension_delta[0]
+        }
+        tension_delta[0] = 0;
+
+        // print!("ten: {}, delta: {:?}", tension, tension_delta);
 
         // 计算需求值
         let mut info = ctx.info;
@@ -195,7 +200,7 @@ where
                 let batch = self
                     .solver
                     .solve_best_fn(ctx, &demand, info.workers, |v, b| {
-                        return v + tension_delta[(b.tension_add() / ctx.info.workers) as usize];
+                        return v + tension_delta[b.tension_add() as usize];
                     });
                 self.cache.insert(hash, batch);
                 batch

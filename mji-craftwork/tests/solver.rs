@@ -232,3 +232,15 @@ fn test_solver_simp_loop() {
         let result = SolverDual::solve_best(&mut solver, &ctx, &demands, 4);
     }
 }
+
+#[test]
+fn test_solver_multi_adv2() {
+    let demands = [9, 17, 10, 9, 9, 24, 16, 10, 9, 24, 13, 10, 7, 10, 9, 9, 24, -2, 17, 16, 10, 9, 9, 17, 13, -2, 8, -5, 10, 9, 
+    13, 10, 10, 10, 14, 10, 16, 6, 10, -3, -7, 13, 24, 9, 16, 10, 9, 10, 10, -2, 9, 10, 7, 10, 9, 10, -2, 2, 17, 24, 13, 9, 10, 24, 14, 10, 9, 17, 13, 10, 9, 6, 10, 9, 9, 9, 9, 9, 9, 9, 9, 9];
+    let (repo, info, limit) = make_config(29, &[]);
+    let ctx = SolverCtx::new(&repo, info, limit);
+    let solver = BFSolver::new();
+    let mut solver = AdvancedSimplifySolver::new(solver);
+    let result = SolverDual::solve_best(&mut solver, &ctx, &demands, 4);
+    println!("result {}", result);
+}

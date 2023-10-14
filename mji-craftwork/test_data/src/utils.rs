@@ -57,7 +57,7 @@ pub fn make_limit(ban: &[u8]) -> SolveLimit {
 
 /// 新建一个通用工房信息
 pub fn make_info() -> CraftworkInfo {
-    CraftworkInfo::new(0, 35, 2, 3)
+    CraftworkInfo::new(0, 45, 3, 3)
 }
 
 /// 使用最常用配置创建库

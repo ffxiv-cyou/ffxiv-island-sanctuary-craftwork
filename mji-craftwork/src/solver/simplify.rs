@@ -1,9 +1,11 @@
+use std::env::consts::FAMILY;
+
 use crate::{
     data::{CraftworkInfo, IDataRepo},
-    simulator::simulate,
+    simulator::{simulate, simulate_multi_batch},
 };
 
-use super::{Batch, SolverCtx, SolverSingle};
+use super::{Batch, BatchWithBatch, SolverCtx, SolverSingle, SolverWithBatch};
 
 /// Simplify 简易剪枝
 ///
@@ -34,6 +36,66 @@ impl SolverSingle for SimplifySolver {
         }
 
         self.solve_sub(ctx, demands, Batch::new(), info, &mut avg, &mut cb);
+    }
+}
+
+impl SolverWithBatch for SimplifySolver {
+    fn solve_fn<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        set: &[(u8, [u8; 6])],
+        demands: &[i8],
+        workers: u8,
+        mut cb: impl FnMut(&BatchWithBatch),
+    ) where
+        T: IDataRepo,
+    {
+        // 准备计算状态
+        let mut recipes = vec![];
+        for (num, seq) in set {
+            let mut arr = [None; 6];
+            for i in 0..seq.len() {
+                let id = seq[i] as usize;
+                arr[i] = match id {
+                    0 => None,
+                    _ => Some(ctx.repo.state(id, demands[id])),
+                }
+            }
+            recipes.push((num.clone(), arr));
+        }
+        recipes.push((workers, [None; 6]));
+
+        let mut avg = 0;
+        let mut info = ctx.info.clone();
+        if workers != 0 {
+            info.workers = workers;
+        }
+
+        self.solve_sub(
+            ctx,
+            demands,
+            Batch::new(),
+            info,
+            &mut avg,
+            &mut |item: &Batch| {
+                for i in 0..item.steps.len() {
+                    let id = item.steps[i] as usize;
+                    recipes[set.len()].1[i] = match i >= item.seq as usize {
+                        true => None,
+                        false => Some(ctx.repo.state(id, demands[id])),
+                    }
+                }
+                let (result, _) = simulate_multi_batch(&ctx.info, &recipes);
+                let mut b2b = BatchWithBatch::from_batch(result[result.len() - 1].1);
+                for i in 0..result.len() - 1 {
+                    let (workers, batch) = result[i];
+                    b2b.value += batch.value * workers as u16;
+                    b2b.cost += batch.cost * workers as u16;
+                }
+    
+                cb(&b2b);
+            },
+        );
     }
 }
 
