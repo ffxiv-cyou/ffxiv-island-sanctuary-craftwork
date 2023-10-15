@@ -28,7 +28,10 @@
       <div class="item-detail-col">
         {{ theme0 }}
       </div>
-      <div class="item-detail-col" v-if="theme1">
+      <div
+        v-if="theme1"
+        class="item-detail-col"
+      >
         {{ theme1 }}
       </div>
       <div class="mji-title mji-text-orange">

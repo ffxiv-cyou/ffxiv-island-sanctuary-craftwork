@@ -53,7 +53,11 @@
           :key="index"
           class="object-item pure-form pure-g"
         >
-          <span class="item-name pure-u-9-24" @mouseenter="(evt) => onMouseIn(item.Id, evt)" @mouseleave="onMouseOut(item.Id)">{{ trimName(item.Name) }}</span>
+          <span
+            class="item-name pure-u-9-24"
+            @mouseenter="(evt) => onMouseIn(item.Id, evt)"
+            @mouseleave="onMouseOut(item.Id)"
+          >{{ trimName(item.Name) }}</span>
           <span class="item-pop pure-u-2-24">
             <icon
               class="mji"

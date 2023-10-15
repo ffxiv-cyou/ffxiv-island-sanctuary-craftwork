@@ -19,6 +19,10 @@
             target="_blank"
             class=" visible-lg"
           >分享</a>
+          <a
+            href="#"
+            @click="copyToClipboard"
+          >复制</a>
         </span>
         <close
           v-if="removeable"
@@ -129,6 +133,7 @@ import Close from "./Close.vue";
 import ingredients from "./Ingredients.vue";
 import Steps from "./Steps.vue";
 import { Utils } from "@/model/data";
+import { CraftworkData } from "@/data/data";
 @Component({
   components: {
     StepsComp: Steps,
@@ -266,6 +271,35 @@ export default class PlanView extends Vue {
   get shareLink() {
     return document.location.protocol + "//" + document.location.host + "/#/plan/" + this.getShareCode();
   }
+
+  copyToClipboard(evt: MouseEvent) {
+    // todo: generate text
+    let text = "总收益: " + this.sumVal + " (成本: " + this.sumCost + ")\n";
+    for (let i = 0; i < 7; i++) {
+      const element = this.workerSteps[i];
+      text += "第" + (i+1).toString() + "天: ";
+      if (element.length === 0) {
+        text += "休息\n";
+        continue;
+      } else {
+        text += this.getDayValue(i) + "\n";
+      }
+      for (let j = 0; j < element.length; j++) {
+        const ws = element[j];
+        text += "    " + ws.worker.toString() + "× ";
+        for (let k = 0; k < ws.steps.length; k++) {
+          const step = ws.steps[k];
+          text += CraftworkData.TrimName(this.solver.data.GetRecipe(step).Name);
+          if (k < ws.steps.length - 1) {
+            text += ", ";
+          }
+        }
+        text += "\n";
+      }
+    }
+    navigator.clipboard.writeText(text).catch((e) => alert(e));
+    evt.preventDefault();
+  }
 }
 </script>
 <style lang="scss">
@@ -311,6 +345,9 @@ export default class PlanView extends Vue {
 
       a {
         color: inherit;
+      }
+      a + a {
+        margin-left: 0.5em;
       }
     }
 

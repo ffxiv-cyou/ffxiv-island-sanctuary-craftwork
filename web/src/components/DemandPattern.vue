@@ -98,7 +98,11 @@
             :class="'item-'+item.Icon"
           />
         </span>
-        <span class="recipe-name" @mouseenter="(evt) => onMouseIn(item.Id, evt)" @mouseleave="onMouseOut(item.Id)">{{ trimName(item.Name) }}</span>
+        <span
+          class="recipe-name"
+          @mouseenter="(evt) => onMouseIn(item.Id, evt)"
+          @mouseleave="onMouseOut(item.Id)"
+        >{{ trimName(item.Name) }}</span>
         <span class="recipe-pop">
           <icon
             class="mji"
