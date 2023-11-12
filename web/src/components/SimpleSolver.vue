@@ -3,6 +3,19 @@
     <legend class="mji-title mji-text-brown">
       编辑工坊队列
       <div class="solver-control">
+        <span class="max-worker">
+          <label
+            class="mji-text-small"
+            for="maximum-worker"
+          >队列最大工坊数</label>
+          <input
+            id="maximum-worker"
+            v-model="maxWorkerPerQueue"
+            min="1"
+            :max="maxWorker"
+            type="number"
+          >
+        </span>
         <span class="multi-worker">
           <input
             id="enable-multi-worker"
@@ -278,6 +291,10 @@ export default class SimpleSolver extends Vue {
    * 启用多队列求解
    */
   enableMultiSolver: boolean = false;
+  /**
+   * 队列最大工坊数
+   */
+  maxWorkerPerQueue: number = 3;
 
   /**
    * 获取剩余可用的工坊数量
@@ -320,6 +337,7 @@ export default class SimpleSolver extends Vue {
    * 根据当前需求值和干劲求解推荐队列
    */
   @Watch("banList", { deep: true })
+  @Watch("maxWorkerPerQueue")
   async solve() {
     if (this.cachedDemands === undefined ||
       this.cachedtension === undefined ||
@@ -342,7 +360,7 @@ export default class SimpleSolver extends Vue {
     if (this.setSteps.length === 0 && this.enableMultiSolver) {
       batches = await this.solver.solveDayDual(this.cachedDemands, this.banList, this.cachedtension, worker);
     } else {
-      if (this.setSteps.length === 0 && worker > 3) worker = 3;
+      if (worker > this.maxWorkerPerQueue) worker = this.maxWorkerPerQueue;
       batches = await this.solver.solveMultiDay(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, worker);
     }
     batches.forEach(b => b.batches.forEach(c => { if (c.workerVal != 0) c.workerVal -= this.sumVal; }));
@@ -457,13 +475,22 @@ export default class SimpleSolver extends Vue {
 .solver-control {
   float: right;
 
-  .multi-worker {
+  .multi-worker, .max-worker {
     margin-right: 1em;
     user-select: none;
 
     input+label {
       margin-left: 0.2em;
     }
+  }
+  input[type=number] {
+    height: 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px rgb(156, 134, 115) solid;
+    color: rgb(82, 49, 33);
+    flex: 1;
+    width: 2em;
   }
 }
 
