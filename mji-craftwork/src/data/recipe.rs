@@ -92,6 +92,14 @@ impl RecipeState {
             * self.popularity.factor() as u16) as f32
             / 10000f32
     }
+    /// 欢迎度系数
+    pub fn factor_pop(&self) -> f32 {
+        self.popularity.factor() as f32 / 100f32
+    }
+    /// 需求系数
+    pub fn factor_demand(&self, demand_sub: i16) -> f32 {
+        Demand::from_val(self.demand as i16 - demand_sub).factor() as f32 / 100f32
+    }
     pub fn value(&self) -> u16 {
         self.value
     }

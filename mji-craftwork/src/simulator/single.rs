@@ -5,9 +5,9 @@ use crate::data::{CraftworkInfo, RecipeState};
 ///
 /// dup: 需求变动值
 pub fn simulate(info: &CraftworkInfo, recipe: &RecipeState, dup: u8) -> u16 {
-    let val = recipe.value() as f32 * info.factor();
+    let val = recipe.value() as f32 * info.factor_level() * info.factor_tension();
     let val = val.floor();
-    let val = val * recipe.factor(dup as i16);
+    let val = val * recipe.factor_demand(dup as i16) * recipe.factor_pop();
     val.floor() as u16
 }
 

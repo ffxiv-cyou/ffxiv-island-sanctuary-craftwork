@@ -36,10 +36,55 @@ fn test_simulate() {
     // 计算公式：v = floor(floor(val * f_tension * f_level) * f_demand * f_pop)
     assert_eq!(
         val as f32,
-        ((32.0f32 * 1.1 * 1.2).floor() * 1.2 * 1.3).floor()
+        ((32.0f32 * 1.1 * 1.2).floor() * 1.3 * 1.2).floor()
     )
 }
 
+#[test]
+fn test_simulate2() {
+    let info = CraftworkInfo::new(25, 35, 3, 4);
+    let recipe = &Recipe {
+        id: 1,
+        theme1: 0,
+        theme2: 0,
+        level: 6,
+        craft_time: 8,
+        value: 136,
+        cost: 0,
+    };
+    let state = RecipeState::new(recipe, 25, Popularity::High);
+
+    let val = simulate(&info, &state, 0);
+
+    // 计算公式：v = floor(floor(val * f_tension * f_level) * f_demand * f_pop)
+    assert_eq!(
+        val as f32,
+        ((136.0f32 * 1.3f32 * 1.25f32).floor() * 1.6f32 * 1.2f32).floor()
+    )
+}
+
+#[test]
+fn test_simulate3() {
+    let info = CraftworkInfo::new(12, 35, 3, 4);
+    let recipe = &Recipe {
+        id: 1,
+        theme1: 0,
+        theme2: 0,
+        level: 6,
+        craft_time: 8,
+        value: 52,
+        cost: 0,
+    };
+    let state = RecipeState::new(recipe, 17, Popularity::High);
+
+    let val = simulate(&info, &state, 0);
+
+    // 计算公式：v = floor(floor(val * f_tension * f_level) * f_demand * f_pop)
+    assert_eq!(
+        val as f32,
+        ((52.0f32 * 1.3f32 * 1.12f32).floor() * 1.3f32 * 1.2f32).floor()
+    )
+}
 #[test]
 fn test_simulate_batch() {
     let repo = new_repo(1);

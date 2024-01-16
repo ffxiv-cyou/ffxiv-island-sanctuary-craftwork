@@ -44,6 +44,14 @@ impl CraftworkInfo {
         let tension = u8::min(self.tension, self.max_tension);
         (1.0 + self.level as f32 * 0.1) * (1.0 + tension as f32 * 0.01)
     }
+    /// 等级系数
+    pub fn factor_level(&self) -> f32 {
+        1.0 + self.level as f32 * 0.1
+    }
+    /// 干劲系数
+    pub fn factor_tension(&self) -> f32 {
+        1.0 + self.tension as f32 * 0.01
+    }
 
     /// 增加对应工坊数量的干劲
     pub fn next(self) -> Self {
