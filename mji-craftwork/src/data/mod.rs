@@ -50,7 +50,8 @@ impl CraftworkInfo {
     }
     /// 干劲系数
     pub fn factor_tension(&self) -> f32 {
-        1.0 + self.tension as f32 * 0.01
+        let tension = u8::min(self.tension, self.max_tension);
+        1.0 + tension as f32 * 0.01
     }
 
     /// 增加对应工坊数量的干劲
