@@ -19,72 +19,53 @@ fn get_recipe_states(repo: &GameDataRepo, seq: &[u8]) -> Vec<RecipeState> {
 
 #[test]
 fn test_simulate() {
+    let calc = |value: u16, tension: f32, level: f32, demand: f32, pop: f32| -> u16 {
+        ((value as f32 * level * tension).floor() * (demand * pop)).floor() as u16
+    };
+    let test_item = |info: &CraftworkInfo, value: u16, demand: i8, demand_sub: u8, pop: Popularity, expected: u16| {
+        let recipe = &Recipe {
+            id: 1,
+            theme1: 0,
+            theme2: 0,
+            level: 6,
+            craft_time: 4,
+            value,
+            cost: 0,
+        };
+        let state = RecipeState::new(recipe, demand, pop);
+        let actual = simulate(info, &state, demand_sub);
+        assert_eq!(expected, actual, "{} is not equal with expected value {}. basic value: {}, demand: {}, pop: {:?}, info: {:?}", 
+            actual, expected, value, demand - demand_sub as i8, pop, info
+        )
+    };
+
     let info = CraftworkInfo::new(10, 10, 2, 1);
-    let recipe = &Recipe {
-        id: 1,
-        theme1: 0,
-        theme2: 0,
-        level: 6,
-        craft_time: 4,
-        value: 32,
-        cost: 0,
-    };
-    let state = RecipeState::new(recipe, 17, Popularity::High);
-
-    let val = simulate(&info, &state, 6);
-
-    // 计算公式：v = floor(floor(val * f_tension * f_level) * f_demand * f_pop)
-    assert_eq!(
-        val as f32,
-        ((32.0f32 * 1.1 * 1.2).floor() * 1.3 * 1.2).floor()
-    )
+    test_item(&info, 32, 17, 6, Popularity::High, 
+        calc(32, 1.1, 1.2, 1.3, 1.2)
+    );
+    // margin value
+    let info = CraftworkInfo::new(25, 35, 3, 1);
+    test_item(&info, 136, 25, 0, Popularity::High, 
+        422
+    );
+    let info = CraftworkInfo::new(12, 35, 3, 1);
+    test_item(&info, 52, 17, 0, Popularity::High, 
+        116
+    );
+    let info = CraftworkInfo::new(11, 35, 3, 1);
+    test_item(&info, 52, 17, 0, Popularity::High, 
+        116
+    );
+    let info = CraftworkInfo::new(7, 35, 3, 1);
+    test_item(&info, 54, 25, 0, Popularity::Low, 
+        96
+    );
+    let info = CraftworkInfo::new(7, 35, 3, 1);
+    test_item(&info, 54, 17, 0, Popularity::Low, 
+        78
+    );
 }
 
-#[test]
-fn test_simulate2() {
-    let info = CraftworkInfo::new(25, 35, 3, 4);
-    let recipe = &Recipe {
-        id: 1,
-        theme1: 0,
-        theme2: 0,
-        level: 6,
-        craft_time: 8,
-        value: 136,
-        cost: 0,
-    };
-    let state = RecipeState::new(recipe, 25, Popularity::High);
-
-    let val = simulate(&info, &state, 0);
-
-    // 计算公式：v = floor(floor(val * f_tension * f_level) * f_demand * f_pop)
-    assert_eq!(
-        val as f32,
-        ((136.0f32 * 1.3f32 * 1.25f32).floor() * 1.6f32 * 1.2f32).floor()
-    )
-}
-
-#[test]
-fn test_simulate3() {
-    let info = CraftworkInfo::new(12, 35, 3, 4);
-    let recipe = &Recipe {
-        id: 1,
-        theme1: 0,
-        theme2: 0,
-        level: 6,
-        craft_time: 8,
-        value: 52,
-        cost: 0,
-    };
-    let state = RecipeState::new(recipe, 17, Popularity::High);
-
-    let val = simulate(&info, &state, 0);
-
-    // 计算公式：v = floor(floor(val * f_tension * f_level) * f_demand * f_pop)
-    assert_eq!(
-        val as f32,
-        ((52.0f32 * 1.3f32 * 1.12f32).floor() * 1.3f32 * 1.2f32).floor()
-    )
-}
 #[test]
 fn test_simulate_batch() {
     let repo = new_repo(1);

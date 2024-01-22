@@ -7,7 +7,7 @@ use crate::data::{CraftworkInfo, RecipeState};
 pub fn simulate(info: &CraftworkInfo, recipe: &RecipeState, dup: u8) -> u16 {
     let val = recipe.value() as f32 * info.factor_level() * info.factor_tension();
     let val = val.floor();
-    let val = val * recipe.factor_demand(dup as i16) * recipe.factor_pop();
+    let val = val * recipe.factor(dup as i16);
     val.floor() as u16
 }
 
