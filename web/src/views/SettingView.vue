@@ -104,6 +104,24 @@
           </label>
           <span class="pure-form-message-inline">使用整周的产量计算需求变动，而不是使用当天之前的产量计算。<br>启用后会导致排班表和推荐队列中的显示的需求与收益不一致。<br>此功能在不按日期顺序选择推荐方案的情况下可能得到更优的方案。</span>
         </div>
+        <div class="pure-control-group">
+          <label for="default-ban-list">默认禁用列表</label>
+          <div class="ban-list">
+            <div
+              v-for="(val, key) in config.defaultBanList"
+              :key="key"
+              class="ban-item mji-step-box"
+            >
+              <icon
+                class="item"
+                :class="iconPath(val)"
+              />
+              <span>{{ itemName(val) }}</span>
+              <close @click="removeBan(key)" />
+            </div>
+            <button @click="showItemSelection">+</button>
+          </div>
+        </div>
       </fieldset>
       <fieldset>
         <legend>样式设置</legend>
@@ -153,13 +171,25 @@
         </div>
       </fieldset>
     </div>
+    <popup v-show="banPicker" @close="banPicker = false">
+      <item-selection :solver="solver" @on-select="addBan"/>
+    </popup>
   </div>
 </template>
 <script lang="ts">
-import { Region } from "@/data/data";
+import Close from "@/components/Close.vue";
+import Dialog from "@/components/Dialog.vue";
+import ItemSelection from "@/components/ItemSelection.vue";
+import { CraftworkData, Region } from "@/data/data";
 import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue } from "vue-facing-decorator";
-@Component({})
+@Component({
+  components: {
+    Popup: Dialog,
+    ItemSelection: ItemSelection,
+    Close: Close,
+  }
+})
 export default class SettingView extends Vue {
   @Prop()
   solver!: SolverProxy;
@@ -234,6 +264,33 @@ export default class SettingView extends Vue {
   set differentWorkers(val: number) {
     this.config.differentWorkers = val;
   }
+  
+  iconPath(id: number) {
+    return "item-" + this.solver.data.GetRecipe(id).Icon;
+  }
+  itemName(id: number) {
+    return CraftworkData.TrimName(this.solver.data.GetRecipe(id).Name);
+  }
+  
+  /**
+   * 移除一个禁用物品
+   * @param index 当前禁用物品的Index
+   */
+  removeBan(index: number) {
+    this.config.defaultBanList.splice(index, 1);
+    this.config.save();
+  }
+
+  addBan(item: number) {
+    this.banPicker = false;
+    this.config.defaultBanList.push(item);
+    this.config.save();
+  }
+
+  banPicker = false
+  showItemSelection() {
+    this.banPicker = true;
+  }
 }
 </script>
 <style lang="scss">
@@ -244,6 +301,17 @@ export default class SettingView extends Vue {
   }
   input[type="number"] {
     width: 5em;
+  }
+
+  .ban-list {
+    display: inline-flex;
+    max-width: calc(100% - 11em);
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .ban-list {
+    max-width: 100% !important;
   }
 }
 </style>

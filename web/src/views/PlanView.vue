@@ -365,8 +365,8 @@ export default class PlanView extends Vue {
     let planWithFavorStr = localStorage.getItem("MJIPlanWithFavors");
     if (planWithFavorStr) {
       let obj = JSON.parse(planWithFavorStr);
-      let plan = new WorkerPlan([]);
       for (let i = 0; i < obj.length; i++) { // index
+        let plan = new WorkerPlan([]);
         let steps = obj[i].steps;
         for (let j = 0; j < steps.length; j++) { // day
           let day = [];

@@ -17,6 +17,7 @@ export class Config {
   _showNetValue: boolean = false;
   _showItemPopup: boolean = true;
   _differentWorkers: number = 1;
+  _defaultBanList: number[] = [];
 
   /**
    * 需求变化规律表
@@ -172,6 +173,15 @@ export class Config {
     this.save();
   }
 
+  public get defaultBanList() {
+    return this._defaultBanList;
+  }
+
+  public set defaultBanList(val: number[]) {
+    this._defaultBanList = val;
+    this.save();
+  }
+
   constructor(len: number) {
     for (let i = 0; i < len; i++) {
       this.demandPatterns.push(0);
@@ -203,6 +213,7 @@ export class Config {
     cfg._showNetValue = obj._showNetValue ?? false;
     cfg._showItemPopup = obj._showItemPopup ?? true;
     cfg._differentWorkers = obj._differentWorkers ?? 1;
+    cfg._defaultBanList = obj._defaultBanList ?? [];
     return cfg;
   }
 }

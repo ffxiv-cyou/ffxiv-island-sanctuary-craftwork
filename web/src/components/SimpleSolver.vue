@@ -462,7 +462,7 @@ export default class SimpleSolver extends Vue {
     });
     this.isLoading = false;
     this.setValues = [];
-    this.banList = [];
+    this.banList = this.solver.config.defaultBanList;
     this.solve();
   }
 
