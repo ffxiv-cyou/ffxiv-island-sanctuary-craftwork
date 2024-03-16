@@ -31,6 +31,9 @@
         </div>
       </div>
     </popup>
+    <popup v-show="recipePicker" @close="recipePicker = false">
+      <item-selection :solver="solver" @on-select="applyFavor"/>
+    </popup>
     <popup
       v-if="shareCode"
       :no-close="true"
@@ -76,11 +79,13 @@
         v-for="(plan, key) in workerPlans"
         :key="key"
         :solver="solver"
-        :worker-steps="plan"
+        :worker-steps="plan.steps"
         :removeable="true"
+        :favors="plan.favors"
         @remove="removePlan(key)"
         @edit-steps="(day: number) => editStep(key, day)"
         @del-steps="(day: number) => delStep(key, day)"
+        @edit-favor="(index: number) => editFavor(key, index)"
       />
       <div class="control-buttons">
         <button
@@ -105,11 +110,12 @@
 import Close from "@/components/Close.vue";
 import SimpleSolver from "@/components/SimpleSolver.vue";
 import { FromShareCode, parsePlanV1, parsePlanV2 } from "@/model/share";
-import { WorkerSteps, type SolverProxy } from "@/model/solver";
+import { WorkerSteps, type SolverProxy, FavorItem } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Plan from "../components/Plan.vue"
 import Dialog from "@/components/Dialog.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ItemSelection from "@/components/ItemSelection.vue";
 @Component({
   components: {
     Plan: Plan,
@@ -117,6 +123,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
     Close: Close,
     Popup: Dialog,
     Loading: LoadingSpinner,
+    ItemSelection: ItemSelection,
   }
 })
 export default class PlanView extends Vue {
@@ -131,7 +138,7 @@ export default class PlanView extends Vue {
   /**
    * 排班表存储
    */
-  workerPlans: WorkerSteps[][][] = [];
+  workerPlans: WorkerPlan[] = [];
 
   /**
    * 求解器当前排班表ID
@@ -146,7 +153,7 @@ export default class PlanView extends Vue {
   /**
    * 求解器当前索引ID
    */
-  currentIndex: number = 0;
+  currentFavor: number = 0;
 
   get shareCode() {
     return this.$route.params["share"];
@@ -169,6 +176,11 @@ export default class PlanView extends Vue {
    * 求解整周的状态
    */
   isLoading = false;
+
+  /**
+   * 配方选择器状态
+   */
+  recipePicker = false;
 
   /**
    * 当前时间
@@ -234,7 +246,7 @@ export default class PlanView extends Vue {
   }
 
   /**
-   * 为排班添加某天的内容
+   * 编辑指定排班表的指定天数的排班
    * @param id 排班表Index
    * @param day 天数
    */
@@ -248,7 +260,7 @@ export default class PlanView extends Vue {
       demands.push(origDemands[i]);
     }
     let tension = 0;
-    let plan = this.workerPlans[id];
+    let plan = this.workerPlans[id].steps;
 
     // 计算干劲叠加
     for (let i = 0; i < day; i++) {
@@ -273,11 +285,23 @@ export default class PlanView extends Vue {
       }
     }
 
+    // 计算已经做完的猫耳小员的委托
+    let favors: FavorItem[] = []; 
+    this.workerPlans[id].favors.forEach(item => {
+      favors.push(item.clone());
+    });
+
+    plan.forEach((steps, d) => {
+      if (d != day)
+        steps.forEach(step => favors.forEach(favor => favor.apply(step)));
+    });
+    favors.forEach(item => item.num = Math.max(item.num, 0));
+
     // 获取已有sets
     let setWorker = [...plan[day]];
 
     this.solverDialog = true;
-    (this.$refs["ssolver"] as SimpleSolver).solveBatch(demands, setWorker, tension);
+    (this.$refs["ssolver"] as SimpleSolver).solveBatch(demands, setWorker, tension, favors);
   }
 
   /**
@@ -286,7 +310,7 @@ export default class PlanView extends Vue {
    */
   applyWorkerSteps(steps: WorkerSteps[]) {
     this.close();
-    this.workerPlans[this.currentPlan][this.currentDay] = steps;
+    this.workerPlans[this.currentPlan].steps[this.currentDay] = steps;
     this.onStepChange();
   }
 
@@ -303,8 +327,32 @@ export default class PlanView extends Vue {
    * @param day 天数
    */
   delStep(id: number, day: number) {
-    this.workerPlans[id][day] = [];
+    this.workerPlans[id].steps[day] = [];
     this.onStepChange();
+  }
+
+  /**
+   * 编辑指定的委托项目
+   */
+  editFavor(id: number, index: number) {
+    this.currentPlan = id;
+    this.currentFavor = index;
+    this.recipePicker = true;
+  }
+
+  applyFavor(id: number) {
+    let num = 6;
+    switch(this.solver.Recipes[id].Time) {
+      case 4:
+      case 8:
+        num = 8;
+        break;
+      case 6:
+        num = 6;
+        break;
+    }
+    this.workerPlans[this.currentPlan].favors[this.currentFavor] = new FavorItem(id, num);
+    this.recipePicker = false;
   }
 
   /**
@@ -312,10 +360,34 @@ export default class PlanView extends Vue {
    */
   load() {
     let arr = [];
+  
+    // v4: 带猫票
+    let planWithFavorStr = localStorage.getItem("MJIPlanWithFavors");
+    if (planWithFavorStr) {
+      let obj = JSON.parse(planWithFavorStr);
+      let plan = new WorkerPlan([]);
+      for (let i = 0; i < obj.length; i++) { // index
+        let steps = obj[i].steps;
+        for (let j = 0; j < steps.length; j++) { // day
+          let day = [];
+          for (let k = 0; k < steps[j].length; k++) { // seq
+            day.push(new WorkerSteps(steps[j][k].worker, steps[j][k].steps));
+          }
+          plan.steps.push(day);
+        }
+        let favors = obj[i].favors;
+        for (let j = 0; j < favors.length; j++) {
+          plan.favors.push(new FavorItem(favors[j].id, favors[j].num));
+        }
+        arr.push(plan);
+      }
+    }
 
+    // v3: 多排班表多工坊
     let workerPlanStr = localStorage.getItem("MJIWorkerPlans");
     if (workerPlanStr) {
       let obj = JSON.parse(workerPlanStr);
+      localStorage.removeItem("MJIWorkerPlans");
       for (let i = 0; i < obj.length; i++) { // index
         let plan = [];
         for (let j = 0; j < obj[i].length; j++) { // day
@@ -325,23 +397,25 @@ export default class PlanView extends Vue {
           }
           plan.push(day);
         }
-        arr.push(plan);
+        arr.push(new WorkerPlan(plan));
       }
     }
 
+    // 老旧数据迁移
+    // v2: 多排班表版本
     let planStr = localStorage.getItem("MJIPlans");
     if (planStr) {
       let plans = JSON.parse(planStr);
       localStorage.removeItem("MJIPlans");
       for (let i = 0; i < plans.length; i++) {
-        arr.push(this.planMigrate(plans[i]));
+        arr.push(new WorkerPlan(this.planMigrate(plans[i])));
       }
     }
 
-    // 老旧数据迁移
+    // v1: 单排班表版本
     let str = localStorage.getItem("MJIPlanItem");
     if (str) {
-      arr.push(this.planMigrate(JSON.parse(str)));
+      arr.push(new WorkerPlan(this.planMigrate(JSON.parse(str))));
       localStorage.removeItem("MJIPlanItem");
     }
 
@@ -355,19 +429,14 @@ export default class PlanView extends Vue {
    */
   @Watch("workerPlans", { deep: true })
   save() {
-    localStorage.setItem("MJIWorkerPlans", JSON.stringify(this.workerPlans));
+    localStorage.setItem("MJIPlanWithFavors", JSON.stringify(this.workerPlans));
   }
 
   /**
    * 新建一个排班表
    */
   createPlan() {
-    let arr = [];
-    for (let i = 0; i < 7; i++) {
-      let subarr: WorkerSteps[] = [];
-      arr.push(subarr);
-    }
-    this.workerPlans.push(arr);
+    this.workerPlans.push(WorkerPlan.Empty());
     this.onStepChange();
   }
 
@@ -384,7 +453,7 @@ export default class PlanView extends Vue {
    * 导入排班表
    */
   importPlan() {
-    this.workerPlans.push(this.shareSteps);
+    this.workerPlans.push(new WorkerPlan(this.shareSteps));
     this.resizePlan();
     this.save();
     this.closePlan();
@@ -450,7 +519,7 @@ export default class PlanView extends Vue {
     }
 
     let empty: WorkerSteps[][] = [[]];
-    this.workerPlans.push(empty.concat(maxSteps));
+    this.workerPlans.push(new WorkerPlan(empty.concat(maxSteps)));
     this.onStepChange();
     // this.resizePlan();
 
@@ -469,7 +538,7 @@ export default class PlanView extends Vue {
   // @Watch("seqNum")
   resizePlan() {
     for (let i = 0; i < this.workerPlans.length; i++) {
-      let plan = this.workerPlans[i];
+      let plan = this.workerPlans[i].steps;
       for (let j = 0; j < plan.length; j++) {
         const day = plan[j];
         for (let k = 0; k < day.length; k++) {
@@ -486,6 +555,24 @@ export default class PlanView extends Vue {
   mounted() {
     this.load();
     this.onShareCodeChange();
+  }
+}
+
+class WorkerPlan {
+  public steps: WorkerSteps[][] = [];
+  public favors: FavorItem[] = [];
+
+  constructor(steps: WorkerSteps[][]) {
+    this.steps = steps;
+  }
+
+  static Empty(): WorkerPlan {
+    let arr = [];
+    for (let i = 0; i < 7; i++) {
+      let subarr: WorkerSteps[] = [];
+      arr.push(subarr);
+    }
+    return new WorkerPlan(arr);
   }
 }
 </script>

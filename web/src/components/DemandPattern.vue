@@ -355,64 +355,64 @@ export default class DemandPattern extends Vue {
   // fix margin
   margin-right: -10px;
   margin-bottom: -10px;
-}
 
-.recipe-item,
-.recipe-header {
-  display: flex;
+  .recipe-item,
+  .recipe-header {
+    display: flex;
 
-  * {
-    white-space: nowrap;
+    * {
+      white-space: nowrap;
+    }
+
+    .recipe-name {
+      flex: 4em;
+    }
+
+    .recipe-pop {
+      flex: 1em;
+    }
+
+    .recipe-value {
+      flex: 1em;
+    }
+
+    .recipe-pattern {
+      flex: 2em;
+    }
+
+    .recipe-demand {
+      flex: 1em;
+    }
+  }
+
+  .recipe-item,
+  .recipe-header {
+    height: 38px;
+    line-height: 38px;
   }
 
   .recipe-name {
-    flex: 4em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .recipe-pop {
-    flex: 1em;
+  .recipe-icon {
+    width: 22px;
+  }
+  .recipe-icon icon {
+    scale: 50%;
+    margin: -2px -10px;
   }
 
-  .recipe-value {
-    flex: 1em;
+  .recipe-header {
+    border-bottom: 1px solid #999;
+    margin-bottom: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: white;
   }
-
-  .recipe-pattern {
-    flex: 2em;
-  }
-
-  .recipe-demand {
-    flex: 1em;
-  }
-}
-
-.recipe-item,
-.recipe-header {
-  height: 38px;
-  line-height: 38px;
-}
-
-.recipe-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.recipe-icon {
-  width: 22px;
-}
-.recipe-icon icon {
-  scale: 50%;
-  margin: -2px -10px;
-}
-
-.recipe-header {
-  border-bottom: 1px solid #999;
-  margin-bottom: 5px;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background-color: white;
 }
 
 .mji-box+.mji-box {

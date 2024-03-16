@@ -10,6 +10,7 @@
       :demand="getDemand(index)"
       :pattern="getPattern(val)"
       :pop="getPopularity(index)"
+      :favor="isFavor(index)"
       :removeable="removeable"
       @remove="onRemove(index)"
     />
@@ -50,6 +51,9 @@ export default class Steps extends Vue {
   @Prop()
   removeable?: boolean;
 
+  @Prop()
+  favors?: number[];
+
   getStep(id: number): CraftworkObject {
     return this.solver.data.GetRecipe(id);
   }
@@ -75,6 +79,11 @@ export default class Steps extends Vue {
 
   onRemove(index: number) {
     this.$emit("remove", index);
+  }
+
+  isFavor(index: number) {
+    if (!this.favors) return false;
+    return this.favors.find(x => x == this.steps[index]) !== undefined;
   }
 }
 </script>

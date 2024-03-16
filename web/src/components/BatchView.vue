@@ -20,6 +20,7 @@
       :demands="demands"
       :patterns="patterns"
       :pops="pops"
+      :favors="favors"
       @remove="onRemove"
     />
   </div>
@@ -57,6 +58,9 @@ export default class BatchView extends Vue {
 
   @Prop()
   pops?: number[];
+
+  @Prop()
+  favors?: number[];
 
   onRemove(index: number) {
     this.$emit("remove", index);

@@ -1,5 +1,5 @@
 use mji_craftwork::{
-    data::CraftworkInfo,
+    data::{CraftworkInfo, Favor},
     init_repo,
     predition::get_demands,
     simulate, solve_singleday,
@@ -193,6 +193,48 @@ fn test_solver_multi() {
         );
     }
 }
+
+/// 测试猫耳小员求解
+#[test]
+fn test_solver_multi_favor() {
+    let empty = vec![];
+    let demands = empty_demands();
+    let (repo, info, limit) = make_config(1, &empty);
+    let ctx = SolverCtx::new(&repo, info, limit);
+    let mut solver = BFSolver::new();
+
+    let set = [(3, [14, 49, 14, 49, 0, 0])];
+    let result = SolverWithBatch::solve_unordered(&mut solver, &ctx, &set, &demands, 1);
+    println!("solve space: {}", result.len());
+    let mut max_len = 0;
+    let mut max_time = 0;
+    for r in result {
+        max_len = max_len.max(r.batch.seq);
+        max_time = max_time.max(r.batch.time);
+    }
+    assert_eq!(max_len, 6);
+    assert_eq!(max_time, 24);
+
+    let favors = [
+        Favor::new(12, 8),
+        Favor::new(45, 6),
+        Favor::new(64, 8),
+    ];
+
+    let result = SolverWithBatch::solve_favor(&mut solver, &ctx, &set, &demands, &favors);
+    assert_eq!(result.len(), limit.max_result);
+    for i in 0..10 {
+        println!(
+            "val: {}, {:?}, {:?} | {} | {:x}",
+            result[i].batch.get_val(),
+            result[i].batch.get_steps(),
+            result[i].batch.get_values(),
+            result[i].value,
+            result[i].cmp_value
+        );
+    }
+}
+
 
 #[test]
 fn test_solver_simp_adv() {

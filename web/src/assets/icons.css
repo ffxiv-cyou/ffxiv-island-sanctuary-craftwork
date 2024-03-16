@@ -45,6 +45,12 @@ icon.mji-no-box {
 icon.mji-clock {
     background-position: calc(var(--scale) * -40px) calc(var(--scale) * -240px);
 }
+icon.mji-nekomimi {
+    background-position: calc(var(--scale) * -80px) calc(var(--scale) * -240px);
+}
+icon.mji-nekomimi-export {
+    background-position: calc(var(--scale) * -120px) calc(var(--scale) * -240px);
+}
 icon.mji-true {
     background-position: calc(var(--scale) * -0px) calc(var(--scale) * -120px);
 }
@@ -76,7 +82,7 @@ button.sched:disabled {
 icon.sched,
 button.sched {
     --scale: 1;
-    background-size: calc(var(--scale) * 384px) calc(var(--scale) * 232px);
+    background-size: calc(var(--scale) * 480px) calc(var(--scale) * 232px);
     background-image: url("./mjicraftschedule_hr1.png");
 }
 .sched.sched-check,

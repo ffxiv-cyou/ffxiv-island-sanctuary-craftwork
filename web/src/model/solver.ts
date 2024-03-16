@@ -365,6 +365,36 @@ export class SolverProxy {
     }
 
     /**
+     * 在已经设置了指定工坊的情况下求解当天的猫耳小员的请求
+     * @param demands 需求值
+     * @param setWorkers 已设置的工坊情况
+     * @param banList 禁用列表
+     * @param tension 干劲
+     * @param favors 当前剩下的猫耳小员的请求
+     * @param maxTime 最大工序时间
+     * @returns 解，和对应已设置工坊的值
+     */
+    async solveDayFavor(demands: number[], setWorkers: WorkerSteps[], banList: number[], tension: number, favors: FavorItem[], maxTime: number = 24) {
+        const banArr = new Uint8Array(banList);
+        const demandArr = new Int8Array(demands);
+        const info = this.infoWithTension(tension);
+
+        let modFavors: FavorItem[] = [];
+        favors.forEach(item => {
+            modFavors.push(item.clone());
+        });
+
+        setWorkers.forEach(worker => {
+            modFavors.forEach(favor => favor.apply(worker));
+        });
+
+        const set = WorkerSteps.toU8Array(setWorkers);
+        const arr = await this.solver.solve_day_favor(info, this.config.level, banArr, set, demandArr, FavorItem.toU8Array(modFavors), maxTime, this.config.withCost);
+
+        return BatchesValues.fromSingleWorkerArray(BatchValuesWithWorker.fromWorkerArrays(arr, 1));
+    }
+
+    /**
      * 使用指定的需求模式尝试求解本周最优
      * @param banList 禁用列表
      * @returns 
@@ -690,6 +720,16 @@ export class WorkerSteps {
         }
     }
 
+    getRecipeProduct(id: number) {
+        let count = 0;
+        for (let i = 0; i < this.steps.length; i++) {
+            if (this.steps[i] == id) {
+                count += (i == 0 ? 1 : 2) * this.worker;
+            }
+        }
+        return count;
+    }
+
     static toU8Array(steps: WorkerSteps[]) {
         const seq = new Uint8Array(steps.length * 7);
         for (let i = 0; i < steps.length; i++) {
@@ -721,5 +761,40 @@ export class WorkerSteps {
         }
 
         return result;
+    }
+}
+
+export class FavorItem {
+    id: number;
+    num: number;
+
+    constructor(id: number, num: number) {
+        this.id = id;
+        this.num = num;
+    }
+
+    clone(): FavorItem {
+        return new FavorItem(this.id, this.num);
+    }
+
+    setU8Array(arr: Uint8Array) {
+        arr[0] = this.id;
+        arr[1] = Math.max(this.num, 0);
+    }
+
+    apply(worker: WorkerSteps) {
+        for (let i = 0; i < worker.steps.length; i++) {
+            if (this.id == worker.steps[i]) {
+                this.num -= (i == 0 ? 1 : 2) * worker.worker;
+            }
+        }
+    }
+
+    static toU8Array(items: FavorItem[]) {
+        const seq = new Uint8Array(items.length * 2);
+        for (let i = 0; i < items.length; i++) {
+            items[i].setU8Array(seq.subarray(i * 2));
+        }
+        return seq;
     }
 }

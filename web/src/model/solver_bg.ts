@@ -150,6 +150,20 @@ export class SolverBG {
     });
   }
   
+  public solve_day_favor(state: WorkerInfo, level: number, ban_list: Uint8Array, set: Uint8Array, demands: Int8Array, favors: Uint8Array, time: number, with_cost: boolean) {
+    return this.postMsg<Uint16Array>({
+      type: "solve_day_favor",
+      state: this.toInfoObj(state),
+      level: level,
+      ban_list: ban_list,
+      set: set,
+      demands: demands,
+      favors: favors,
+      time: time,
+      with_cost: with_cost,
+    });
+  }
+
   public solve_week(state: WorkerInfo, level: number, ban_list: Uint8Array, time: number, with_cost: boolean, pattern: Uint8Array) {
     return this.postMsg<Uint16Array>({
       type: "solve_week",

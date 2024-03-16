@@ -2,11 +2,13 @@ mod demand;
 mod popularity;
 mod recipe;
 mod repo;
+mod favor;
 
 pub use demand::{Demand, DemandChange};
 pub use popularity::Popularity;
 pub use recipe::{Recipe, RecipeState};
 pub use repo::{GameDataRepo, IDataRepo};
+pub use favor::{Favor, Favors};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// 工坊当前状态

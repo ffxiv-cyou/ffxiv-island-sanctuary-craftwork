@@ -9,6 +9,7 @@
         class="item"
         :class="iconPath"
       />
+      <icon class="mji mji-nekomimi-export icon-sub" v-if="favor"/>
     </div>
     <div class="item-text hide-md">
       <div class="item-primary">
@@ -85,6 +86,9 @@ export default class Step extends Vue {
   @Prop()
   pattern?: number;
 
+  @Prop()
+  favor?: boolean;
+
   get name() {
     return CraftworkData.TrimName(this.step.Name);
   }
@@ -135,6 +139,13 @@ export default class Step extends Vue {
 
   .item-img {
     height: 40px;
+
+    .icon-sub {
+      --scale: 0.5;
+      left: 0;
+      bottom: 0;
+      position: absolute;
+    }
   }
 
   .item-text {

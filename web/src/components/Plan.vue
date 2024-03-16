@@ -111,6 +111,32 @@
             </div>
           </div>
         </div>
+        <!--猫耳小员的委托-->
+        <div class="plan-favors plan-batch mji-info-box" v-if="favors">
+          <div class="plan-batch-info">
+            <icon class="mji mji-nekomimi" />
+          </div>
+          <div class="plan-content">
+            <div v-for="(item, index) in favors" class="plan-favor-item mji-step-box" :key="index" @click="editFavor(index)">
+              <icon class="item" :class="getFavorIcon(item.id)" />
+              <div class="favor-item-body">
+                <span>{{getFavorName(item.id)}}</span>
+              </div>
+              <span class="favor-item-state">
+                <icon class="mji mji-true" v-if="getFavorFinished(item.id) >= item.num"></icon>
+                <span v-else>{{ getFavorFinished(item.id) }}/{{ item.num }}</span>
+              </span>
+            </div>
+            <div class="plan-favor-item" v-if="favors.length < 3" @click="editFavor(favors.length)">
+              <button
+                v-if="!isMax && !hideBtn"
+                class="plan-add"
+              >
+                <icon class="sched sched-add" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <div
         v-if="!solver.config.hideIngredients"
@@ -127,7 +153,7 @@
 </template>
 <script lang="ts">
 import { planToShare } from "@/model/share";
-import type { SolverProxy, BatchValues, WorkerSteps } from "@/model/solver";
+import type { SolverProxy, BatchValues, WorkerSteps, FavorItem } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import Close from "./Close.vue";
 import ingredients from "./Ingredients.vue";
@@ -148,6 +174,9 @@ export default class PlanView extends Vue {
 
   @Prop()
   workerSteps!: WorkerSteps[][];
+
+  @Prop()
+  favors!: FavorItem[];
 
   @Prop()
   removeable?: boolean;
@@ -300,6 +329,26 @@ export default class PlanView extends Vue {
     navigator.clipboard.writeText(text).catch((e) => alert(e));
     evt.preventDefault();
   }
+
+  getFavorIcon(id: number) {
+    return "item-" +  this.solver.Recipes[id].Icon;
+  }
+
+  getFavorName(id: number) {
+    return CraftworkData.TrimName(this.solver.Recipes[id].Name);
+  }
+
+  getFavorFinished(id: number) {
+    let count = 0;
+    this.workerSteps.forEach(day => {
+      day.forEach(steps => count += steps.getRecipeProduct(id));
+    });
+    return count;
+  }
+
+  editFavor(index: number) {
+    this.$emit("edit-favor", index)
+  }
 }
 </script>
 <style lang="scss">
@@ -445,12 +494,14 @@ export default class PlanView extends Vue {
   }
 }
 
+.plan-favor-item,
 .plan-steps {
   cursor: pointer;
 }
 
 .plan-steps:hover .step-item,
-button.plan-add:hover {
+button.plan-add:hover,
+.plan-favor-item:hover {
   border-color: rgba(131, 85, 0, 0.9);
   background-color: rgba(214, 211, 206, 0.95);
 }
@@ -470,4 +521,34 @@ button.plan-add:hover {
     display: none;
   }
 }
+
+.plan-favors {
+  .plan-favor-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+
+    width: 33.3%;
+    .item {
+      width: 40px 0;
+    }
+    .favor-item-body {
+      width: calc(100% - 40px - 28px - 10px);
+      span {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    .favor-item-state {
+      width: 28px;
+      icon {
+        --scale: 0.6;
+      }
+    }
+  }
+}
+
 </style>

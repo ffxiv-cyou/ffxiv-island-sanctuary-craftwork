@@ -1,4 +1,4 @@
-use crate::data::IDataRepo;
+use crate::data::{Favor, Favors, IDataRepo};
 
 use super::SolverCtx;
 
@@ -178,5 +178,42 @@ pub trait SolverWithBatch {
             }
         });
         max_batch
+    }
+
+    /// 解猫耳小员
+    fn solve_favor<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        set: &[(u8, [u8; 6])],
+        demands: &[i8],
+        favors: &[Favor],
+    ) -> Vec<BatchWithBatch>
+    where
+        T: IDataRepo,
+    {
+        // 结果排序
+        let mut heap = BinaryHeap::new();
+        self.solve_fn(ctx, set, demands, 1, |item| {
+            let mut item = *item;
+            let val = match ctx.limit.with_cost {
+                true => {
+                    (item.batch.value - item.batch.cost) + (item.value - item.cost)
+                }
+                false => (item.batch.value) + (item.value),
+            };
+            let mut fav_counter = Favors::<3>::new(favors);
+            for i in 0..item.batch.seq {
+                fav_counter.add(item.batch.steps[i as usize], match i == 0 {
+                    true => 1,
+                    false => 2,
+                })
+            }
+            item.cmp_value = ((fav_counter.value() as u16) << 12) + val;
+            heap.push(item);
+            if heap.len() > ctx.limit.max_result {
+                heap.pop();
+            }
+        });
+        heap.into_sorted_vec()
     }
 }

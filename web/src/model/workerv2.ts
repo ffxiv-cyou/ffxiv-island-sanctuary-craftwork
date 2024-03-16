@@ -100,6 +100,20 @@ async function init_worker() {
         self.postMessage(result, [result.buffer]);
         break;
       }
+      case "solve_day_favor": {
+        const state = get_craft_info(data.state);
+        const result = repo.solve_day_with_favor(
+          state,
+          data.level,
+          data.ban_list,
+          data.set,
+          data.demands,
+          data.favors,
+          data.time,
+          data.with_cost);
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
       case "solve_week_part": {
         const state = get_craft_info(data.state);
         const result = repo.solve_week_part(
@@ -127,7 +141,7 @@ async function init_worker() {
         break;
       }
       case "simulate":
-        return self.reportError("simulate is deprecated. use solve_multi_day instead");
+        return self.reportError("simulate is deprecated. use simulate_multi instead");
       case "solve_day":
         return self.reportError("solve_day is deprecated. use solve_multi_day instead");
       default:

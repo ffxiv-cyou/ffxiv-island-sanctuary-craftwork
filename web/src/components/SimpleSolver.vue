@@ -16,16 +16,15 @@
             type="number"
           >
         </span>
-        <span class="multi-worker">
-          <input
-            id="enable-multi-worker"
-            v-model="enableMultiSolver"
-            type="checkbox"
-          >
-          <label
-            class="mji-text-small"
-            for="enable-multi-worker"
-          >启用多队列求解器（实验性）</label>
+        <span class="solver-method mji-text-small">
+          <label for="solver-method">求解算法</label>
+          <div class="select">
+            <select id="solver-method" v-model.number="solverMethod">
+              <option value=0>单队列</option>
+              <option value=1>多队列（实验性）</option>
+              <option value=2>猫耳小员的委托</option>
+            </select>
+          </div>
         </span>
         <button
           class="mji"
@@ -60,6 +59,7 @@
             :solver="solver"
             :batch="worker"
             :patterns="patterns"
+            :favors="favors"
           >
             <button
               class="sched sched-red add-item"
@@ -136,6 +136,7 @@
             :pops="stepPops[key1][key2]"
             :patterns="patterns"
             :delta-val="steps.workerVal"
+            :favors="favors"
             @remove="addBan(key1, key2, $event)"
           >
             <div class="batch-worker-num">
@@ -157,7 +158,7 @@
   </div>
 </template>
 <script lang="ts">
-import { WorkerSteps, type BatchValues, type SolverProxy, BatchesValues } from "@/model/solver";
+import { WorkerSteps, type BatchValues, type SolverProxy, BatchesValues, FavorItem } from "@/model/solver";
 import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import BatchView from "@/components/BatchView.vue";
 import Close from "@/components/Close.vue";
@@ -262,6 +263,12 @@ export default class SimpleSolver extends Vue {
     return this.solver.config.demandPatterns;
   }
 
+  get favors() {
+    let arr: number[] = [];
+    this.favorItems.forEach(x => arr.push(x.id));
+    return arr;
+  }
+
   /**
    * 计算结果中每个物品的需求值
    */
@@ -288,13 +295,17 @@ export default class SimpleSolver extends Vue {
    */
   setValues: BatchValues[] = [];
   /**
-   * 启用多队列求解
+   * 求解算法
    */
-  enableMultiSolver: boolean = false;
+  solverMethod: number = 0;
   /**
    * 队列最大工坊数
    */
   maxWorkerPerQueue: number = 3;
+  /**
+   * 当前委托项目
+   */
+  favorItems: FavorItem[] = [];
 
   /**
    * 获取剩余可用的工坊数量
@@ -326,11 +337,9 @@ export default class SimpleSolver extends Vue {
     this.solve();
   }
 
-  @Watch("enableMultiSolver")
+  @Watch("solverMethod")
   async switchMode() {
-    if (this.setSteps.length === 0) {
-      await this.solve();
-    }
+    await this.solve();
   }
 
   /**
@@ -357,12 +366,25 @@ export default class SimpleSolver extends Vue {
 
     let worker = this.remainWorker < 1 ? 1 : this.remainWorker;
     let batches: BatchesValues[] = [];
-    if (this.setSteps.length === 0 && this.enableMultiSolver) {
-      batches = await this.solver.solveDayDual(this.cachedDemands, this.banList, this.cachedtension, worker);
-    } else {
-      if (worker > this.maxWorkerPerQueue) worker = this.maxWorkerPerQueue;
-      batches = await this.solver.solveMultiDay(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, worker);
+
+    let method = this.solverMethod;
+    if (method == 1 && this.setSteps.length > 0) {
+      method = 0;
     }
+
+    switch(method) {
+      case 0:
+        if (worker > this.maxWorkerPerQueue) worker = this.maxWorkerPerQueue;
+        batches = await this.solver.solveMultiDay(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, worker);
+      break;
+      case 1:
+        batches = await this.solver.solveDayDual(this.cachedDemands, this.banList, this.cachedtension, worker);
+      break;
+      case 2:
+        batches = await this.solver.solveDayFavor(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, this.favorItems);
+      break;
+    }
+
     batches.forEach(b => b.batches.forEach(c => { if (c.workerVal != 0) c.workerVal -= this.sumVal; }));
 
     this.isLoading = false;
@@ -430,10 +452,11 @@ export default class SimpleSolver extends Vue {
    * @param demands 各个物品的需求值
    * @param tension 当前干劲
    */
-  public solveBatch(demands: number[], sets: WorkerSteps[], tension: number) {
+  public solveBatch(demands: number[], sets: WorkerSteps[], tension: number, favors: FavorItem[]) {
     this.cachedDemands = demands;
     this.cachedtension = tension;
     this.setSteps = [];
+    this.favorItems = favors;
     sets.forEach(ele => {
       this.setSteps.push(ele.clone());
     });
@@ -491,6 +514,32 @@ export default class SimpleSolver extends Vue {
     color: rgb(82, 49, 33);
     flex: 1;
     width: 2em;
+  }
+
+  .select {
+    display: inline-block;
+    select {
+      background: none;
+      border: none;
+      appearance: none;
+      cursor: pointer;
+      padding: 0 !important;
+      text-align: left;
+      height: 100%;
+      margin-left: 0px;
+      display: inline-block;
+      color: inherit;
+      font-weight: inherit;
+      font-family: inherit;
+    }
+
+    &::before {
+      content: "▸";
+      display: inline-block;
+      pointer-events: none;
+      font-size: 20px;
+      width: 16px;
+    }
   }
 }
 

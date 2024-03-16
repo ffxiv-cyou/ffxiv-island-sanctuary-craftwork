@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 use crate::{
-    data::{CraftworkInfo, GameDataRepo},
+    data::{CraftworkInfo, Favor, GameDataRepo},
     gsolver::{GMultiSolver, GSolver, MildMulitSolver, MildSolver},
     init_repo,
     predition::DemandPattern,
@@ -157,6 +157,60 @@ impl APIv2 {
                 }
                 ret.extend_from_slice(batch.get_values());
             }
+        }
+        ret
+    }
+
+    /// 在已配置工房的情况下，搜索此状态下的猫耳小员最优解
+    ///
+    /// - set: 已设置的工房，结构为 [工坊数量, 序列[6]]
+    ///
+    /// 返回所有可能的解的数组，数组结构如下：
+    /// - value 总价
+    /// - cost 成本
+    /// - prev_value 之前工坊的总价
+    /// - prev_cost 之前工坊的成本
+    /// - step_count 步骤数目
+    /// - steps[6] 每一步的物品ID
+    /// - values[6] 每一步的价格
+    pub fn solve_day_with_favor(
+        &mut self,
+        state: &CraftworkInfo,
+        level: u8,
+        ban_list: &[u8],
+        set: &[u8],
+        demands: &[i8],
+        favors: &[u8],
+        time: u8,
+        with_cost: bool,
+    ) -> Vec<u16> {
+        let limit = SolveLimit::new(level, ban_list, time, with_cost);
+        let ctx = SolverCtx::new(&self.repo, state.clone(), limit);
+
+        let mut sets = vec![];
+        for i in (0..set.len()).step_by(7) {
+            sets.push((set[i], set[i + 1..i + 7].try_into().unwrap()));
+        }
+
+        let mut favor_list = vec![];
+        for i in (0..favors.len()).step_by(2) {
+            favor_list.push(Favor::from_array(&favors[i..i+2]));
+        }
+
+        let batches =
+            SolverWithBatch::solve_favor(&mut self.day_solver_single, &ctx, &sets, demands, &favor_list);
+
+        let mut ret = vec![];
+        for b in batches {
+            ret.push(b.value);
+            ret.push(b.cost);
+            ret.push(b.batch.get_val());
+            ret.push(b.batch.get_cost());
+            ret.push(b.batch.seq as u16);
+            for i in b.batch.get_steps() {
+                ret.push(*i as u16);
+            }
+            ret.extend_from_slice(b.batch.get_values());
         }
         ret
     }
