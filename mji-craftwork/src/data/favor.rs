@@ -59,6 +59,14 @@ impl<'a, const T: usize> Favors<'a, T> {
         for i in 0..min(T, self.items.len()) {
             sum += min(self.sum[i], self.items[i].num);
         }
+        sum <<= 2;
+        // 优先使用正好填满的东西
+        for i in 0..min(T, self.items.len()) {
+            sum += match self.items[i].num > 0 && self.sum[i] >= self.items[i].num {
+                true => 1,
+                false => 0,
+            };
+        }
         sum
     }
 }

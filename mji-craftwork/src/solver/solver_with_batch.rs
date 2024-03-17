@@ -208,7 +208,7 @@ pub trait SolverWithBatch {
                     false => 2,
                 })
             }
-            item.cmp_value = ((fav_counter.value() as u16) << 12) + val;
+            item.cmp_value = ((fav_counter.value() as u16) << 10) + val;
             heap.push(item);
             if heap.len() > ctx.limit.max_result {
                 heap.pop();

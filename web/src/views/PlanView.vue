@@ -32,7 +32,7 @@
       </div>
     </popup>
     <popup v-show="recipePicker" @close="recipePicker = false">
-      <item-selection :solver="solver" @on-select="applyFavor"/>
+      <item-selection :solver="solver" @on-select="applyFavor" :filter-override="currentFavor + 1"/>
     </popup>
     <popup
       v-if="shareCode"

@@ -2,7 +2,7 @@
   <div class="item-selection mji-wooden-plate">
     <div class="mji-title mji-text-brown">配方选择器</div>
     <div class="item-body">
-      <div class="item-body-left mji-info-box">
+      <div class="item-body-left mji-info-box" v-if="!filterOverride">
         <div class="filter-item" :class="{ 'selected': index == filter }" v-for="(name, index) in filterList"
           :value="index" @click="setFilter(index)">{{ name }}</div>
       </div>
@@ -28,14 +28,21 @@ export default class ItemSelection extends Vue {
   @Prop()
   solver!: SolverProxy;
 
-  filter: number = 0;
+  @Prop()
+  filterOverride?: number;
+
+  filterUser: number = 0;
 
   get filterList() {
     return ["所有配方", "4小时", "6小时", "8小时"].concat(this.themes);
   }
 
   setFilter(id: number) {
-    this.filter = id;
+    this.filterUser = id;
+  }
+
+  get filter() {
+    return this.filterOverride ?? this.filterUser;
   }
 
   get themes() {
