@@ -77,7 +77,8 @@ export default class ItemSelection extends Vue {
   min-width: 300px;
   max-width: 500px;
   min-height: 300px;
-  max-height: 50%;
+  max-height: 500px;
+  height: 50%;
   width: 50%;
 }
 

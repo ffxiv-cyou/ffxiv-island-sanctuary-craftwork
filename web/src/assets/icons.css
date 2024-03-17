@@ -48,7 +48,7 @@ icon.mji-clock {
 icon.mji-nekomimi {
     background-position: calc(var(--scale) * -80px) calc(var(--scale) * -240px);
 }
-icon.mji-nekomimi-export {
+icon.mji-nekomimi-next {
     background-position: calc(var(--scale) * -120px) calc(var(--scale) * -240px);
 }
 icon.mji-true {

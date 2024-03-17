@@ -9,7 +9,7 @@
         class="item"
         :class="iconPath"
       />
-      <icon class="mji mji-nekomimi-export icon-sub" v-if="favor"/>
+      <icon class="mji mji-nekomimi icon-sub" v-if="favor"/>
     </div>
     <div class="item-text hide-md">
       <div class="item-primary">
