@@ -79,7 +79,7 @@ export default class ItemSelection extends Vue {
   min-height: 300px;
   max-height: 500px;
   height: 50%;
-  width: 50%;
+  width: 80%;
 }
 
 .item-body {
@@ -123,7 +123,7 @@ export default class ItemSelection extends Vue {
 
 .recipe-item {
   display: block;
-  height: 40px;
+  height: 42px;
   cursor: pointer;
   margin: 1px;
 
@@ -132,6 +132,11 @@ export default class ItemSelection extends Vue {
     margin-left: 5px;
     height: 40px;
     line-height: 40px;
+    max-width: calc(100% - 50px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
   }
 }
 

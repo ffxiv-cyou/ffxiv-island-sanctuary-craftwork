@@ -5,10 +5,10 @@ const CONFIG_KEY = "MJICraftworksConfig";
 export class Config {
 
   _region: Region = Region.CN;
-  _level: number = 12;
-  _maxTension: number = 35;
-  _craftLevel: number = 2;
-  _workers: number = 3;
+  _level: number = 20;
+  _maxTension: number = 45;
+  _craftLevel: number = 4;
+  _workers: number = 4;
   _popPattern: number = 1;
   _withCost: boolean = false;
   _styleStepWidth: boolean = false;
@@ -16,7 +16,7 @@ export class Config {
   _hideIngredients: boolean = false;
   _showNetValue: boolean = false;
   _showItemPopup: boolean = true;
-  _differentWorkers: number = 1;
+  _differentWorkers: number = 2;
   _defaultBanList: number[] = [];
 
   /**

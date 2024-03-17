@@ -120,7 +120,7 @@
             <div v-for="(item, index) in favors" class="plan-favor-item mji-step-box" :key="index" @click="editFavor(index)">
               <icon class="item" :class="getFavorIcon(item.id)" />
               <div class="favor-item-body">
-                <span>{{getFavorName(item.id)}}</span>
+                <span class="hide-md">{{getFavorName(item.id)}}</span>
               </div>
               <span class="favor-item-state">
                 <icon class="mji mji-true" v-if="getFavorFinished(item.id) >= item.num"></icon>
@@ -324,6 +324,18 @@ export default class PlanView extends Vue {
           }
         }
         text += "\n";
+      }
+    }
+    if (this.favors.length > 0) {
+      text += "猫耳小员的委托: ";
+      for (let i = 0; i < this.favors.length; i++) {
+        const fav = this.favors[i];
+        text += CraftworkData.TrimName(this.solver.data.GetRecipe(fav.id).Name);
+        const finished = this.getFavorFinished(fav.id);
+        text += "(" + finished + "/" + fav.num + ")"
+        if (i < this.favors.length - 1) {
+          text += ", ";
+        }
       }
     }
     navigator.clipboard.writeText(text).catch((e) => alert(e));
