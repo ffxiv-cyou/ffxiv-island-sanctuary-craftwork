@@ -1,6 +1,8 @@
 <template>
   <div class="item-selection mji-wooden-plate">
-    <div class="mji-title mji-text-brown">配方选择器</div>
+    <div class="mji-title mji-text-brown">配方选择器
+      <span v-if="filterOverride">({{ filterList[filter] }})</span>
+    </div>
     <div class="item-body">
       <div class="item-body-left mji-info-box" v-if="!filterOverride">
         <div class="filter-item" :class="{ 'selected': index == filter }" v-for="(name, index) in filterList"
