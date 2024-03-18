@@ -180,8 +180,9 @@ export default class Step extends Vue {
 
     .item-desc {
       color: #666;
-      font-size: 14px;
-      width: 100%;
+      font-size: 13.5px;
+      width: calc(100% + 7px);
+      margin-left: -5px;
 
       icon.mji,
       icon.blue-coin {

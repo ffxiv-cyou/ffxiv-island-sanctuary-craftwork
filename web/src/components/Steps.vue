@@ -93,26 +93,26 @@ export default class Steps extends Vue {
   flex-flow: nowrap !important;
   flex: 1;
   .step-item   {
-    margin-left: 2px;
+    margin-left: 1px;
   }
 }
 
 .step-4 {
-  width: calc(100% / 6 - 2px);
+  width: calc(100% / 6 - 1px);
 }
 
 .step-6 {
-  width: calc(100% / 4 - 2px);
+  width: calc(100% / 4 - 1px);
 }
 
 .step-8 {
-  width: calc(100% / 3 - 2px);
+  width: calc(100% / 3 - 1px);
 }
 
 [step-style=monospace] {
   .step-6,
   .step-8 {
-    width: calc(100% / 6 - 2px);
+    width: calc(100% / 6 - 1px);
   }
 }
 
