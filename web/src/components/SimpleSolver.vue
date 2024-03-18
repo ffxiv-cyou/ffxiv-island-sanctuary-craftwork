@@ -3,7 +3,7 @@
     <legend class="mji-title mji-text-brown">
       编辑工坊队列
       <div class="solver-control">
-        <span class="max-worker">
+        <span class="max-worker" v-if="solverMethod < 2">
           <label
             class="mji-text-small"
             for="maximum-worker"
@@ -11,6 +11,19 @@
           <input
             id="maximum-worker"
             v-model="maxWorkerPerQueue"
+            min="1"
+            :max="maxWorker"
+            type="number"
+          >
+        </span>
+        <span class="max-worker" v-if="solverMethod == 2">
+          <label
+            class="mji-text-small"
+            for="maximum-worker"
+          >委托工坊数</label>
+          <input
+            id="maximum-worker"
+            v-model="favorWorker"
             min="1"
             :max="maxWorker"
             type="number"
@@ -303,6 +316,10 @@ export default class SimpleSolver extends Vue {
    */
   maxWorkerPerQueue: number = 3;
   /**
+   * 委托工坊数
+   */
+  favorWorker: number = 1;
+  /**
    * 当前委托项目
    */
   favorItems: FavorItem[] = [];
@@ -347,6 +364,7 @@ export default class SimpleSolver extends Vue {
    */
   @Watch("banList", { deep: true })
   @Watch("maxWorkerPerQueue")
+  @Watch("favorWorker")
   async solve() {
     if (this.cachedDemands === undefined ||
       this.cachedtension === undefined ||
@@ -381,7 +399,8 @@ export default class SimpleSolver extends Vue {
         batches = await this.solver.solveDayDual(this.cachedDemands, this.banList, this.cachedtension, worker);
       break;
       case 2:
-        batches = await this.solver.solveDayFavor(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, this.favorItems);
+        if (worker > this.favorWorker) worker = this.favorWorker;
+        batches = await this.solver.solveDayFavor(this.cachedDemands, this.setSteps, this.banList, this.cachedtension, this.favorItems, worker);
       break;
     }
 

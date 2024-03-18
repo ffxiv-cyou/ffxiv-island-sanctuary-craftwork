@@ -112,7 +112,7 @@
           </div>
         </div>
         <!--猫耳小员的委托-->
-        <div class="plan-favors plan-batch mji-info-box" v-if="favors">
+        <div class="plan-favors plan-batch mji-info-box" v-if="favors && !hideBtn">
           <div class="plan-batch-info">
             <icon class="mji mji-nekomimi" />
           </div>
@@ -128,10 +128,7 @@
               </span>
             </div>
             <div class="plan-favor-item" v-if="favors.length < 3" @click="editFavor(favors.length)">
-              <button
-                v-if="!isMax && !hideBtn"
-                class="plan-add"
-              >
+              <button class="plan-add">
                 <icon class="sched sched-add" />
               </button>
             </div>

@@ -186,6 +186,7 @@ pub trait SolverWithBatch {
         ctx: &SolverCtx<'a, T>,
         set: &[(u8, [u8; 6])],
         demands: &[i8],
+        workers: u8,
         favors: &[Favor],
     ) -> Vec<BatchWithBatch>
     where
@@ -193,19 +194,20 @@ pub trait SolverWithBatch {
     {
         // 结果排序
         let mut heap = BinaryHeap::new();
-        self.solve_fn(ctx, set, demands, 1, |item| {
+        self.solve_fn(ctx, set, demands, workers, |item| {
             let mut item = *item;
             let val = match ctx.limit.with_cost {
                 true => {
-                    (item.batch.value - item.batch.cost) + (item.value - item.cost)
+                    ((item.batch.value - item.batch.cost) * workers as u16)
+                        + (item.value - item.cost)
                 }
-                false => (item.batch.value) + (item.value),
+                false => (item.batch.value) * workers as u16 + (item.value),
             };
             let mut fav_counter = Favors::<3>::new(favors);
             for i in 0..item.batch.seq {
                 fav_counter.add(item.batch.steps[i as usize], match i == 0 {
-                    true => 1,
-                    false => 2,
+                    true => 1 * workers,
+                    false => 2 * workers,
                 })
             }
             item.cmp_value = ((fav_counter.value() as u16) << 10) + val;

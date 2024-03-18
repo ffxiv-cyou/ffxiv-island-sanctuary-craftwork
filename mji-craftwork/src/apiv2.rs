@@ -181,6 +181,7 @@ impl APIv2 {
         set: &[u8],
         demands: &[i8],
         favors: &[u8],
+        worker: u8,
         time: u8,
         with_cost: bool,
     ) -> Vec<u16> {
@@ -198,7 +199,7 @@ impl APIv2 {
         }
 
         let batches =
-            SolverWithBatch::solve_favor(&mut self.day_solver_single, &ctx, &sets, demands, &favor_list);
+            SolverWithBatch::solve_favor(&mut self.day_solver_single, &ctx, &sets, demands, worker, &favor_list);
 
         let mut ret = vec![];
         for b in batches {

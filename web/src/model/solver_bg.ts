@@ -150,7 +150,7 @@ export class SolverBG {
     });
   }
   
-  public solve_day_favor(state: WorkerInfo, level: number, ban_list: Uint8Array, set: Uint8Array, demands: Int8Array, favors: Uint8Array, time: number, with_cost: boolean) {
+  public solve_day_favor(state: WorkerInfo, level: number, ban_list: Uint8Array, set: Uint8Array, demands: Int8Array, favors: Uint8Array, worker: number, time: number, with_cost: boolean) {
     return this.postMsg<Uint16Array>({
       type: "solve_day_favor",
       state: this.toInfoObj(state),
@@ -160,6 +160,7 @@ export class SolverBG {
       demands: demands,
       favors: favors,
       time: time,
+      worker: worker,
       with_cost: with_cost,
     });
   }

@@ -109,6 +109,7 @@ async function init_worker() {
           data.set,
           data.demands,
           data.favors,
+          data.worker,
           data.time,
           data.with_cost);
         self.postMessage(result, [result.buffer]);

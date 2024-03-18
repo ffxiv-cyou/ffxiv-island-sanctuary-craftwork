@@ -374,7 +374,7 @@ export class SolverProxy {
      * @param maxTime 最大工序时间
      * @returns 解，和对应已设置工坊的值
      */
-    async solveDayFavor(demands: number[], setWorkers: WorkerSteps[], banList: number[], tension: number, favors: FavorItem[], maxTime: number = 24) {
+    async solveDayFavor(demands: number[], setWorkers: WorkerSteps[], banList: number[], tension: number, favors: FavorItem[], worker: number, maxTime: number = 24) {
         const banArr = new Uint8Array(banList);
         const demandArr = new Int8Array(demands);
         const info = this.infoWithTension(tension);
@@ -389,9 +389,9 @@ export class SolverProxy {
         });
 
         const set = WorkerSteps.toU8Array(setWorkers);
-        const arr = await this.solver.solve_day_favor(info, this.config.level, banArr, set, demandArr, FavorItem.toU8Array(modFavors), maxTime, this.config.withCost);
+        const arr = await this.solver.solve_day_favor(info, this.config.level, banArr, set, demandArr, FavorItem.toU8Array(modFavors), worker, maxTime, this.config.withCost);
 
-        return BatchesValues.fromSingleWorkerArray(BatchValuesWithWorker.fromWorkerArrays(arr, 1));
+        return BatchesValues.fromSingleWorkerArray(BatchValuesWithWorker.fromWorkerArrays(arr, worker));
     }
 
     /**
