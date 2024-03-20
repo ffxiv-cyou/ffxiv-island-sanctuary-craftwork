@@ -95,7 +95,7 @@
       </div>
     </template>
     <legend
-      v-if="banList.length > 0"
+      v-if="banList > 0"
       class="mji-title mji-text-orange mji-text-small"
     >
       禁用列表
@@ -481,7 +481,8 @@ export default class SimpleSolver extends Vue {
     });
     this.isLoading = false;
     this.setValues = [];
-    this.banList = this.solver.config.defaultBanList;
+    if (this.banList.length === 0)
+      this.solver.config.defaultBanList.forEach(ele => this.banList.push(ele));
     this.solve();
   }
 
