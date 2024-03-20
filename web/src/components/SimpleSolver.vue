@@ -95,7 +95,7 @@
       </div>
     </template>
     <legend
-      v-if="banList > 0"
+      v-if="banList.length > 0"
       class="mji-title mji-text-orange mji-text-small"
     >
       禁用列表
