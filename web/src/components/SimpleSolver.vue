@@ -481,8 +481,8 @@ export default class SimpleSolver extends Vue {
     });
     this.isLoading = false;
     this.setValues = [];
-    if (this.banList.length === 0)
-      this.solver.config.defaultBanList.forEach(ele => this.banList.push(ele));
+    this.banList = [];
+    this.solver.config.defaultBanList.forEach(ele => this.banList.push(ele));
     this.solve();
   }
 
