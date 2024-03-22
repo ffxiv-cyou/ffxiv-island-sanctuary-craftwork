@@ -128,6 +128,19 @@ async function init_worker() {
         self.postMessage(result, [result.buffer]);
         break;
       }
+      case "solve_week_favor": {
+        const state = get_craft_info(data.state);
+        const result = repo.solve_week_favor(
+          state,
+          data.level,
+          data.ban_list,
+          data.time,
+          data.with_cost,
+          data.pattern,
+          data.favors);
+        self.postMessage(result, [result.buffer]);
+        break;
+      }
       case "solve_cache_clear": {
         repo.solver_clear_cache();
         self.postMessage({

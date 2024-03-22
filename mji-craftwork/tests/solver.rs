@@ -221,7 +221,7 @@ fn test_solver_multi_favor() {
         Favor::new(64, 8),
     ];
 
-    let result = SolverWithBatch::solve_favor(&mut solver, &ctx, &set, &demands, &favorsm, 1);
+    let result = SolverWithBatch::solve_favor(&mut solver, &ctx, &set, &demands, 1, &favors);
     assert_eq!(result.len(), limit.max_result);
     for i in 0..10 {
         println!(

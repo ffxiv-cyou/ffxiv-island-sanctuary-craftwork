@@ -190,6 +190,19 @@ export class SolverBG {
     });
   }
 
+  public solve_week_favor(state: WorkerInfo, level: number, ban_list: Uint8Array, time: number, with_cost: boolean, pattern: Uint8Array, favors: Uint8Array) {
+    return this.postMsg<Uint16Array>({
+      type: "solve_week_favor",
+      state: this.toInfoObj(state),
+      level: level,
+      ban_list: ban_list,
+      pattern: pattern,
+      time: time,
+      with_cost: with_cost,
+      favors: favors
+    });
+  }
+
   public solve_cache_clear() {
     return this.postMsg<void>({
       type: "solve_cache_clear"

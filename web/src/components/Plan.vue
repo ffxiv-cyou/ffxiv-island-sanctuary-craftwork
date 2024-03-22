@@ -104,6 +104,7 @@
                   :solver="solver"
                   :values="worker.stepValues"
                   :steps="worker.steps"
+                  :favors="favors.map(x => x.id)"
                   class="plan-steps"
                   @click="edit(index)"
                 />

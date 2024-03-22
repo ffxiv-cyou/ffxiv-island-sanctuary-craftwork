@@ -1,4 +1,4 @@
-use crate::data::{Favor, Favors, IDataRepo};
+use crate::data::{Favor, Favors, IDataRepo, RecipeState};
 
 use super::SolverCtx;
 
@@ -61,6 +61,7 @@ pub trait SolverWithBatch {
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
+        filter: impl Fn(&[Option<RecipeState>; 6]) -> bool,
         cb: impl FnMut(&BatchWithBatch),
     ) where
         T: IDataRepo;
@@ -84,7 +85,7 @@ pub trait SolverWithBatch {
         T: IDataRepo,
     {
         let mut result = vec![];
-        self.solve_fn(ctx, set, demands, workers, |steps| {
+        self.solve_fn(ctx, set, demands, workers, |_|true, |steps| {
             result.push(*steps);
         });
         result
@@ -103,7 +104,7 @@ pub trait SolverWithBatch {
     {
         // 结果排序
         let mut heap = BinaryHeap::new();
-        self.solve_fn(ctx, set, demands, workers, |item| {
+        self.solve_fn(ctx, set, demands, workers, |_|true, |item| {
             let mut item = *item;
             item.cmp_value = match ctx.limit.with_cost {
                 true => {
@@ -133,7 +134,7 @@ pub trait SolverWithBatch {
     {
         let mut max_val = 0;
         let mut max_batch = BatchWithBatch::from_batch(Batch::new());
-        self.solve_fn(ctx, set, demands, workers, |item| {
+        self.solve_fn(ctx, set, demands, workers, |_|true, |item| {
             let val = match ctx.limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
@@ -163,7 +164,7 @@ pub trait SolverWithBatch {
     {
         let mut max_val = 0;
         let mut max_batch = BatchWithBatch::from_batch(Batch::new());
-        self.solve_fn(ctx, set, demands, workers, |item| {
+        self.solve_fn(ctx, set, demands, workers, |_|true, |item| {
             let val = match ctx.limit.with_cost {
                 true => {
                     ((item.batch.value - item.batch.cost) * workers as u16)
@@ -194,7 +195,7 @@ pub trait SolverWithBatch {
     {
         // 结果排序
         let mut heap = BinaryHeap::new();
-        self.solve_fn(ctx, set, demands, workers, |item| {
+        self.solve_fn(ctx, set, demands, workers, |_|true, |item| {
             let mut item = *item;
             let val = match ctx.limit.with_cost {
                 true => {
@@ -217,5 +218,66 @@ pub trait SolverWithBatch {
             }
         });
         heap.into_sorted_vec()
+    }
+
+    /// 解猫耳小员
+    fn solve_favor_best<'a, T>(
+        &mut self,
+        ctx: &SolverCtx<'a, T>,
+        set: &[(u8, [u8; 6])],
+        demands: &[i8],
+        workers: u8,
+        favors: &[Favor],
+    ) -> BatchWithBatch
+    where
+        T: IDataRepo,
+    {
+        let sum: u8 = favors.iter().map(|x| 
+            match ctx.repo.recipe(x.id as usize).craft_time > 0  {
+            true => x.num,
+            false => 0,
+        }).sum();
+        if sum == 0 {
+            return self.solve_best(ctx, set, demands, workers);
+        }
+
+        let mut max_val = 0;
+        let mut max_batch = BatchWithBatch::from_batch(Batch::new());
+        self.solve_fn(ctx, set, demands, workers, |recipe| {
+            for step in recipe {
+                match step {
+                    None => return false,
+                    Some(step) => {
+                        for f in favors {
+                            if f.num > 0 && f.id == step.id() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            false
+        }, |item| {
+            let val = match ctx.limit.with_cost {
+                true => {
+                    ((item.batch.value - item.batch.cost) * workers as u16)
+                        + (item.value - item.cost)
+                }
+                false => (item.batch.value) * workers as u16 + (item.value),
+            };
+            let mut fav_counter = Favors::<3>::new(favors);
+            for i in 0..item.batch.seq {
+                fav_counter.add(item.batch.steps[i as usize], match i == 0 {
+                    true => 1 * workers,
+                    false => 2 * workers,
+                })
+            }
+            let cmp_value = ((fav_counter.value() as u16) << 10) + val;
+            if cmp_value > max_val {
+                max_batch = *item;
+                max_val = cmp_value
+            }
+        });
+        max_batch
     }
 }

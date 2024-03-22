@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use mji_craftwork::{
-    data::IDataRepo,
+    data::{Favor, IDataRepo},
     gsolver::{GSolver, MildSolver, RadicalSolver},
     simulator::{simulate_batch_seq, simulate_multi_batch},
     solver::{
@@ -163,6 +163,13 @@ fn solver_multi_benchmark(c: &mut Criterion) {
                 2,
             )
         })
+    });
+
+    let favors = [Favor::new(56, 8), Favor::new(60, 6), Favor::new(43, 8)];
+
+    // 暴力搜索，排序前100
+    group.bench_function(BenchmarkId::new("favor", 100), |b| {
+        b.iter(|| SolverWithBatch::solve_favor(&mut solver, black_box(&ctx), black_box(&set), black_box(&demands), 1, &favors))
     });
 }
 

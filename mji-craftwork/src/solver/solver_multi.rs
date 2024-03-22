@@ -25,12 +25,22 @@ impl Batches {
             cmp_value: 0,
         }
     }
+
+    pub fn from_single_batch(batch: Batch, worker: u8) -> Self {
+        Batches {
+            batches: [(worker, batch), (0, Batch::new())],
+            value: batch.value * worker as u16,
+            cost: batch.cost * worker as u16,
+            cmp_value: 0
+        }
+    }
+
     pub fn from_batch(batches: &[(u8, Batch)]) -> Self {
         let mut value = 0;
         let mut cost = 0;
-        for b in batches {
-            value += b.0 as u16 * b.1.value;
-            cost += b.0 as u16 * b.1.cost;
+        for (worker, batch) in batches {
+            value += *worker as u16 * batch.value;
+            cost += *worker as u16 * batch.cost;
         }
         Batches {
             batches: [batches[0], batches[1]],
@@ -39,19 +49,29 @@ impl Batches {
             cmp_value: 0,
         }
     }
+
     pub fn set_result(&mut self, batches: &[(u8, Batch)]) {
         self.batches[0] = batches[0];
         self.batches[1] = batches[1];
+        self.update_values();
+    }
 
+    fn update_values(&mut self) {
         let mut value = 0;
         let mut cost = 0;
-        for b in batches {
-            value += b.0 as u16 * b.1.value;
-            cost += b.0 as u16 * b.1.cost;
+        for (worker, batch) in &self.batches {
+            value += *worker as u16 * batch.value;
+            cost += *worker as u16 * batch.cost;
         }
         self.value = value;
         self.cost = cost;
     }
+
+    pub fn set_second_result(&mut self, batch: Batch, worker: u8) {
+        self.batches[1] = (worker, batch);
+        self.update_values();
+    }
+
     /// 干劲增加量
     pub fn tension_add(&self) -> u8 {
         let mut tension = 0;

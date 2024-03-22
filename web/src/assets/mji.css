@@ -66,3 +66,8 @@ button.mji {
 button.mji:hover {
   filter: brightness(1.1);
 }
+
+button.mji[disabled] {
+  filter: grayscale(1);
+  cursor: auto;
+}

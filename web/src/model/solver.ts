@@ -433,6 +433,20 @@ export class SolverProxy {
     }
 
     /**
+     * 解静态猫票
+     * @param banList 禁用列表
+     * @returns 
+     */
+    async solveWeekFavor(banList: number[], favors: FavorItem[]): Promise<WorkerSteps[][]> {
+        const info = this.infoWithTension(0);
+        const banArr = new Uint8Array(banList);
+        const patternArr = new Uint8Array(this.config.demandPatterns);
+
+        const arr = await this.solver.solve_week_favor(info, this.config.level, banArr, 24, this.config.withCost, patternArr, FavorItem.toU8Array(favors));
+        return WorkerSteps.fromSolverArray(arr);
+    }
+
+    /**
      * 清理求解缓存
      * @returns 
      */

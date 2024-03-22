@@ -1,5 +1,5 @@
 use crate::{
-    data::IDataRepo,
+    data::{Favor, IDataRepo},
     predition::DemandPattern,
     simulator::Batch,
     solver::{Batches, SolverCtx},
@@ -11,6 +11,8 @@ mod radical;
 pub use radical::RadicalSolver;
 mod mild_multi;
 pub use mild_multi::MildMulitSolver;
+mod favor;
+pub use favor::FavorSolver;
 
 /// Global Solver 整周排班求解器
 pub trait GSolver {
@@ -52,6 +54,13 @@ pub trait GMultiSolver {
         }
         max_result
     }
+}
+
+/// Global Favor Solver 简易猫票求解器
+pub trait GFavorSolver {
+    fn solve<'a, T>(&mut self, ctx: &mut SolverCtx<'a, T>, pat: &[DemandPattern], favors: &[Favor]) -> [Option<Batches>; 6]
+    where
+        T: IDataRepo;
 }
 
 pub fn print_week_result(arr: &[Option<Batches>]) {

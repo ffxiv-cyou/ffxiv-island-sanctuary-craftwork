@@ -32,6 +32,8 @@ pub fn get_demand(pattern: DemandPattern, day: u8, _offset: u8) -> i8 {
 }
 
 /// 根据变动Pattern获取需求
+///
+/// day 从0开始
 pub fn get_demands(pattern: &[DemandPattern], day: u8) -> Vec<i8> {
     let mut demands = vec![];
     for p in pattern {

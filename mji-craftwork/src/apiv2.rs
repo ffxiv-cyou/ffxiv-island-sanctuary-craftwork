@@ -2,7 +2,7 @@ use std::convert::TryInto;
 
 use crate::{
     data::{CraftworkInfo, Favor, GameDataRepo},
-    gsolver::{GMultiSolver, GSolver, MildMulitSolver, MildSolver},
+    gsolver::{FavorSolver, GFavorSolver, GMultiSolver, GSolver, MildMulitSolver, MildSolver},
     init_repo,
     predition::DemandPattern,
     simulate_multi,
@@ -19,6 +19,7 @@ pub struct APIv2 {
     day_solver_dual: AdvancedSimplifySolver<BFSolver>,
     week_solver_single: MildSolver,
     week_solver_dual: MildMulitSolver<AdvancedSimplifySolver<BFSolver>>,
+    week_solver_favor: FavorSolver<MildSolver, BFSolver>,
 }
 
 /// 初始化 V2 版本的 API
@@ -37,6 +38,7 @@ pub fn init_api_v2(recipes: Vec<u16>, pop_pattern: Vec<u8>, pop_pattern_row: usi
         day_solver_dual: AdvancedSimplifySolver::new(BFSolver::new()),
         week_solver_single: MildSolver::new(),
         week_solver_dual: MildMulitSolver::new(AdvancedSimplifySolver::new(BFSolver::new())),
+        week_solver_favor: FavorSolver::new(MildSolver::new(), BFSolver::new())
     }
 }
 
@@ -329,4 +331,63 @@ impl APIv2 {
         }
         ret
     }
+
+    /// 尝试求解静态猫票
+    ///
+    /// 传入的是需求趋势模式数组
+    pub fn solve_week_favor(
+        &mut self,
+        state: &CraftworkInfo,
+        level: u8,
+        ban_list: &[u8],
+        time: u8,
+        with_cost: bool,
+        pattern: &[u8],
+        favors: &[u8],
+    ) -> Vec<u16> {
+        let limit = SolveLimit::new(level, ban_list, time, with_cost);
+        let mut ctx = SolverCtx::new(&self.repo, state.clone(), limit);
+
+        let mut favor_list = vec![];
+        for i in (0..favors.len()).step_by(2) {
+            favor_list.push(Favor::from_array(&favors[i..i+2]));
+        }
+
+        let vec = DemandPattern::from_u8(pattern);
+        let batches = self.week_solver_favor.solve(&mut ctx, &vec, &favor_list);
+
+        let mut ret = vec![];
+        for batch in batches {
+            match batch {
+                None => {
+                    ret.push(0); // val
+                    ret.push(0); // cost
+                    ret.push(0); // worker types
+                }
+                Some(batch) => {
+                    ret.push(batch.value);
+                    ret.push(batch.cost);
+
+                    let index = ret.len();
+                    ret.push(batch.batches.len() as u16);
+
+                    for (worker, batch) in batch.batches {
+                        // 跳过空的
+                        if worker == 0 {
+                            ret[index] -= 1;
+                            continue;
+                        }
+                        ret.push(worker as u16);
+                        ret.push(batch.seq as u16);
+                        for i in batch.get_steps() {
+                            ret.push(*i as u16);
+                        }
+                        ret.extend_from_slice(batch.get_values());
+                    }
+                }
+            }
+        }
+        ret
+    }
+
 }

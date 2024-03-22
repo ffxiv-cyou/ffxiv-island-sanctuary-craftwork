@@ -1,5 +1,5 @@
 use crate::{
-    data::{CraftworkInfo, IDataRepo},
+    data::{CraftworkInfo, IDataRepo, RecipeState},
     simulator::{simulate, simulate_multi_batch},
 };
 
@@ -94,6 +94,7 @@ impl SolverWithBatch for BFSolver {
         set: &[(u8, [u8; 6])],
         demands: &[i8],
         workers: u8,
+        filter: impl Fn(&[Option<RecipeState>; 6]) -> bool,
         mut cb: impl FnMut(&BatchWithBatch),
     ) where
         T: IDataRepo,
@@ -116,9 +117,9 @@ impl SolverWithBatch for BFSolver {
         let mut pos = 0;
         let mut sum_time = 0;
         loop {
+            // 需要改的recipe
+            let recipe = &mut recipes[set.len()].1;
             {
-                // 需要改的recipe
-                let recipe = &mut recipes[set.len()].1;
                 let mut curr_id = match recipe[pos] {
                     None => 0,
                     Some(r) => r.id() as usize,
@@ -184,6 +185,10 @@ impl SolverWithBatch for BFSolver {
             if sum_time + 4 <= ctx.limit.time as u8 && pos < 6 - 1 {
                 // 还可以，继续插入！
                 pos += 1;
+                continue;
+            }
+
+            if !filter(recipe) {
                 continue;
             }
 

@@ -52,12 +52,12 @@ pub fn empty_demands() -> Vec<i8> {
 
 /// 新建一个通用求解限制
 pub fn make_limit(ban: &[u8]) -> SolveLimit {
-    SolveLimit::new(16, ban, 24, false)
+    SolveLimit::new(20, ban, 24, false)
 }
 
 /// 新建一个通用工房信息
 pub fn make_info() -> CraftworkInfo {
-    CraftworkInfo::new(0, 35, 2, 3)
+    CraftworkInfo::new(0, 45, 4, 3)
 }
 
 /// 使用最常用配置创建库

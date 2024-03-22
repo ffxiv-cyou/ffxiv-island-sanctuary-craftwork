@@ -2,6 +2,8 @@ use std::cmp::min;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
+use crate::simulator::Batch;
+
 /// 猫耳小员委托Item
 #[derive(Clone, Copy, Debug)]
 #[wasm_bindgen]
@@ -54,6 +56,15 @@ impl<'a, const T: usize> Favors<'a, T> {
         }
     }
 
+    pub fn add_seq(&mut self, batch: &Batch, workers: u8) {
+        for i in 0..batch.seq {
+            self.add(batch.steps[i as usize], match i == 0 {
+                true => 1 * workers,
+                false => 2 * workers,
+            })
+        }
+    }
+
     pub fn value(&self) -> u8 {
         let mut sum = 0;
         for i in 0..min(T, self.items.len()) {
@@ -68,5 +79,20 @@ impl<'a, const T: usize> Favors<'a, T> {
             };
         }
         sum
+    }
+
+    pub fn to_favors(&self) -> [Favor; T] {
+        let mut arr = [Favor::new(0, 0); T];
+        let len = min(T, self.items.len());
+        arr[0..len].clone_from_slice(self.items);
+
+        for i in 0..len {
+            arr[i].num = match arr[i].num > self.sum[i] {
+                true => arr[i].num - self.sum[i],
+                false => 0,
+            };
+        }
+
+        arr
     }
 }

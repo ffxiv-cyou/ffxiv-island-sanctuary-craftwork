@@ -12,6 +12,36 @@
         @apply="applyWorkerSteps"
       />
     </popup>
+    <popup v-show="isSolveFavor" @close="isSolveFavor = false">
+      <div class="mji-wooden-plate">
+        <div class="mji-title mji-text-brown">猫耳小员的委托</div>
+        <div class="solve-favor-body">
+          <div class="solve-favor-item mji-step-box" v-for="(item, index) in solveFavors" :key="index" @click="editFavor(-1, index)">
+            <icon class="item" :class="getFavorIcon(item.id)" />
+            <div class="favor-item-body">
+              <span>{{getFavorName(item.id)}}</span>
+            </div>
+          </div>
+          <div class="solve-favor-item" v-if="solveFavors.length < 3" @click="editFavor(-1, solveFavors.length)">
+            <button class="plan-add">
+              <icon class="sched sched-add" />
+            </button>
+          </div>
+        </div>
+        <div
+          class="mji-footer"
+          style="text-align: right;"
+        >
+          <button
+            class="mji mji-text-brown"
+            @click="createPlanFromFavor"
+            :disabled="solveFavors.length < 3"
+          >
+            求解
+          </button>
+        </div>
+      </div>    
+    </popup>
     <popup
       v-show="isLoading"
       :no-close="true"
@@ -90,17 +120,24 @@
       <div class="control-buttons">
         <button
           class="pure-button"
-          style="width: 70%"
+          style="width: 50%"
           @click="createPlan"
         >
           新建排班表
         </button>
         <button
           class="pure-button"
-          style="width: calc(30% - 5px)"
+          style="width: calc(50% - 56px - 5px - 5px)"
           @click="createPlanFromSolve"
         >
           手气不错
+        </button>
+        <button
+          class="pure-button"
+          style="width: 56px"
+          @click="isSolveFavor = true"
+        >
+          <icon class="mji mji-nekomimi" style="--scale:0.6" />
         </button>
       </div>
     </div>
@@ -116,6 +153,7 @@ import Plan from "../components/Plan.vue"
 import Dialog from "@/components/Dialog.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ItemSelection from "@/components/ItemSelection.vue";
+import { CraftworkData } from "@/data/data";
 @Component({
   components: {
     Plan: Plan,
@@ -176,6 +214,11 @@ export default class PlanView extends Vue {
    * 求解整周的状态
    */
   isLoading = false;
+
+  /**
+   * 猫票选择状态
+   */
+  isSolveFavor = false;
 
   /**
    * 配方选择器状态
@@ -340,6 +383,8 @@ export default class PlanView extends Vue {
     this.recipePicker = true;
   }
 
+  solveFavors: FavorItem[] = [];
+
   applyFavor(id: number) {
     let num = 6;
     switch(this.solver.Recipes[id].Time) {
@@ -351,8 +396,20 @@ export default class PlanView extends Vue {
         num = 6;
         break;
     }
-    this.workerPlans[this.currentPlan].favors[this.currentFavor] = new FavorItem(id, num);
+    if (this.currentPlan < 0) {
+      this.solveFavors[this.currentFavor] = new FavorItem(id, num);
+    } else {
+      this.workerPlans[this.currentPlan].favors[this.currentFavor] = new FavorItem(id, num);
+    }
     this.recipePicker = false;
+  }
+  
+  getFavorIcon(id: number) {
+    return "item-" +  this.solver.Recipes[id].Icon;
+  }
+
+  getFavorName(id: number) {
+    return CraftworkData.TrimName(this.solver.Recipes[id].Name);
   }
 
   /**
@@ -505,7 +562,7 @@ export default class PlanView extends Vue {
       this.totalProgress = 30;
       await this.solver.solveCacheClear();
       for (let i = 0; i < 30; i++) {
-        let result = await this.solver.solveWeekPartly([], i);
+        let result = await this.solver.solveWeekPartly(this.solver.config.defaultBanList, i);
         this.progress = i;
         this.lastProgressTime = new Date().getTime();
         if (result[0] > maxValue) {
@@ -515,7 +572,7 @@ export default class PlanView extends Vue {
       }
     } else {
       this.totalProgress = 1;
-      maxSteps = await this.solver.solveWeek([]);
+      maxSteps = await this.solver.solveWeek(this.solver.config.defaultBanList);
     }
 
     let empty: WorkerSteps[][] = [[]];
@@ -526,6 +583,32 @@ export default class PlanView extends Vue {
     this.isLoading = false;
     clearInterval(handler);
   }
+
+  /**
+   * 新建一个排班表
+   */
+   async createPlanFromFavor() {
+    this.isSolveFavor = false;
+    this.isLoading = true;
+    this.progress = 0;
+    this.beginTime = new Date().getTime();
+    this.lastProgressTime = 0;
+    this.updateNow();
+    let handler = setInterval(this.updateNow, 1000);
+
+    this.totalProgress = 1;
+    let maxSteps = await this.solver.solveWeekFavor(this.solver.config.defaultBanList, this.solveFavors);
+
+    let empty: WorkerSteps[][] = [[]];
+    let plan = new WorkerPlan(empty.concat(maxSteps));
+    plan.favors = this.solveFavors;
+    this.workerPlans.push(plan);
+    this.onStepChange();
+
+    this.isLoading = false;
+    clearInterval(handler);
+  }
+
 
   planMigrate(steps: number[][]): WorkerSteps[][] {
     let arr = [];
@@ -624,5 +707,34 @@ class WorkerPlan {
 
 .progress {
   width: 300px;
+}
+
+.solve-favor-body {
+  width: 300px;
+}
+
+.solve-favor-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+  cursor: pointer;
+
+  &:hover{
+    background-color: rgba(214, 211, 206, 0.85);
+  }
+
+  .item {
+    width: 40px 0;
+  }
+  .favor-item-body {
+    width: calc(100% - 40px - 5px);
+    span {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 </style>

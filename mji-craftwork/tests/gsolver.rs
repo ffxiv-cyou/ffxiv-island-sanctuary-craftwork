@@ -1,7 +1,7 @@
 use mji_craftwork::{
-    data::CraftworkInfo,
+    data::{CraftworkInfo, Favor},
     gsolver::{
-        print_week_result, GMultiSolver, GSolver, MildMulitSolver, MildSolver, RadicalSolver,
+        print_week_result, FavorSolver, GFavorSolver, GMultiSolver, GSolver, MildMulitSolver, MildSolver, RadicalSolver
     },
     predition::DemandPattern,
     simulator::Batch,
@@ -127,6 +127,27 @@ fn test_gsolver_mild_multi() {
     let ctx = SolverCtx::new(&repo, info, limit);
 
     let result = solver.solve(&ctx, &pat);
+    println!("code: {}", to_plan_code(&result));
+    print_week_result(&result);
+}
+
+#[test]
+fn test_gsolver_favor() {
+    let limit = make_limit(&[]);
+
+    let (repo, mut info, pat) =
+        from_pattern_code(b"G7AmgbJbpypjsbNMVZQkzKlkdonFyhg5gTenJkwVc5uYtGo1ghxnNLlYAAAAAAA");
+    info.workers = 4;
+
+    let mut solver = FavorSolver::new(MildSolver::new(), BFSolver::new());
+    let mut ctx = SolverCtx::new(&repo, info, limit);
+    let favors = [
+        Favor::new(56, 8),
+        Favor::new(80, 6),
+        Favor::new(43, 8)
+    ];
+
+    let result = solver.solve(&mut ctx, &pat, &favors);
     println!("code: {}", to_plan_code(&result));
     print_week_result(&result);
 }
