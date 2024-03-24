@@ -75,6 +75,7 @@
           :worker-steps="shareSteps"
           :hide-share="true"
           :hide-btn="true"
+          :favors="[]"
         >
           <template #header>
             <div class="mji-title">
