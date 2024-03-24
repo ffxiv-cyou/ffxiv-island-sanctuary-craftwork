@@ -26,7 +26,7 @@
             min="1"
             :max="workers"
           >
-          <span class="pure-form-message-inline">设置排班表中每天能够配置多少种不同的配方</span>
+          <span class="pure-form-message-inline">影响整周求解时使用的算法类型。若大于1则会使用多工坊求解算法，求解速度会降低。</span>
         </div>
       </fieldset>
       <fieldset>
@@ -65,7 +65,7 @@
             max="45"
             placeholder="0-45"
           >
-          <span class="pure-form-message-inline">工坊的干劲上限，影响产品价格。通常不需要修改。</span>
+          <span class="pure-form-message-inline">工坊的干劲上限（0-45），影响产品价格。通常不需要修改。</span>
         </div>
         <div class="pure-control-group">
           <label for="workers">工坊数量</label>
@@ -77,7 +77,7 @@
             max="4"
             placeholder="1-4"
           >
-          <span class="pure-form-message-inline">同时工作的工坊数量，影响需求变动和干劲叠加的计算。</span>
+          <span class="pure-form-message-inline">可用工坊数量（1-4），影响求解时配置工坊数量上限。</span>
         </div>
       </fieldset>
       <fieldset>
@@ -167,7 +167,7 @@
             >
             显示详细信息弹窗
           </label>
-          <span class="pure-form-message-inline">指向排班表或求解器上的指定配方时，显示配方的详细信息。</span>
+          <span class="pure-form-message-inline">指向排班表或求解器上的配方时，显示配方的详细信息。</span>
         </div>
       </fieldset>
     </div>
