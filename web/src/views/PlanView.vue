@@ -14,7 +14,10 @@
     </popup>
     <popup v-show="isSolveFavor" @close="isSolveFavor = false">
       <div class="mji-wooden-plate">
-        <div class="mji-title mji-text-brown">猫耳小员的委托</div>
+        <div class="mji-title mji-text-brown">
+          猫耳小员的委托
+          <span class="mji mji-text-orange mji-text-small" style="float: right;">不保证方案最优</span>
+        </div>
         <div class="solve-favor-body">
           <div class="solve-favor-item mji-step-box" v-for="(item, index) in solveFavors" :key="index" @click="editFavor(-1, index)">
             <icon class="item" :class="getFavorIcon(item.id)" />
@@ -32,6 +35,7 @@
           class="mji-footer"
           style="text-align: right;"
         >
+          <span class="mji mji-text-orange mji-text-small" v-if="solveFavors[2]?.id === 77" style="margin-right: 1em;">水晶像需要手动调整</span>
           <button
             class="mji mji-text-brown"
             @click="createPlanFromFavor"
