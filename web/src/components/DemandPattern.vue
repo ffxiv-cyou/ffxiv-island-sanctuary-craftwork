@@ -185,7 +185,7 @@ export default class DemandPattern extends Vue {
   }
 
   set popPattern(val: number) {
-    if (val <= 0) return;
+    if (val <= 0 || val > 100) return;
     this.solver.popPattern = val;
   }
 
