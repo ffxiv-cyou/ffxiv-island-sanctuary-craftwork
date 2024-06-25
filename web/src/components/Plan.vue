@@ -118,7 +118,7 @@
             <icon class="mji mji-nekomimi" />
           </div>
           <div class="plan-content">
-            <div v-for="(item, index) in favors" class="plan-favor-item mji-step-box" :key="index" @click="editFavor(index)">
+            <div v-for="(item, index) in favors" class="plan-favor-item mji-step-box" :key="index" @click="editFavor(index)" @mouseenter="evt => onMouseIn(item.id, evt)" @mouseleave="onMouseOut(item.id)">
               <icon class="item" :class="getFavorIcon(item.id)" />
               <div class="favor-item-body">
                 <span class="hide-md">{{getFavorName(item.id)}}</span>
@@ -358,6 +358,14 @@ export default class PlanView extends Vue {
 
   editFavor(index: number) {
     this.$emit("edit-favor", index)
+  }
+
+  onMouseIn(id: number, evt: MouseEvent) {
+    this.solver.event.onHoverEnter(id, evt.clientX, evt.clientY);
+  }
+  
+  onMouseOut(id: number) {
+    this.solver.event.onHoverExit(id);
   }
 }
 </script>

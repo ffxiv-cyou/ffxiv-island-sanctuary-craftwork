@@ -44,7 +44,7 @@
     v-if="solver.config.showItemPopup"
     :id="hoverID"
     ref="detail"
-    :data="solver.data"
+    :solver="solver"
     :style="{ 'top': top + 'px', 'left': left + 'px' }"
   />
 </template>

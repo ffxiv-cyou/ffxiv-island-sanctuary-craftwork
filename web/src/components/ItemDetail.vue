@@ -18,6 +18,7 @@
           <span>Lv.{{ step.Level }}</span>
           <span><icon class="mji mji-clock" />{{ step.Time }}h</span>
           <span><icon class="blue-coin" />{{ step.Price }}</span>
+          <span v-if="pattern"><icon class="mji mji-no-box" />{{ patternName }}</span>
         </div>
       </div>
     </div>
@@ -53,6 +54,8 @@
 </template>
 <script lang="ts">
 import { CraftworkData, type CraftworkObject } from "@/data/data";
+import { PatternNames } from "@/model/data";
+import type { SolverProxy } from "@/model/solver";
 import { Component, Vue, Prop } from "vue-facing-decorator";
 @Component({})
 export default class ItemDetailComponent extends Vue {
@@ -63,8 +66,18 @@ export default class ItemDetailComponent extends Vue {
     return this.data.GetRecipe(this.id);
   }
 
+  get data() {
+    return this.solver.data;
+  }
+
   @Prop()
-  data!: CraftworkData;
+  solver!: SolverProxy;
+
+  get pattern(): number | undefined {
+    if (this.step.Id >= this.solver.config.demandPatterns.length)
+      return undefined;
+    return this.solver.config.demandPatterns[this.step.Id];
+  }
 
   ingridientName(id: number) {
     if (!this.data) return "";
@@ -74,7 +87,10 @@ export default class ItemDetailComponent extends Vue {
   get name() {
     return CraftworkData.TrimName(this.step.Name);
   }
-
+  get patternName(): string {
+    if (this.pattern === undefined) return PatternNames[0];
+    return PatternNames[this.pattern];
+  }
   get theme0() {
     return this.data.GetTheme(this.step.Theme0);
   }
