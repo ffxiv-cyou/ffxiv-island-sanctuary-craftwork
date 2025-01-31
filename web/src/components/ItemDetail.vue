@@ -19,6 +19,7 @@
           <span><icon class="mji mji-clock" />{{ step.Time }}h</span>
           <span><icon class="blue-coin" />{{ step.Price }}</span>
           <span v-if="pattern"><icon class="mji mji-no-box" />{{ patternName }}</span>
+          <span v-if="pop"><icon class="mji" :class="pop" /></span>
         </div>
       </div>
     </div>
@@ -77,6 +78,13 @@ export default class ItemDetailComponent extends Vue {
     if (this.step.Id >= this.solver.config.demandPatterns.length)
       return undefined;
     return this.solver.config.demandPatterns[this.step.Id];
+  }
+
+  get pop(): string | undefined {
+    let pop = this.solver.Popularity[this.solver.popPattern];
+    if (this.step.Id >= pop.length)
+      return undefined;
+    return "mji-popular-" + pop[this.step.Id].toString();
   }
 
   ingridientName(id: number) {
