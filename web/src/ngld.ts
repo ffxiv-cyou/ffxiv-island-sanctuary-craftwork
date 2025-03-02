@@ -24,6 +24,7 @@ if (link != null) {
 }
 
 function setContent(content: string) {
+  console.log("craftwork data:", content);
   if (element != null) {
     element.setAttribute('href', basePath + "/#/pred/" + content);
     element.innerText = "解析";
@@ -31,6 +32,7 @@ function setContent(content: string) {
 }
 
 function onZoneChange(zone: number) {
+  console.log("zone change:", zone);
   if (zone == 1055) {
     showText();
   } else {
@@ -62,8 +64,8 @@ function toggleText() {
 const config = new Config(0);
 let version = config.region;
 
-const versionText = ["6.5", "6.5", "6.4"];
-const packetLen = [96, 96, 88];
+const versionText = ["7.1", "7.1", "7.1"];
+const packetLen = [96, 96, 96];
 
 function toggleVersion() {
   version = (version + 1) % packetLen.length;
