@@ -1,15 +1,43 @@
 <template>
   <div>
     <popup
-      v-if="inputShareCode"
+      v-if="shareCode"
       :no-close="true"
     >
       <DemandShare
         class="demand-share"
         :solver="solver"
-        :share-code="inputShareCode"
+        :share-code="shareCode"
         @on-apply="onShareApply"
       />
+    </popup>
+    <popup
+      v-else-if="showCurrentPopup"
+      @close="hideCurrentPopup = true"
+    >
+      <div class="mji-wooden-plate">
+        <div class="mji-title mji-text-brown">提示</div>
+        <div class="mji-text-brown">
+          今天是无人岛第 {{ currentWeek + 1 }} 周<br>要使用内置的需求趋势吗？
+        </div>
+        <div
+          class="mji-footer"
+          style="text-align: right;"
+        >
+          <button 
+            class="mji mji-text-brown"
+            @click="useCurrent"
+          >
+            使用
+          </button>
+          <button
+            class="mji mji-text-brown"
+            @click="hideCurrentPopup = true"
+          >
+            取消
+          </button>
+        </div>
+      </div>
     </popup>
     <div class="control-form pure-form">
       <fieldset class="pure-g">
@@ -142,10 +170,12 @@ import type { SolverProxy } from "@/model/solver";
 import { Component, Prop, Vue, Watch } from "vue-facing-decorator";
 import { DemandUtils, PatternNames } from "@/model/data";
 import { CraftworkData, CraftworkObject } from "@/data/data";
+import HistoryPattern from "@/data/pattern.json";
 import SortLabel from "./SortLabel.vue";
 import Dialog from "./Dialog.vue";
 import DemandShare from "./DemandShare.vue";
 import MjiBox from "./MjiBox.vue";
+import { FromShareCode } from "@/model/share";
 
 @Component({
   emits: [
@@ -168,6 +198,12 @@ export default class DemandPattern extends Vue {
   @Prop()
   inputShareCode?: string;
 
+  hideCurrentPopup = false;
+  
+  get showCurrentPopup() {
+    return !this.hideCurrentPopup && this.solver.popPattern !== this.currentPopPattern;
+  }
+
   get config() {
     return this.solver.config;
   }
@@ -187,6 +223,32 @@ export default class DemandPattern extends Vue {
   set popPattern(val: number) {
     if (val <= 0 || val > 100) return;
     this.solver.popPattern = val;
+  }
+
+  currentCode = "";
+  get shareCode() {
+    return this.inputShareCode || this.currentCode;
+  }
+  
+  get currentWeek() {
+    const now = new Date();
+    const start = 1661241600000; // 2022-08-23 16:00:00 GMT+8
+    const diff = now.getTime() - start;
+    return Math.floor(diff / (7 * 24 * 3600 * 1000));
+  }
+
+  get currentShareCode() {
+    const index = this.currentWeek % HistoryPattern.length;
+    return HistoryPattern[index];
+  }
+
+  get currentPopPattern() {
+    return FromShareCode(this.currentShareCode)[0];
+  }
+
+  useCurrent() {
+    this.currentCode = this.currentShareCode;
+    this.hideCurrentPopup = true;
   }
 
   get shareLink() {
@@ -305,6 +367,7 @@ export default class DemandPattern extends Vue {
   }
 
   onShareApply() {
+    this.currentCode = "";
     this.$router.push('/pred');
   }
 
